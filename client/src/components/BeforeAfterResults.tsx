@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useCallback } from "react";
+import { getImage } from "@/assets/imageImports";
 
 interface BeforeAfterItem {
   id: string;
@@ -31,22 +32,9 @@ const beforeAfterItems: BeforeAfterItem[] = [
 ];
 
 export default function BeforeAfterResults() {
+  // Use the centralized image getter function
   const getImagePath = useCallback((filename: string) => {
-    try {
-      // Use a placeholder image if the specified one fails to load
-      const defaultImage = new URL(`@assets/images/Beige Nude Aesthetic Feminine Modern Gynecology Health Clinic Branding Logo.png`, import.meta.url).href;
-      if (!filename) return defaultImage;
-      
-      try {
-        const path = new URL(`@assets/images/${filename}`, import.meta.url).href;
-        return path;
-      } catch (e) {
-        return defaultImage;
-      }
-    } catch (error) {
-      console.error("Error loading image:", error);
-      return "";
-    }
+    return getImage(filename);
   }, []);
 
   return (

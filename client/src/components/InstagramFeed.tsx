@@ -1,18 +1,14 @@
 import { Heart } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { useCallback } from "react";
+import { getImage } from "@/assets/imageImports";
 
 export default function InstagramFeed() {
   const { instagramPosts } = useStore();
 
+  // Use the centralized image getter function
   const getImagePath = useCallback((filename: string) => {
-    try {
-      const path = new URL(`@assets/images/${filename}`, import.meta.url).href;
-      return path;
-    } catch (error) {
-      console.error("Error loading image:", error);
-      return "";
-    }
+    return getImage(filename);
   }, []);
 
   return (
