@@ -27,6 +27,10 @@ export default function TreatmentCard({ treatment }: TreatmentCardProps) {
         className="w-full h-64 object-cover" 
         src={getImagePath(image)} 
         alt={`${title} Treatment`} 
+        onError={(e) => {
+          console.error(`Failed to load image: ${image}`);
+          e.currentTarget.src = "https://placehold.co/600x400/e9e2dd/a17a69?text=Image+Unavailable";
+        }}
       />
       <div className="p-6">
         <h3 className="text-2xl font-playfair text-secondary mb-2">{title}</h3>
