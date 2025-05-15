@@ -7,7 +7,7 @@ export default function InstagramFeed() {
 
   const getImagePath = useCallback((filename: string) => {
     try {
-      const path = new URL(`@assets/${filename}`, import.meta.url).href;
+      const path = new URL(`@assets/images/${filename}`, import.meta.url).href;
       return path;
     } catch (error) {
       console.error("Error loading image:", error);
