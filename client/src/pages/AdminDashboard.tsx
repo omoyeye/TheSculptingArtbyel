@@ -101,6 +101,18 @@ export default function AdminDashboard() {
   const productsQuery = useProducts();
   const bookingsQuery = useBookings();
   const ordersQuery = useOrders();
+  
+  // Filtered data helpers
+  const filteredTreatments = treatmentsQuery.data?.filter(treatment => 
+    treatment.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    treatment.description.toLowerCase().includes(searchQuery.toLowerCase())
+  ) || [];
+  
+  const filteredProducts = productsQuery.data?.filter(product => 
+    product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    product.category.toLowerCase().includes(searchQuery.toLowerCase())
+  ) || [];
   const testimonialsQuery = useTestimonials();
   const galleryItemsQuery = useGalleryItems();
   const instagramPostsQuery = useInstagramPosts();
@@ -380,17 +392,7 @@ export default function AdminDashboard() {
     { id: "1005", customer: "Maria Garcia", products: "Firming Body Cream, Detox Body Scrub", total: 86.00, status: "completed" },
   ];
   
-  // Filter treatments and products based on search query
-  const filteredTreatments = treatments.filter(treatment => 
-    treatment.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    treatment.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  
-  const filteredProducts = products.filter(product => 
-    product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    product.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Using filteredTreatments and filteredProducts defined above
   
   const handleSaveChanges = () => {
     toast({

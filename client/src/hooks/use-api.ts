@@ -227,8 +227,8 @@ export function useDeleteTestimonial(): UseMutationResult<void, Error, number> {
 }
 
 // Gallery Items
-export function useGalleryItems(category?: string): UseQueryResult<GalleryItem[]> {
-  return useQuery({
+export function useGalleryItems(category?: string): UseQueryResult<GalleryItem[], Error> {
+  return useQuery<GalleryItem[], Error>({
     queryKey: category ? ['/api/gallery', { category }] : ['/api/gallery'],
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
@@ -268,8 +268,8 @@ export function useDeleteGalleryItem(): UseMutationResult<void, Error, number> {
 }
 
 // Instagram Posts
-export function useInstagramPosts(): UseQueryResult<InstagramPost[]> {
-  return useQuery({
+export function useInstagramPosts(): UseQueryResult<InstagramPost[], Error> {
+  return useQuery<InstagramPost[], Error>({
     queryKey: ['/api/instagram'],
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
