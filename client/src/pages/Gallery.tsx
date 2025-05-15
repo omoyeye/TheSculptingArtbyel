@@ -25,19 +25,37 @@ export default function Gallery() {
       id: "before-after-1",
       title: "Abdominal Sculpting Results",
       category: "Before & After",
-      image: "Before After Beauty Skincare Minimlasit Instagram Post.png"
+      image: "images/Before After Beauty Skincare Minimlasit Instagram Post.png"
     },
     {
       id: "before-after-2",
       title: "Facial Contouring Results",
       category: "Before & After",
-      image: "Screenshot 2025-05-04 160111.png"
+      image: "images/Screenshot 2025-05-04 160111.png"
     },
     {
       id: "before-after-3",
       title: "Full Body Transformation",
       category: "Before & After",
-      image: "Screenshot 2025-05-04 154211.png"
+      image: "images/Screenshot 2025-05-04 154211.png"
+    },
+    {
+      id: "before-after-4",
+      title: "Male Body Sculpting",
+      category: "Before & After",
+      image: "images/DE40158A-B168-46C1-B082-94E9F91478C5.jpeg"
+    },
+    {
+      id: "before-after-5",
+      title: "Post-Treatment Recovery",
+      category: "Before & After",
+      image: "images/IMG_3361.jpeg"
+    },
+    {
+      id: "before-after-6",
+      title: "Skin Rejuvenation",
+      category: "Before & After",
+      image: "images/FDAFD339-7FA3-4285-9421-7B79CAA669BF.jpeg"
     },
     ...treatments.map(treatment => ({
       id: `treatment-${treatment.id}`,

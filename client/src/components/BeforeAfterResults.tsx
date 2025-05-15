@@ -14,19 +14,19 @@ const beforeAfterItems: BeforeAfterItem[] = [
     id: "1",
     title: "Abdominal Sculpting",
     description: "Wood Therapy + Cavitation (4 sessions)",
-    image: "Before After Beauty Skincare Minimlasit Instagram Post.png",
+    image: "images/Before After Beauty Skincare Minimlasit Instagram Post.png",
   },
   {
     id: "2",
     title: "Facial Contouring",
     description: "Lymphatic Drainage (3 sessions)",
-    image: "Screenshot 2025-05-04 160111.png",
+    image: "images/Screenshot 2025-05-04 160111.png",
   },
   {
     id: "3",
     title: "Full Body Transformation",
     description: "Custom Treatment Plan (8 sessions)",
-    image: "Screenshot 2025-05-04 154211.png",
+    image: "images/Screenshot 2025-05-04 154211.png",
   },
 ];
 
