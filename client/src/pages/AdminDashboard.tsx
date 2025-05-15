@@ -28,7 +28,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { useStore } from "@/lib/store";
 import { 
   Users, 
   ShoppingBag, 
@@ -39,16 +38,209 @@ import {
   PlusCircle,
   Edit,
   Trash2, 
-  Search 
+  Search,
+  Loader2
 } from "lucide-react";
 import { useCallback } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { 
+  useTreatments, 
+  useProducts, 
+  useBookings, 
+  useOrders,
+  useTestimonials,
+  useGalleryItems,
+  useInstagramPosts,
+  useCreateTreatment,
+  useUpdateTreatment,
+  useDeleteTreatment,
+  useCreateProduct,
+  useUpdateProduct,
+  useDeleteProduct,
+  useUpdateBookingStatus,
+  useDeleteBooking,
+  useUpdateOrderStatus,
+  useCreateTestimonial,
+  useUpdateTestimonial,
+  useDeleteTestimonial,
+  useCreateGalleryItem,
+  useUpdateGalleryItem,
+  useDeleteGalleryItem,
+  useCreateInstagramPost,
+  useUpdateInstagramPost,
+  useDeleteInstagramPost
+} from "../hooks/use-api";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const { toast } = useToast();
-  const { treatments, products } = useStore();
-  
   const [searchQuery, setSearchQuery] = useState("");
+  
+  // Fetch data using React Query hooks
+  const treatmentsQuery = useTreatments();
+  const productsQuery = useProducts();
+  const bookingsQuery = useBookings();
+  const ordersQuery = useOrders();
+  const testimonialsQuery = useTestimonials();
+  const galleryItemsQuery = useGalleryItems();
+  const instagramPostsQuery = useInstagramPosts();
+  
+  // Treatment mutations
+  const createTreatmentMutation = useCreateTreatment();
+  const updateTreatmentMutation = useUpdateTreatment();
+  const deleteTreatmentMutation = useDeleteTreatment();
+  
+  // Product mutations
+  const createProductMutation = useCreateProduct();
+  const updateProductMutation = useUpdateProduct();
+  const deleteProductMutation = useDeleteProduct();
+  
+  // Booking mutations
+  const updateBookingStatusMutation = useUpdateBookingStatus();
+  const deleteBookingMutation = useDeleteBooking();
+  
+  // Order mutations
+  const updateOrderStatusMutation = useUpdateOrderStatus();
+  
+  // Testimonial mutations
+  const createTestimonialMutation = useCreateTestimonial();
+  const updateTestimonialMutation = useUpdateTestimonial();
+  const deleteTestimonialMutation = useDeleteTestimonial();
+  
+  // Gallery mutations
+  const createGalleryItemMutation = useCreateGalleryItem();
+  const updateGalleryItemMutation = useUpdateGalleryItem();
+  const deleteGalleryItemMutation = useDeleteGalleryItem();
+  
+  // Instagram mutations
+  const createInstagramPostMutation = useCreateInstagramPost();
+  const updateInstagramPostMutation = useUpdateInstagramPost();
+  const deleteInstagramPostMutation = useDeleteInstagramPost();
+  
+  // Modal states
+  const [treatmentModalOpen, setTreatmentModalOpen] = useState(false);
+  const [editingTreatment, setEditingTreatment] = useState<number | null>(null);
+  
+  // Form schemas
+  const treatmentFormSchema = z.object({
+    title: z.string().min(2, { message: "Title must be at least 2 characters" }),
+    slug: z.string().min(2, { message: "Slug must be at least 2 characters" }),
+    description: z.string().min(10, { message: "Description must be at least 10 characters" }),
+    price: z.coerce.number().min(1, { message: "Price must be at least 1" }),
+    duration: z.coerce.number().min(15, { message: "Duration must be at least 15 minutes" }),
+    image: z.string().min(1, { message: "Image is required" }),
+    featured: z.boolean().nullable().default(false),
+  });
+  
+  // Treatment form
+  const treatmentForm = useForm<z.infer<typeof treatmentFormSchema>>({
+    resolver: zodResolver(treatmentFormSchema),
+    defaultValues: {
+      title: "",
+      slug: "",
+      description: "",
+      price: 0,
+      duration: 60,
+      image: "",
+      featured: false,
+    },
+  });
+  
+  // Treatment handlers
+  const handleAddTreatment = () => {
+    setEditingTreatment(null);
+    treatmentForm.reset({
+      title: "",
+      slug: "",
+      description: "",
+      price: 0,
+      duration: 60,
+      image: "",
+      featured: false,
+    });
+    setTreatmentModalOpen(true);
+  };
+  
+  const handleEditTreatment = (id: number) => {
+    const treatment = treatmentsQuery.data?.find(t => t.id === id);
+    if (treatment) {
+      setEditingTreatment(id);
+      treatmentForm.reset({
+        title: treatment.title,
+        slug: treatment.slug,
+        description: treatment.description,
+        price: Number(treatment.price),
+        duration: treatment.duration,
+        image: treatment.image,
+        featured: treatment.featured || false,
+      });
+      setTreatmentModalOpen(true);
+    }
+  };
+  
+  const handleDeleteTreatment = async (id: number) => {
+    try {
+      await deleteTreatmentMutation.mutateAsync(id);
+      toast({
+        title: "Success",
+        description: "Treatment deleted successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete treatment",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  const onTreatmentSubmit = async (data: z.infer<typeof treatmentFormSchema>) => {
+    try {
+      if (editingTreatment) {
+        await updateTreatmentMutation.mutateAsync({
+          id: editingTreatment,
+          data,
+        });
+        toast({
+          title: "Success",
+          description: "Treatment updated successfully",
+        });
+      } else {
+        await createTreatmentMutation.mutateAsync(data);
+        toast({
+          title: "Success",
+          description: "Treatment created successfully",
+        });
+      }
+      setTreatmentModalOpen(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save treatment",
+        variant: "destructive",
+      });
+    }
+  };
   
   const getImagePath = useCallback((filename: string) => {
     try {
@@ -450,52 +642,241 @@ export default function AdminDashboard() {
             <TabsContent value="treatments" className="space-y-6">
               <div className="flex justify-between items-center">
                 <h2 className="text-3xl font-playfair text-secondary">Manage Treatments</h2>
-                <Button className="bg-secondary hover:bg-secondary/90">
-                  <PlusCircle className="h-4 w-4 mr-2" /> Add Treatment
+                <Button 
+                  className="bg-secondary hover:bg-secondary/90"
+                  onClick={handleAddTreatment}
+                  disabled={createTreatmentMutation.isPending}
+                >
+                  {createTreatmentMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                  )}
+                  Add Treatment
                 </Button>
               </div>
               
               <Card>
                 <CardContent className="pt-6">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Image</TableHead>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>Duration</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredTreatments.map((treatment) => (
-                        <TableRow key={treatment.id}>
-                          <TableCell>
-                            <img 
-                              src={getImagePath(treatment.image)} 
-                              alt={treatment.title} 
-                              className="w-12 h-12 object-cover rounded-md" 
-                            />
-                          </TableCell>
-                          <TableCell>{treatment.title}</TableCell>
-                          <TableCell>${treatment.price.toFixed(2)}</TableCell>
-                          <TableCell>{treatment.duration} min</TableCell>
-                          <TableCell>
-                            <div className="flex items-center space-x-2">
-                              <Button size="sm" variant="outline">
-                                <Edit className="h-4 w-4 mr-1" /> Edit
-                              </Button>
-                              <Button size="sm" variant="destructive">
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
+                  {treatmentsQuery.isLoading ? (
+                    <div className="flex justify-center py-8">
+                      <Loader2 className="h-8 w-8 animate-spin text-secondary" />
+                    </div>
+                  ) : treatmentsQuery.isError ? (
+                    <div className="text-center py-8 text-red-500">
+                      Error loading treatments. Please try again.
+                    </div>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Image</TableHead>
+                          <TableHead>Title</TableHead>
+                          <TableHead>Price</TableHead>
+                          <TableHead>Duration</TableHead>
+                          <TableHead>Featured</TableHead>
+                          <TableHead>Actions</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {treatmentsQuery.data
+                          ?.filter(treatment => 
+                            treatment.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            treatment.description.toLowerCase().includes(searchQuery.toLowerCase())
+                          )
+                          .map((treatment) => (
+                          <TableRow key={treatment.id}>
+                            <TableCell>
+                              <img 
+                                src={getImagePath(treatment.image)} 
+                                alt={treatment.title} 
+                                className="w-12 h-12 object-cover rounded-md" 
+                              />
+                            </TableCell>
+                            <TableCell>{treatment.title}</TableCell>
+                            <TableCell>${Number(treatment.price).toFixed(2)}</TableCell>
+                            <TableCell>{treatment.duration} min</TableCell>
+                            <TableCell>{treatment.featured ? "Yes" : "No"}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center space-x-2">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={() => handleEditTreatment(treatment.id)}
+                                  disabled={updateTreatmentMutation.isPending}
+                                >
+                                  {updateTreatmentMutation.isPending && updateTreatmentMutation.variables?.id === treatment.id ? (
+                                    <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                  ) : (
+                                    <Edit className="h-4 w-4 mr-1" />
+                                  )}
+                                  Edit
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="destructive"
+                                  onClick={() => handleDeleteTreatment(treatment.id)}
+                                  disabled={deleteTreatmentMutation.isPending}
+                                >
+                                  {deleteTreatmentMutation.isPending && deleteTreatmentMutation.variables === treatment.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <Trash2 className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
                 </CardContent>
               </Card>
+              
+              {/* Treatment Form Modal */}
+              <Dialog open={treatmentModalOpen} onOpenChange={setTreatmentModalOpen}>
+                <DialogContent className="sm:max-w-[525px]">
+                  <DialogHeader>
+                    <DialogTitle>
+                      {editingTreatment ? "Edit Treatment" : "Add New Treatment"}
+                    </DialogTitle>
+                    <DialogDescription>
+                      {editingTreatment 
+                        ? "Update the treatment details below."
+                        : "Fill in the details to create a new treatment."}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <Form {...treatmentForm}>
+                    <form onSubmit={treatmentForm.handleSubmit(onTreatmentSubmit)} className="space-y-4">
+                      <FormField
+                        control={treatmentForm.control}
+                        name="title"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Title</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={treatmentForm.control}
+                        name="slug"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Slug</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormDescription>
+                              URL-friendly version of the title (e.g., "wood-therapy")
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={treatmentForm.control}
+                        name="description"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Description</FormLabel>
+                            <FormControl>
+                              <Textarea {...field} rows={4} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={treatmentForm.control}
+                          name="price"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Price ($)</FormLabel>
+                              <FormControl>
+                                <Input type="number" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={treatmentForm.control}
+                          name="duration"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Duration (minutes)</FormLabel>
+                              <FormControl>
+                                <Input type="number" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <FormField
+                        control={treatmentForm.control}
+                        name="image"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Image Filename</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormDescription>
+                              Enter the filename of an uploaded image (e.g., "treatment-image.jpg")
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={treatmentForm.control}
+                        name="featured"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                            <FormControl>
+                              <div className="flex items-center space-x-2">
+                                <input
+                                  type="checkbox"
+                                  checked={field.value as boolean}
+                                  onChange={field.onChange}
+                                  className="h-4 w-4 rounded border-gray-300"
+                                />
+                                <label className="text-sm font-medium leading-none">
+                                  Featured Treatment
+                                </label>
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <DialogFooter>
+                        <Button 
+                          type="submit"
+                          disabled={treatmentForm.formState.isSubmitting}
+                          className="bg-secondary hover:bg-secondary/90"
+                        >
+                          {treatmentForm.formState.isSubmitting ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Saving...
+                            </>
+                          ) : (
+                            "Save Treatment"
+                          )}
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                  </Form>
+                </DialogContent>
+              </Dialog>
             </TabsContent>
             
             {/* Products Tab */}

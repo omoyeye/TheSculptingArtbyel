@@ -23,8 +23,8 @@ export function useTreatments(): UseQueryResult<Treatment[], Error> {
   });
 }
 
-export function useTreatment(slug: string): UseQueryResult<Treatment> {
-  return useQuery({
+export function useTreatment(slug: string): UseQueryResult<Treatment, Error> {
+  return useQuery<Treatment, Error>({
     queryKey: ['/api/treatments', slug],
     enabled: !!slug,
   });
@@ -64,15 +64,15 @@ export function useDeleteTreatment(): UseMutationResult<void, Error, number> {
 }
 
 // Products
-export function useProducts(): UseQueryResult<Product[]> {
-  return useQuery({
+export function useProducts(): UseQueryResult<Product[], Error> {
+  return useQuery<Product[], Error>({
     queryKey: ['/api/products'],
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
 
-export function useProduct(slug: string): UseQueryResult<Product> {
-  return useQuery({
+export function useProduct(slug: string): UseQueryResult<Product, Error> {
+  return useQuery<Product, Error>({
     queryKey: ['/api/products', slug],
     enabled: !!slug,
   });
