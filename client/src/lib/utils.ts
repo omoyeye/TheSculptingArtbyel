@@ -34,7 +34,7 @@ export function truncateText(text: string, maxLength: number): string {
 }
 
 export function getImageUrl(filename: string): string {
-  return `@assets/${filename}`;
+  return `@assets/images/${filename}`;
 }
 
 export const DEFAULT_BOOKING_DURATION = 60; // in minutes

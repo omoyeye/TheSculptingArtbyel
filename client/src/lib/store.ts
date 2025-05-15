@@ -198,27 +198,27 @@ export const useStore = create<StoreState>()(
         },
         {
           id: '2',
-          image: 'Soft Brown Massage Treatment Relaxing Your Body Instagram Story.png',
+          image: 'IMG_3361.jpeg',
           likes: 89,
         },
         {
           id: '3',
-          image: 'Beige Nude Aesthetic Feminine Modern Gynecology Health Clinic Branding Logo.png',
+          image: 'IMG_3362.jpeg',
           likes: 203,
         },
         {
           id: '4',
-          image: 'Screenshot 2025-05-04 154211.png',
+          image: 'DE40158A-B168-46C1-B082-94E9F91478C5.jpeg',
           likes: 134,
         },
         {
           id: '5',
-          image: 'Before After Beauty Skincare Minimlasit Instagram Post.png',
+          image: 'FDAFD339-7FA3-4285-9421-7B79CAA669BF.jpeg',
           likes: 178,
         },
         {
           id: '6',
-          image: 'Screenshot 2025-05-04 160111.png',
+          image: 'Soft Brown Massage Treatment Relaxing Your Body Instagram Story.png',
           likes: 112,
         },
       ],
