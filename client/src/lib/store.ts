@@ -85,7 +85,7 @@ export const useStore = create<StoreState>()(
           description: 'Non-invasive technique using wooden tools to sculpt the body, break down fat, and stimulate the lymphatic system.',
           price: 120,
           duration: 60,
-          image: 'Soft Brown Massage Treatment Relaxing Your Body Instagram Story.png',
+          image: 'Before After Beauty Skincare Minimlasit Instagram Post.png',
         },
         {
           id: 'cavitation-vacuum',
@@ -93,7 +93,7 @@ export const useStore = create<StoreState>()(
           description: 'Powerful, non-invasive treatment using sound waves to break down stubborn fat cells and enhance circulation.',
           price: 150,
           duration: 75,
-          image: 'Screenshot 2025-05-04 154211.png',
+          image: 'IMG_3361.jpeg',
         },
         {
           id: 'lymphatic-drainage',
@@ -101,7 +101,7 @@ export const useStore = create<StoreState>()(
           description: 'Gentle massage technique that stimulates the lymphatic system to reduce water retention and enhance circulation.',
           price: 135,
           duration: 60,
-          image: 'Screenshot 2025-05-04 160111.png',
+          image: 'IMG_3362.jpeg',
         },
         {
           id: 'recovery-boost',
@@ -109,7 +109,7 @@ export const useStore = create<StoreState>()(
           description: 'Personalized post-op drainage massage designed specifically for post-operative recovery.',
           price: 160,
           duration: 90,
-          image: 'Screenshot 2025-05-04 160111.png',
+          image: 'DE40158A-B168-46C1-B082-94E9F91478C5.jpeg',
         },
         {
           id: 'laser-lipo',
@@ -117,7 +117,7 @@ export const useStore = create<StoreState>()(
           description: 'Non-invasive treatment that uses advanced laser technology to break down stubborn fat cells.',
           price: 180,
           duration: 90,
-          image: 'Screenshot 2025-05-04 154211.png',
+          image: 'FDAFD339-7FA3-4285-9421-7B79CAA669BF.jpeg',
         },
       ],
       products: [
@@ -135,7 +135,7 @@ export const useStore = create<StoreState>()(
           title: 'Detox Body Scrub',
           description: 'Exfoliating & Smoothing scrub that removes dead skin cells and improves circulation.',
           price: 38,
-          image: 'Screenshot 2025-05-04 160111.png',
+          image: 'DE40158A-B168-46C1-B082-94E9F91478C5.jpeg',
           category: 'Scrubs',
         },
         {
@@ -143,7 +143,7 @@ export const useStore = create<StoreState>()(
           title: 'Home Massage Kit',
           description: 'Self-Care Essentials to maintain your results between professional treatments.',
           price: 75,
-          image: 'Soft Brown Massage Treatment Relaxing Your Body Instagram Story.png',
+          image: 'Before After Beauty Skincare Minimlasit Instagram Post.png',
           category: 'Tools',
           badge: 'BEST SELLER',
         },
@@ -152,7 +152,7 @@ export const useStore = create<StoreState>()(
           title: 'Firming Body Cream',
           description: 'Hydrating & Tightening cream that improves skin elasticity and firmness.',
           price: 48,
-          image: 'Screenshot 2025-05-04 154211.png',
+          image: 'FDAFD339-7FA3-4285-9421-7B79CAA669BF.jpeg',
           category: 'Body Creams',
         },
       ],

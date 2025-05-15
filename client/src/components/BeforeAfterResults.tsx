@@ -14,27 +14,35 @@ const beforeAfterItems: BeforeAfterItem[] = [
     id: "1",
     title: "Abdominal Sculpting",
     description: "Wood Therapy + Cavitation (4 sessions)",
-    image: "images/Before After Beauty Skincare Minimlasit Instagram Post.png",
+    image: "Before After Beauty Skincare Minimlasit Instagram Post.png",
   },
   {
     id: "2",
     title: "Facial Contouring",
     description: "Lymphatic Drainage (3 sessions)",
-    image: "images/Screenshot 2025-05-04 160111.png",
+    image: "DE40158A-B168-46C1-B082-94E9F91478C5.jpeg",
   },
   {
     id: "3",
     title: "Full Body Transformation",
     description: "Custom Treatment Plan (8 sessions)",
-    image: "images/Screenshot 2025-05-04 154211.png",
+    image: "FDAFD339-7FA3-4285-9421-7B79CAA669BF.jpeg",
   },
 ];
 
 export default function BeforeAfterResults() {
   const getImagePath = useCallback((filename: string) => {
     try {
-      const path = new URL(`@assets/${filename}`, import.meta.url).href;
-      return path;
+      // Use a placeholder image if the specified one fails to load
+      const defaultImage = new URL(`@assets/Beige Nude Aesthetic Feminine Modern Gynecology Health Clinic Branding Logo.png`, import.meta.url).href;
+      if (!filename) return defaultImage;
+      
+      try {
+        const path = new URL(`@assets/${filename}`, import.meta.url).href;
+        return path;
+      } catch (e) {
+        return defaultImage;
+      }
     } catch (error) {
       console.error("Error loading image:", error);
       return "";

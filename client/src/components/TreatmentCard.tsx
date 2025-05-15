@@ -13,8 +13,16 @@ export default function TreatmentCard({ treatment }: TreatmentCardProps) {
 
   const getImagePath = useCallback((filename: string) => {
     try {
-      const path = new URL(`@assets/${filename}`, import.meta.url).href;
-      return path;
+      // Use a placeholder image if the specified one fails to load
+      const defaultImage = new URL(`@assets/Beige Nude Aesthetic Feminine Modern Gynecology Health Clinic Branding Logo.png`, import.meta.url).href;
+      if (!filename) return defaultImage;
+      
+      try {
+        const path = new URL(`@assets/${filename}`, import.meta.url).href;
+        return path;
+      } catch (e) {
+        return defaultImage;
+      }
     } catch (error) {
       console.error("Error loading image:", error);
       return "";

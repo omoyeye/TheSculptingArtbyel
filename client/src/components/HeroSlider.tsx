@@ -16,19 +16,19 @@ const slides: Slide[] = [
     id: 1,
     heading: "Redefine Your Body's Natural Beauty",
     subheading: "Experience transformative body sculpting and wellness treatments tailored to your unique needs.",
-    backgroundImage: "bg-[url('@assets/images/Before After Beauty Skincare Minimlasit Instagram Post.png')]",
+    backgroundImage: "bg-[url('@assets/Before After Beauty Skincare Minimlasit Instagram Post.png')]",
   },
   {
     id: 2,
     heading: "Sculpt, Define, Transform",
     subheading: "Advanced non-invasive techniques to help you achieve your body goals.",
-    backgroundImage: "bg-[url('@assets/images/Screenshot 2025-05-04 154211.png')]",
+    backgroundImage: "bg-[url('@assets/IMG_3361.jpeg')]",
   },
   {
     id: 3,
     heading: "Wellness from the Inside Out",
     subheading: "Holistic approach to body sculpting that benefits both body and mind.",
-    backgroundImage: "bg-[url('@assets/images/Soft Brown Massage Treatment Relaxing Your Body Instagram Story.png')]",
+    backgroundImage: "bg-[url('@assets/IMG_3362.jpeg')]",
   },
 ];
 
