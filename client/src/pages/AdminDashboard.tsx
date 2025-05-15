@@ -140,6 +140,8 @@ export default function AdminDashboard() {
   // Modal states
   const [treatmentModalOpen, setTreatmentModalOpen] = useState(false);
   const [editingTreatment, setEditingTreatment] = useState<number | null>(null);
+  const [productModalOpen, setProductModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<number | null>(null);
   
   // Form schemas
   const treatmentFormSchema = z.object({
@@ -237,6 +239,115 @@ export default function AdminDashboard() {
       toast({
         title: "Error",
         description: "Failed to save treatment",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  // Product form schema
+  const productFormSchema = z.object({
+    title: z.string().min(2, { message: "Title must be at least 2 characters" }),
+    slug: z.string().min(2, { message: "Slug must be at least 2 characters" }),
+    description: z.string().min(10, { message: "Description must be at least 10 characters" }),
+    price: z.coerce.number().min(1, { message: "Price must be at least 1" }),
+    category: z.string().min(2, { message: "Category must be at least 2 characters" }),
+    image: z.string().min(1, { message: "Image is required" }),
+    badge: z.string().nullable().optional(),
+    featured: z.boolean().nullable().default(false),
+    stockQuantity: z.coerce.number().min(0, { message: "Stock quantity cannot be negative" }),
+  });
+  
+  // Product form
+  const productForm = useForm<z.infer<typeof productFormSchema>>({
+    resolver: zodResolver(productFormSchema),
+    defaultValues: {
+      title: "",
+      slug: "",
+      description: "",
+      price: 0,
+      category: "",
+      image: "",
+      badge: "",
+      featured: false,
+      stockQuantity: 0,
+    },
+  });
+  
+  // Product handlers
+  const handleAddProduct = () => {
+    setEditingProduct(null);
+    productForm.reset({
+      title: "",
+      slug: "",
+      description: "",
+      price: 0,
+      category: "",
+      image: "",
+      badge: "",
+      featured: false,
+      stockQuantity: 0,
+    });
+    setProductModalOpen(true);
+  };
+  
+  const handleEditProduct = (id: number) => {
+    const product = productsQuery.data?.find(p => p.id === id);
+    if (product) {
+      setEditingProduct(id);
+      productForm.reset({
+        title: product.title,
+        slug: product.slug,
+        description: product.description,
+        price: Number(product.price),
+        category: product.category,
+        image: product.image,
+        badge: product.badge || "",
+        featured: product.featured || false,
+        stockQuantity: product.stockQuantity,
+      });
+      setProductModalOpen(true);
+    }
+  };
+  
+  const handleDeleteProduct = async (id: number) => {
+    try {
+      await deleteProductMutation.mutateAsync(id);
+      toast({
+        title: "Success",
+        description: "Product deleted successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete product",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  const onProductSubmit = async (data: z.infer<typeof productFormSchema>) => {
+    try {
+      if (editingProduct) {
+        await updateProductMutation.mutateAsync({
+          id: editingProduct,
+          data,
+        });
+        toast({
+          title: "Success",
+          description: "Product updated successfully",
+        });
+      } else {
+        await createProductMutation.mutateAsync(data);
+        toast({
+          title: "Success",
+          description: "Product created successfully",
+        });
+      }
+      setProductModalOpen(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save product",
         variant: "destructive",
       });
     }
@@ -883,52 +994,297 @@ export default function AdminDashboard() {
             <TabsContent value="products" className="space-y-6">
               <div className="flex justify-between items-center">
                 <h2 className="text-3xl font-playfair text-secondary">Manage Products</h2>
-                <Button className="bg-secondary hover:bg-secondary/90">
-                  <PlusCircle className="h-4 w-4 mr-2" /> Add Product
+                <Button 
+                  className="bg-secondary hover:bg-secondary/90"
+                  onClick={handleAddProduct}
+                  disabled={createProductMutation.isPending}
+                >
+                  {createProductMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                  )}
+                  Add Product
                 </Button>
               </div>
               
               <Card>
                 <CardContent className="pt-6">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Image</TableHead>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredProducts.map((product) => (
-                        <TableRow key={product.id}>
-                          <TableCell>
-                            <img 
-                              src={getImagePath(product.image)} 
-                              alt={product.title} 
-                              className="w-12 h-12 object-cover rounded-md" 
-                            />
-                          </TableCell>
-                          <TableCell>{product.title}</TableCell>
-                          <TableCell>{product.category}</TableCell>
-                          <TableCell>${product.price.toFixed(2)}</TableCell>
-                          <TableCell>
-                            <div className="flex items-center space-x-2">
-                              <Button size="sm" variant="outline">
-                                <Edit className="h-4 w-4 mr-1" /> Edit
-                              </Button>
-                              <Button size="sm" variant="destructive">
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
+                  {productsQuery.isLoading ? (
+                    <div className="flex justify-center py-8">
+                      <Loader2 className="h-8 w-8 animate-spin text-secondary" />
+                    </div>
+                  ) : productsQuery.isError ? (
+                    <div className="text-center py-8 text-red-500">
+                      Error loading products. Please try again.
+                    </div>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Image</TableHead>
+                          <TableHead>Title</TableHead>
+                          <TableHead>Category</TableHead>
+                          <TableHead>Price</TableHead>
+                          <TableHead>Stock</TableHead>
+                          <TableHead>Actions</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {productsQuery.data
+                          ?.filter(product => 
+                            product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            product.category.toLowerCase().includes(searchQuery.toLowerCase())
+                          )
+                          .map((product) => (
+                          <TableRow key={product.id}>
+                            <TableCell>
+                              <img 
+                                src={getImagePath(product.image)} 
+                                alt={product.title} 
+                                className="w-12 h-12 object-cover rounded-md" 
+                              />
+                            </TableCell>
+                            <TableCell>{product.title}</TableCell>
+                            <TableCell>{product.category}</TableCell>
+                            <TableCell>${Number(product.price).toFixed(2)}</TableCell>
+                            <TableCell>{product.stockQuantity}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center space-x-2">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={() => handleEditProduct(product.id)}
+                                  disabled={updateProductMutation.isPending}
+                                >
+                                  {updateProductMutation.isPending && updateProductMutation.variables?.id === product.id ? (
+                                    <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                  ) : (
+                                    <Edit className="h-4 w-4 mr-1" />
+                                  )}
+                                  Edit
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="destructive"
+                                  onClick={() => handleDeleteProduct(product.id)}
+                                  disabled={deleteProductMutation.isPending}
+                                >
+                                  {deleteProductMutation.isPending && deleteProductMutation.variables === product.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <Trash2 className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
                 </CardContent>
               </Card>
+              
+              {/* Product Form Modal */}
+              <Dialog open={productModalOpen} onOpenChange={setProductModalOpen}>
+                <DialogContent className="sm:max-w-[525px]">
+                  <DialogHeader>
+                    <DialogTitle>
+                      {editingProduct ? "Edit Product" : "Add New Product"}
+                    </DialogTitle>
+                    <DialogDescription>
+                      {editingProduct 
+                        ? "Update the product details below."
+                        : "Fill in the details to create a new product."}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <Form {...productForm}>
+                    <form onSubmit={productForm.handleSubmit(onProductSubmit)} className="space-y-4">
+                      <FormField
+                        control={productForm.control}
+                        name="title"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Title</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={productForm.control}
+                        name="slug"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Slug</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormDescription>
+                              URL-friendly version of the title (e.g., "anti-cellulite-cream")
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={productForm.control}
+                        name="description"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Description</FormLabel>
+                            <FormControl>
+                              <Textarea {...field} rows={4} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={productForm.control}
+                          name="price"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Price ($)</FormLabel>
+                              <FormControl>
+                                <Input type="number" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={productForm.control}
+                          name="category"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Category</FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select a category" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="Creams">Creams</SelectItem>
+                                  <SelectItem value="Serums">Serums</SelectItem>
+                                  <SelectItem value="Tools">Tools</SelectItem>
+                                  <SelectItem value="Supplements">Supplements</SelectItem>
+                                  <SelectItem value="Accessories">Accessories</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={productForm.control}
+                          name="stockQuantity"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Stock Quantity</FormLabel>
+                              <FormControl>
+                                <Input type="number" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={productForm.control}
+                          name="badge"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Badge (optional)</FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value || ""}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select a badge" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="">None</SelectItem>
+                                  <SelectItem value="New">New</SelectItem>
+                                  <SelectItem value="Sale">Sale</SelectItem>
+                                  <SelectItem value="Best Seller">Best Seller</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <FormField
+                        control={productForm.control}
+                        name="image"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Image Filename</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormDescription>
+                              Enter the filename of an uploaded image (e.g., "product-image.jpg")
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={productForm.control}
+                        name="featured"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                            <FormControl>
+                              <div className="flex items-center space-x-2">
+                                <input
+                                  type="checkbox"
+                                  checked={field.value as boolean}
+                                  onChange={field.onChange}
+                                  className="h-4 w-4 rounded border-gray-300"
+                                />
+                                <label className="text-sm font-medium leading-none">
+                                  Featured Product
+                                </label>
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <DialogFooter>
+                        <Button 
+                          type="submit"
+                          disabled={productForm.formState.isSubmitting}
+                          className="bg-secondary hover:bg-secondary/90"
+                        >
+                          {productForm.formState.isSubmitting ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Saving...
+                            </>
+                          ) : (
+                            "Save Product"
+                          )}
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                  </Form>
+                </DialogContent>
+              </Dialog>
             </TabsContent>
             
             {/* Orders Tab */}

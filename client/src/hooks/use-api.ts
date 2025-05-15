@@ -112,15 +112,15 @@ export function useDeleteProduct(): UseMutationResult<void, Error, number> {
 }
 
 // Bookings
-export function useBookings(): UseQueryResult<Booking[]> {
-  return useQuery({
+export function useBookings(): UseQueryResult<Booking[], Error> {
+  return useQuery<Booking[], Error>({
     queryKey: ['/api/bookings'],
     staleTime: 1000 * 60 * 1, // 1 minute (more frequent updates for bookings)
   });
 }
 
-export function useBooking(id: number): UseQueryResult<Booking> {
-  return useQuery({
+export function useBooking(id: number): UseQueryResult<Booking, Error> {
+  return useQuery<Booking, Error>({
     queryKey: ['/api/bookings', id],
     enabled: !!id,
   });
@@ -160,15 +160,15 @@ export function useDeleteBooking(): UseMutationResult<void, Error, number> {
 }
 
 // Orders
-export function useOrders(): UseQueryResult<Order[]> {
-  return useQuery({
+export function useOrders(): UseQueryResult<Order[], Error> {
+  return useQuery<Order[], Error>({
     queryKey: ['/api/orders'],
     staleTime: 1000 * 60 * 1, // 1 minute
   });
 }
 
-export function useOrder(id: number): UseQueryResult<Order> {
-  return useQuery({
+export function useOrder(id: number): UseQueryResult<Order, Error> {
+  return useQuery<Order, Error>({
     queryKey: ['/api/orders', id],
     enabled: !!id,
   });
@@ -186,8 +186,8 @@ export function useUpdateOrderStatus(): UseMutationResult<Order, Error, { id: nu
 }
 
 // Testimonials
-export function useTestimonials(): UseQueryResult<Testimonial[]> {
-  return useQuery({
+export function useTestimonials(): UseQueryResult<Testimonial[], Error> {
+  return useQuery<Testimonial[], Error>({
     queryKey: ['/api/testimonials'],
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
