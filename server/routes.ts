@@ -300,32 +300,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.put("/api/testimonials/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const testimonial = await storage.updateTestimonial(id, req.body);
-      if (!testimonial) {
-        return res.status(404).json({ message: "Testimonial not found" });
-      }
-      res.json(testimonial);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to update testimonial" });
-    }
-  });
-  
-  app.delete("/api/testimonials/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const success = await storage.deleteTestimonial(id);
-      if (!success) {
-        return res.status(404).json({ message: "Testimonial not found" });
-      }
-      res.status(204).send();
-    } catch (error) {
-      res.status(500).json({ message: "Failed to delete testimonial" });
-    }
-  });
-  
   // API routes for gallery
   app.get("/api/gallery", async (req, res) => {
     try {
@@ -352,32 +326,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.put("/api/gallery/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const galleryItem = await storage.updateGalleryItem(id, req.body);
-      if (!galleryItem) {
-        return res.status(404).json({ message: "Gallery item not found" });
-      }
-      res.json(galleryItem);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to update gallery item" });
-    }
-  });
-  
-  app.delete("/api/gallery/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const success = await storage.deleteGalleryItem(id);
-      if (!success) {
-        return res.status(404).json({ message: "Gallery item not found" });
-      }
-      res.status(204).send();
-    } catch (error) {
-      res.status(500).json({ message: "Failed to delete gallery item" });
-    }
-  });
-  
   // API routes for Instagram posts
   app.get("/api/instagram", async (req, res) => {
     try {
@@ -394,32 +342,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(post);
     } catch (error) {
       res.status(500).json({ message: "Failed to create Instagram post" });
-    }
-  });
-  
-  app.put("/api/instagram/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const post = await storage.updateInstagramPost(id, req.body);
-      if (!post) {
-        return res.status(404).json({ message: "Instagram post not found" });
-      }
-      res.json(post);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to update Instagram post" });
-    }
-  });
-  
-  app.delete("/api/instagram/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const success = await storage.deleteInstagramPost(id);
-      if (!success) {
-        return res.status(404).json({ message: "Instagram post not found" });
-      }
-      res.status(204).send();
-    } catch (error) {
-      res.status(500).json({ message: "Failed to delete Instagram post" });
     }
   });
   
