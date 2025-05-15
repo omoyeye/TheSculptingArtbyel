@@ -351,7 +351,7 @@ export class MemStorage implements IStorage {
       description: "Non-invasive technique using wooden tools to sculpt the body, break down fat, and stimulate the lymphatic system.",
       price: 120,
       duration: 60,
-      image: "Soft Brown Massage Treatment Relaxing Your Body Instagram Story.png",
+      image: "images/Soft Brown Massage Treatment Relaxing Your Body Instagram Story.png",
       featured: true
     });
     
@@ -361,7 +361,7 @@ export class MemStorage implements IStorage {
       description: "Powerful, non-invasive treatment using sound waves to break down stubborn fat cells and enhance circulation.",
       price: 150,
       duration: 75,
-      image: "Screenshot 2025-05-04 154211.png",
+      image: "images/Screenshot 2025-05-04 154211.png",
       featured: true
     });
     
@@ -371,7 +371,7 @@ export class MemStorage implements IStorage {
       description: "Gentle massage technique that stimulates the lymphatic system to reduce water retention and enhance circulation.",
       price: 135,
       duration: 60,
-      image: "Screenshot 2025-05-04 160111.png",
+      image: "images/Screenshot 2025-05-04 160111.png",
       featured: true
     });
     
@@ -381,7 +381,7 @@ export class MemStorage implements IStorage {
       description: "Personalized post-op drainage massage designed specifically for post-operative recovery.",
       price: 160,
       duration: 90,
-      image: "Screenshot 2025-05-04 160111.png",
+      image: "images/FDAFD339-7FA3-4285-9421-7B79CAA669BF.jpeg",
       featured: false
     });
     
@@ -391,7 +391,7 @@ export class MemStorage implements IStorage {
       description: "Non-invasive treatment that uses advanced laser technology to break down stubborn fat cells.",
       price: 180,
       duration: 90,
-      image: "Screenshot 2025-05-04 154211.png",
+      image: "images/Before After Beauty Skincare Minimlasit Instagram Post.png",
       featured: false
     });
     
@@ -401,7 +401,7 @@ export class MemStorage implements IStorage {
       title: "Sculpting Body Oil",
       description: "Firming & Toning formula that enhances the results of your treatments.",
       price: 42,
-      image: "Soft Brown Massage Treatment Relaxing Your Body Instagram Story.png",
+      image: "images/Soft Brown Massage Treatment Relaxing Your Body Instagram Story.png",
       category: "Body Oils",
       badge: "NEW",
       featured: true,
@@ -413,7 +413,7 @@ export class MemStorage implements IStorage {
       title: "Detox Body Scrub",
       description: "Exfoliating & Smoothing scrub that removes dead skin cells and improves circulation.",
       price: 38,
-      image: "Screenshot 2025-05-04 160111.png",
+      image: "images/Screenshot 2025-05-04 160111.png",
       category: "Scrubs",
       featured: true,
       stockQuantity: 30
@@ -424,7 +424,7 @@ export class MemStorage implements IStorage {
       title: "Home Massage Kit",
       description: "Self-Care Essentials to maintain your results between professional treatments.",
       price: 75,
-      image: "Soft Brown Massage Treatment Relaxing Your Body Instagram Story.png",
+      image: "images/IMG_3361.jpeg",
       category: "Tools",
       badge: "BEST SELLER",
       featured: true,
@@ -436,7 +436,7 @@ export class MemStorage implements IStorage {
       title: "Firming Body Cream",
       description: "Hydrating & Tightening cream that improves skin elasticity and firmness.",
       price: 48,
-      image: "Screenshot 2025-05-04 154211.png",
+      image: "images/DE40158A-B168-46C1-B082-94E9F91478C5.jpeg",
       category: "Body Creams",
       featured: true,
       stockQuantity: 20
