@@ -3,6 +3,11 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { 
+  beforeAfterImage, 
+  img3361, 
+  img3362 
+} from "@/assets/imageImports";
 
 interface Slide {
   id: number;
@@ -16,19 +21,19 @@ const slides: Slide[] = [
     id: 1,
     heading: "Redefine Your Body's Natural Beauty",
     subheading: "Experience transformative body sculpting and wellness treatments tailored to your unique needs.",
-    backgroundImage: "bg-[url('@assets/images/Before After Beauty Skincare Minimlasit Instagram Post.png')]",
+    backgroundImage: beforeAfterImage,
   },
   {
     id: 2,
     heading: "Sculpt, Define, Transform",
     subheading: "Advanced non-invasive techniques to help you achieve your body goals.",
-    backgroundImage: "bg-[url('@assets/images/IMG_3361.jpeg')]",
+    backgroundImage: img3361,
   },
   {
     id: 3,
     heading: "Wellness from the Inside Out",
     subheading: "Holistic approach to body sculpting that benefits both body and mind.",
-    backgroundImage: "bg-[url('@assets/images/IMG_3362.jpeg')]",
+    backgroundImage: img3362,
   },
 ];
 
@@ -89,7 +94,12 @@ export default function HeroSlider() {
             index === currentSlide ? "opacity-100" : "opacity-0 pointer-events-none"
           )}
         >
-          <div className={cn("absolute inset-0 bg-cover bg-center", slide.backgroundImage)}>
+          <div className="absolute inset-0">
+            <img 
+              src={slide.backgroundImage} 
+              alt={slide.heading}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
             <div className="absolute inset-0 bg-black bg-opacity-40"></div>
           </div>
           

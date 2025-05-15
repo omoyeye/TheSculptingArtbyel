@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 
-// Import all images directly
-import beforeAfterImage from '../assets/images/Before After Beauty Skincare Minimlasit Instagram Post.png';
-import img3361 from '../assets/images/IMG_3361.jpeg';
-import img3362 from '../assets/images/IMG_3362.jpeg';
+// Import from our centralized images module
+import { 
+  beforeAfterImage, 
+  img3361, 
+  img3362 
+} from '../assets/imageImports';
 
 export default function ImageTest() {
   const [imagesExist, setImagesExist] = useState<Record<string, boolean>>({});
