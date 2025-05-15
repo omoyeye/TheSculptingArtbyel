@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Base colors */
+    --background: 43 50% 94%;
+    --foreground: 20 14.3% 4.1%;
+    
+    /* Card colors */
+    --card: 0 0% 100%;
+    --card-foreground: 20 14.3% 4.1%;
+    
+    /* Popover colors */
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 14.3% 4.1%;
+    
+    /* Primary colors - blue */
+    --primary: 210 100% 20%;
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary colors - brown */
+    --secondary: 30 58% 36%;
+    --secondary-foreground: 0 0% 98%;
+    
+    /* Muted colors */
+    --muted: 30 20% 96%;
+    --muted-foreground: 24 5.4% 40%;
+    
+    /* Accent colors - gold */
+    --accent: 43 74% 66%;
+    --accent-foreground: 20 14.3% 4.1%;
+    
+    /* Destructive colors */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    
+    /* Border and other utilities */
+    --border: 20 5.9% 90%;
+    --input: 20 5.9% 90%;
+    --ring: 30 58% 36%;
+    
+    /* Border radius */
+    --radius: 0.5rem;
+  }
+ 
+  .dark {
+    --background: 20 14.3% 4.1%;
+    --foreground: 0 0% 98%;
+    
+    --card: 20 14.3% 4.1%;
+    --card-foreground: 0 0% 98%;
+    
+    --popover: 20 14.3% 4.1%;
+    --popover-foreground: 0 0% 98%;
+    
+    --primary: 210 100% 30%;
+    --primary-foreground: 0 0% 98%;
+    
+    --secondary: 30 48% 25%;
+    --secondary-foreground: 0 0% 98%;
+    
+    --muted: 12 6.5% 15.1%;
+    --muted-foreground: 24 5.4% 63.9%;
+    
+    --accent: 43 74% 56%;
+    --accent-foreground: 20 14.3% 4.1%;
+    
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --border: 12 6.5% 15.1%;
+    --input: 12 6.5% 15.1%;
+    --ring: 24 5.7% 82.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Montserrat', sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+  }
+}
+
+/* Custom utility classes */
+@layer utilities {
+  .font-playfair {
+    font-family: 'Playfair Display', serif;
+  }
+  
+  .font-montserrat {
+    font-family: 'Montserrat', sans-serif;
+  }
+  
+  .font-cormorant {
+    font-family: 'Cormorant Garamond', serif;
+  }
+  
+  .blue-gradient {
+    background: linear-gradient(to right, hsl(210, 100%, 20%), hsl(210, 100%, 30%));
+  }
+  
+  .brown-gradient {
+    background: linear-gradient(to right, hsl(30, 58%, 36%), hsl(30, 58%, 46%));
+  }
+  
+  .gold-gradient {
+    background: linear-gradient(to right, hsl(43, 74%, 56%), hsl(43, 74%, 66%));
+  }
+  
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .h-screen-90 {
+    height: 90vh;
+  }
+  
+  .treatment-card {
+    @apply transition-all duration-300;
+  }
+  
+  .treatment-card:hover {
+    @apply transform -translate-y-1 shadow-lg;
+  }
+}
