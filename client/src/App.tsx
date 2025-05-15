@@ -12,8 +12,9 @@ import Booking from "@/pages/Booking";
 import Cart from "@/pages/Cart";
 import Checkout from "@/pages/Checkout";
 import NotFound from "@/pages/not-found";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
+import ImageTest from "@/components/ImageTest";
 
 function App() {
   const { initializeCart } = useStore();
@@ -37,6 +38,7 @@ function App() {
         <Route path="/booking" component={Booking} />
         <Route path="/cart" component={Cart} />
         <Route path="/checkout" component={Checkout} />
+        <Route path="/image-test" component={ImageTest} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
