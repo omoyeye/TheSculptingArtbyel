@@ -3,9 +3,9 @@ import { Button } from "@/components/ui/button";
 import { useCallback } from "react";
 
 export default function BrandStory() {
-  const getImagePath = useCallback((filename: string) => {
+  const getImagePath = useCallback(() => {
     try {
-      const path = new URL(`@assets/Beige Nude Aesthetic Feminine Modern Gynecology Health Clinic Branding Logo.png`, import.meta.url).href;
+      const path = new URL(`@assets/images/IMG_3362.jpeg`, import.meta.url).href;
       return path;
     } catch (error) {
       console.error("Error loading image:", error);

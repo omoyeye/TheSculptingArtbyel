@@ -4,9 +4,9 @@ import Newsletter from "@/components/Newsletter";
 import { useCallback } from "react";
 
 export default function About() {
-  const getImagePath = useCallback((filename: string) => {
+  const getImagePath = useCallback(() => {
     try {
-      const path = new URL(`@assets/Beige Nude Aesthetic Feminine Modern Gynecology Health Clinic Branding Logo.png`, import.meta.url).href;
+      const path = new URL(`@assets/images/Beige Nude Aesthetic Feminine Modern Gynecology Health Clinic Branding Logo.png`, import.meta.url).href;
       return path;
     } catch (error) {
       console.error("Error loading image:", error);
