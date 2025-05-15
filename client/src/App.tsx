@@ -11,7 +11,6 @@ import Contact from "@/pages/Contact";
 import Booking from "@/pages/Booking";
 import Cart from "@/pages/Cart";
 import Checkout from "@/pages/Checkout";
-import AdminDashboard from "@/pages/AdminDashboard";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 import { useStore } from "@/lib/store";
@@ -38,7 +37,6 @@ function App() {
         <Route path="/booking" component={Booking} />
         <Route path="/cart" component={Cart} />
         <Route path="/checkout" component={Checkout} />
-        <Route path="/admin" component={AdminDashboard} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
