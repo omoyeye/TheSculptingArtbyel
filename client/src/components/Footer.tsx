@@ -11,7 +11,7 @@ export default function Footer() {
           {/* About Column */}
           <div className="space-y-4">
             <div className="mb-4">
-              <img src={theSculptingArtLogo} alt="The Sculpting Art" className="h-16" />
+              <img src={theSculptingArtLogo} alt="THE SCULPTING ART" className="h-16" />
             </div>
             <p className="text-sm text-black mb-4">
               Luxury body sculpting and wellness spa dedicated to enhancing your natural 
