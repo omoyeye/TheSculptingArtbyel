@@ -1,30 +1,20 @@
 import { Link } from "wouter";
-import { 
-  Facebook, 
-  Instagram, 
-  Twitter, 
-  Linkedin, 
-  MapPin, 
-  Phone, 
-  Mail 
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Phone, Mail, MapPin, Instagram, Facebook, Twitter } from "lucide-react";
+import { theSculptingArtLogo } from "@/assets/imageImports";
 
 export default function Footer() {
   return (
-    <footer className="bg-secondary-900 text-black pt-16 pb-8">
+    <footer className="bg-muted pt-16 pb-8 text-black">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          {/* Column 1: About */}
-          <div>
-            <div className="mb-6">
-              <span className="text-black font-playfair text-2xl font-semibold">
-                THE SCULPTING ART
-              </span>
+          {/* About Column */}
+          <div className="space-y-4">
+            <div className="mb-4">
+              <img src={theSculptingArtLogo} alt="The Sculpting Art" className="h-16" />
             </div>
-            <p className="text-black mb-6">
-              Luxury body sculpting and wellness spa dedicated to enhancing your
-              natural beauty through innovative, non-invasive treatments.
+            <p className="text-sm text-black mb-4">
+              Luxury body sculpting and wellness spa dedicated to enhancing your natural 
+              beauty through innovative, non-invasive treatments.
             </p>
             <div className="flex space-x-4">
               <a
@@ -66,10 +56,10 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Column 2: Quick Links */}
-          <div>
-            <h3 className="text-lg font-playfair mb-6 text-black">Quick Links</h3>
-            <ul className="space-y-3">
+          {/* Quick Links Column */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-playfair text-secondary mb-4">Quick Links</h3>
+            <ul className="space-y-2">
               <li>
                 <Link href="/" className="text-black hover:text-gray-700 transition duration-300">
                   Home
@@ -103,10 +93,10 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 3: Services */}
-          <div>
-            <h3 className="text-lg font-playfair mb-6 text-black">Our Treatments</h3>
-            <ul className="space-y-3">
+          {/* Services Column */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-playfair text-secondary mb-4">Our Treatments</h3>
+            <ul className="space-y-2">
               <li>
                 <Link href="/treatments/wood-therapy" className="text-black hover:text-gray-700 transition duration-300">
                   Wood Therapy
@@ -140,10 +130,10 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 4: Contact */}
-          <div>
-            <h3 className="text-lg font-playfair mb-6 text-black">Contact Us</h3>
-            <ul className="space-y-3">
+          {/* Contact Column */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-playfair text-secondary mb-4">Contact Us</h3>
+            <ul className="space-y-2">
               <li className="flex items-start">
                 <MapPin className="h-5 w-5 text-black mt-1 mr-3" />
                 <span className="text-black">
@@ -168,7 +158,7 @@ export default function Footer() {
                   info@thesculptingart.com
                 </a>
               </li>
-              <li className="flex items-center mt-4">
+              <li className="mt-4">
                 <Button asChild className="bg-secondary hover:bg-secondary/90 text-white">
                   <Link href="/booking">Book Appointment</Link>
                 </Button>

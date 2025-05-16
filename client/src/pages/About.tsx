@@ -2,16 +2,11 @@ import { Helmet } from "react-helmet";
 import { CheckCircle, Award, Heart, Users } from "lucide-react";
 import Newsletter from "@/components/Newsletter";
 import { useCallback } from "react";
+import { theSculptingArtLogo } from "@/assets/imageImports";
 
 export default function About() {
   const getImagePath = useCallback(() => {
-    try {
-      const path = new URL(`@assets/images/Beige Nude Aesthetic Feminine Modern Gynecology Health Clinic Branding Logo.png`, import.meta.url).href;
-      return path;
-    } catch (error) {
-      console.error("Error loading image:", error);
-      return "";
-    }
+    return theSculptingArtLogo;
   }, []);
 
   return (
