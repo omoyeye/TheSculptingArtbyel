@@ -9,6 +9,7 @@ import Gallery from "@/pages/Gallery";
 import About from "@/pages/About";
 import Contact from "@/pages/Contact";
 import Booking from "@/pages/Booking";
+import Pricing from "@/pages/Pricing";
 import Cart from "@/pages/Cart";
 import Checkout from "@/pages/Checkout";
 import NotFound from "@/pages/not-found";
@@ -36,6 +37,7 @@ function App() {
         <Route path="/about" component={About} />
         <Route path="/contact" component={Contact} />
         <Route path="/booking" component={Booking} />
+        <Route path="/pricing" component={Pricing} />
         <Route path="/cart" component={Cart} />
         <Route path="/checkout" component={Checkout} />
         <Route path="/image-test" component={ImageTest} />

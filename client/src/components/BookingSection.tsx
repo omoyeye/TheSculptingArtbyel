@@ -4,7 +4,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import { useToast } from "@/hooks/use-toast";
-import { Link } from "wouter";
 
 const timeSlots = [
   "8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", 
@@ -12,7 +11,7 @@ const timeSlots = [
 ];
 
 export default function BookingSection() {
-  const [selectedTreatment, setSelectedTreatment] = useState("wood-therapy");
+  const [selectedTreatment, setSelectedTreatment] = useState("wood-therapy-30");
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -99,6 +98,10 @@ export default function BookingSection() {
 
   const allCalendarDays = [...calendarDays, ...daysFromNextMonth];
 
+  // Filter treatments into regular treatments and packages
+  const regularTreatments = treatments.filter(t => !t.id.includes('package'));
+  const packageTreatments = treatments.filter(t => t.id.includes('package'));
+
   return (
     <section id="booking" className="py-20 bg-white">
       <div className="container mx-auto px-4">
@@ -115,8 +118,11 @@ export default function BookingSection() {
             {/* Treatment Selection */}
             <div className="mb-8">
               <h3 className="text-xl font-playfair text-secondary mb-4">Select Treatment</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {treatments.map((treatment) => (
+              
+              {/* Regular Treatments */}
+              <h4 className="text-lg font-medium mb-2">Individual Treatments</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                {regularTreatments.map((treatment) => (
                   <div key={treatment.id} className="relative">
                     <input 
                       type="radio" 
@@ -133,7 +139,34 @@ export default function BookingSection() {
                       }`}
                     >
                       <span className="text-lg font-medium block mb-1">{treatment.title}</span>
-                      <span className="text-primary">${treatment.price} • {treatment.duration} min</span>
+                      <span className="text-primary">£{treatment.price.toFixed(2)} • {treatment.duration} min</span>
+                    </label>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Treatment Packages */}
+              <h4 className="text-lg font-medium mb-2">Treatment Packages</h4>
+              <div className="grid grid-cols-1 gap-4">
+                {packageTreatments.map((treatment) => (
+                  <div key={treatment.id} className="relative">
+                    <input 
+                      type="radio" 
+                      id={treatment.id} 
+                      name="treatment" 
+                      className="absolute opacity-0"
+                      checked={selectedTreatment === treatment.id}
+                      onChange={() => setSelectedTreatment(treatment.id)} 
+                    />
+                    <label 
+                      htmlFor={treatment.id} 
+                      className={`block border-2 rounded-md p-4 cursor-pointer transition duration-300 hover:border-secondary ${
+                        selectedTreatment === treatment.id ? "border-secondary bg-muted" : "border-gray-200"
+                      }`}
+                    >
+                      <span className="text-lg font-medium block mb-1">{treatment.title}</span>
+                      <span className="block mb-2">{treatment.description}</span>
+                      <span className="text-primary font-semibold">£{treatment.price.toFixed(2)}</span>
                     </label>
                   </div>
                 ))}
