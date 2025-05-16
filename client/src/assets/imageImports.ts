@@ -8,6 +8,7 @@ import softBrownMassage from './images/Soft Brown Massage Treatment Relaxing You
 import brandingLogo from './images/Beige Nude Aesthetic Feminine Modern Gynecology Health Clinic Branding Logo.png';
 import screenshot154211 from './images/Screenshot 2025-05-04 154211.png';
 import screenshot160111 from './images/Screenshot 2025-05-04 160111.png';
+import sculptingArtLogo from './images/the_sculpting_art_logo.png';
 
 // Define a map for easy lookup by filename
 const imageMap: Record<string, string> = {
@@ -20,6 +21,7 @@ const imageMap: Record<string, string> = {
   'Beige Nude Aesthetic Feminine Modern Gynecology Health Clinic Branding Logo.png': brandingLogo,
   'Screenshot 2025-05-04 154211.png': screenshot154211,
   'Screenshot 2025-05-04 160111.png': screenshot160111,
+  'the_sculpting_art_logo.png': sculptingArtLogo,
 };
 
 // Helper function to get image by filename
@@ -37,5 +39,6 @@ export {
   softBrownMassage,
   brandingLogo,
   screenshot154211,
-  screenshot160111
+  screenshot160111,
+  sculptingArtLogo
 };
