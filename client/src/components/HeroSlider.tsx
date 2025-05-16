@@ -115,7 +115,7 @@ export default function HeroSlider() {
                 <Button asChild size="lg" className="bg-secondary hover:bg-secondary/90 text-white">
                   <Link href="/booking">Book Your Treatment</Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-secondary">
+                <Button asChild size="lg" variant="outline" className="border-white text-black hover:bg-white hover:text-secondary">
                   <Link href="/treatments">Explore Services</Link>
                 </Button>
               </div>
