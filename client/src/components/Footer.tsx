@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { Phone, Mail, MapPin, Instagram, Facebook, Twitter, Linkedin } from "lucide-react";
 import { theSculptingArtLogo } from "@/assets/imageImports";
+import { Button } from "@/components/ui/button";
 
 export default function Footer() {
   return (
