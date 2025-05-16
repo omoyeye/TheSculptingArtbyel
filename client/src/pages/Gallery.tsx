@@ -57,6 +57,30 @@ export default function Gallery() {
       category: "Before & After",
       image: "FDAFD339-7FA3-4285-9421-7B79CAA669BF.jpeg"
     },
+    {
+      id: "before-after-7",
+      title: "First Session Results",
+      category: "Before & After",
+      image: "before_after_female.jpeg"
+    },
+    {
+      id: "before-after-8",
+      title: "Male Abdominal Sculpting",
+      category: "Before & After",
+      image: "before_after_male.jpeg"
+    },
+    {
+      id: "before-after-9",
+      title: "Facial Contouring",
+      category: "Before & After",
+      image: "before_after_facial.jpeg"
+    },
+    {
+      id: "treatment-wood-therapy",
+      title: "Wood Therapy",
+      category: "Treatments",
+      image: "wood_therapy.jpeg"
+    },
     ...treatments.map(treatment => ({
       id: `treatment-${treatment.id}`,
       title: treatment.title,
