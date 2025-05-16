@@ -2,11 +2,16 @@ import { Helmet } from "react-helmet";
 import { CheckCircle, Award, Heart, Users } from "lucide-react";
 import Newsletter from "@/components/Newsletter";
 import { useCallback } from "react";
-import { theSculptingArtLogo } from "@/assets/imageImports";
+import { sculptingArtLogo } from "@/assets/imageImports";
 
 export default function About() {
   const getImagePath = useCallback(() => {
-    return theSculptingArtLogo;
+    try {
+      return sculptingArtLogo;
+    } catch (error) {
+      console.error("Error loading image:", error);
+      return "";
+    }
   }, []);
 
   return (
@@ -55,6 +60,10 @@ export default function About() {
                 src={getImagePath()} 
                 alt="The Sculpting Art Logo" 
                 className="max-w-md w-full"
+                onError={(e) => {
+                  console.error("Failed to load logo image");
+                  e.currentTarget.src = "https://placehold.co/600x400/e9e2dd/a17a69?text=Logo";
+                }}
               />
             </div>
           </div>
