@@ -107,6 +107,15 @@ export default function Header() {
             </Link>
 
             <Link
+              href="/pricing"
+              className={`text-secondary hover:text-secondary/80 font-medium ${
+                isActive("/pricing") ? "border-b-2 border-secondary" : ""
+              }`}
+            >
+              Pricing
+            </Link>
+
+            <Link
               href="/about"
               className={`text-secondary hover:text-secondary/80 font-medium ${
                 isActive("/about") ? "border-b-2 border-secondary" : ""
@@ -216,6 +225,14 @@ export default function Header() {
             onClick={closeMobileMenu}
           >
             Gallery
+          </Link>
+
+          <Link
+            href="/pricing"
+            className="block py-2 text-secondary hover:text-secondary/80 font-medium border-b border-gray-100"
+            onClick={closeMobileMenu}
+          >
+            Pricing
           </Link>
 
           <Link

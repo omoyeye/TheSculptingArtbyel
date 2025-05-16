@@ -91,6 +91,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/pricing" className="text-black hover:text-gray-700 transition duration-300">
+                  Pricing
+                </Link>
+              </li>
+              <li>
                 <Link href="/about" className="text-black hover:text-gray-700 transition duration-300">
                   About Us
                 </Link>
@@ -167,6 +172,11 @@ export default function Footer() {
                 >
                   info@thesculptingart.com
                 </a>
+              </li>
+              <li className="mt-3">
+                <p className="text-black font-medium">Hours:</p>
+                <p className="text-black mt-1">Monday: Closed</p>
+                <p className="text-black">Tuesday - Sunday: 8am - 5pm</p>
               </li>
               <li className="flex items-center mt-4">
                 <Button asChild className="bg-secondary hover:bg-secondary/90 text-white">
