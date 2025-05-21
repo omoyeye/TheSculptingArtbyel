@@ -4,7 +4,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { 
-  beforeAfterImage, 
+  beforeAfterImagePng, 
   img3361, 
   img3362 
 } from "@/assets/imageImports";
@@ -21,7 +21,7 @@ const slides: Slide[] = [
     id: 1,
     heading: "Redefine Your Body's Natural Beauty",
     subheading: "Experience transformative body sculpting and wellness treatments tailored to your unique needs.",
-    backgroundImage: beforeAfterImage,
+    backgroundImage: beforeAfterImagePng,
   },
   {
     id: 2,

@@ -31,7 +31,13 @@ export default function Pricing() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             <div className="col-span-2">
               {/* Individual Treatments */}
-              <h2 className="text-3xl font-playfair text-secondary mb-8">Individual Treatments</h2>
+              <h2 className="text-3xl font-playfair text-secondary mb-4">Individual Treatments</h2>
+              
+              <div className="bg-blue-50 border border-blue-200 p-4 rounded-md mb-8">
+                <p className="text-sm text-blue-800">
+                  <strong>Note:</strong> A £20 deposit is required for all treatments at the time of booking. This amount will be deducted from the total price of your service.
+                </p>
+              </div>
               
               <div className="mb-12 space-y-10">
                 <div>

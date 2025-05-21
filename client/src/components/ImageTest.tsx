@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 // Import from our centralized images module
 import { 
-  beforeAfterImage, 
+  beforeAfterImagePng, 
   img3361, 
   img3362 
 } from '../assets/imageImports';
@@ -15,7 +15,7 @@ export default function ImageTest() {
       const results: Record<string, boolean> = {};
       
       // Check if the imports exist
-      results['beforeAfterImage'] = !!beforeAfterImage;
+      results['beforeAfterImagePng'] = !!beforeAfterImagePng;
       results['img3361'] = !!img3361;
       results['img3362'] = !!img3362;
       
@@ -44,7 +44,7 @@ export default function ImageTest() {
         <div>
           <h3 className="font-medium mb-2">Before After Image:</h3>
           <img 
-            src={beforeAfterImage} 
+            src={beforeAfterImagePng} 
             alt="Before After" 
             className="w-full h-40 object-cover rounded"
           />

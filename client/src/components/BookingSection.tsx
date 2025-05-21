@@ -119,6 +119,12 @@ export default function BookingSection() {
             <div className="mb-8">
               <h3 className="text-xl font-playfair text-secondary mb-4">Select Treatment</h3>
               
+              <div className="bg-blue-50 border border-blue-200 p-4 rounded-md mb-4">
+                <p className="text-sm text-blue-800">
+                  <strong>Note:</strong> A £20 deposit is required for all treatments at the time of booking. This amount will be deducted from the total price of your service.
+                </p>
+              </div>
+              
               {/* Regular Treatments */}
               <h4 className="text-lg font-medium mb-2">Individual Treatments</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
