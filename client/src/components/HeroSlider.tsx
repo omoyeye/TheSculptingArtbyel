@@ -3,8 +3,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { 
-  beforeAfterImagePng, 
+import {
+ 
   img3361, 
   img3362 
 } from "@/assets/imageImports";
@@ -21,7 +21,7 @@ const slides: Slide[] = [
     id: 1,
     heading: "Redefine Your Body's Natural Beauty",
     subheading: "Experience transformative body sculpting and wellness treatments tailored to your unique needs.",
-    backgroundImage: beforeAfterImagePng,
+    backgroundImage: img3361,
   },
   {
     id: 2,
