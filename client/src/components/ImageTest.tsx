@@ -2,10 +2,13 @@ import { useEffect, useState } from 'react';
 
 // Import from our centralized images module
 import { 
-  beforeAfterImagePng, 
   img3361, 
-  img3362 
+  img3362,
+  getImage
 } from '../assets/imageImports';
+
+// Reference to images
+const beforeAfterImagePng = getImage('Before After Beauty Skincare Minimlasit Instagram Post.png');
 
 export default function ImageTest() {
   const [imagesExist, setImagesExist] = useState<Record<string, boolean>>({});

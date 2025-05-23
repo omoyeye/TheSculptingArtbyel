@@ -7,6 +7,7 @@ import { formatCurrency } from "@/lib/utils";
 import { Clock, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Newsletter from "@/components/Newsletter";
+import { getImage } from "@/assets/imageImports";
 
 export default function TreatmentDetail() {
   const params = useParams<{ id: string }>();
@@ -17,8 +18,8 @@ export default function TreatmentDetail() {
 
   const getImagePath = useCallback((filename: string) => {
     try {
-      const path = new URL(`@assets/${filename}`, import.meta.url).href;
-      return path;
+      // Try to get image from our centralized imports first
+      return getImage(filename);
     } catch (error) {
       console.error("Error loading image:", error);
       return "";

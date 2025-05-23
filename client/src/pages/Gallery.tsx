@@ -7,6 +7,7 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import Newsletter from "@/components/Newsletter";
+import { getImage } from "@/assets/imageImports";
 
 interface GalleryItem {
   id: string;
@@ -67,8 +68,8 @@ export default function Gallery() {
 
   const getImagePath = useCallback((filename: string) => {
     try {
-      const path = new URL(`@assets/images/${filename}`, import.meta.url).href;
-      return path;
+      // Use the centralized image import system
+      return getImage(filename);
     } catch (error) {
       console.error("Error loading image:", error);
       return "";

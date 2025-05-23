@@ -4,9 +4,9 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
- 
   img3361, 
-  img3362 
+  img3362,
+  getImage
 } from "@/assets/imageImports";
 
 interface Slide {
