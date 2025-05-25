@@ -37,7 +37,7 @@ export default function Footer() {
                 <Facebook size={20} />
               </a>
               <a
-                href="https://instagram.com"
+href="https://www.instagram.com/the_sculptingartbyel/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-black hover:text-gray-700 transition duration-300"
@@ -152,25 +152,25 @@ export default function Footer() {
               <li className="flex items-start">
                 <MapPin className="h-5 w-5 text-black mt-1 mr-3" />
                 <span className="text-black">
-                  123 Wellness Way<br />Beverly Hills, CA 90210
+                  Manchester<br />United Kingdom
                 </span>
               </li>
               <li className="flex items-center">
                 <Phone className="h-5 w-5 text-black mr-3" />
                 <a
-                  href="tel:+13105550123"
+                  href="tel:+44 7570 618832"
                   className="text-black hover:text-gray-700 transition duration-300"
                 >
-                  (310) 555-0123
+                  +44 7570 618832
                 </a>
               </li>
               <li className="flex items-center">
                 <Mail className="h-5 w-5 text-black mr-3" />
                 <a
-                  href="mailto:info@thesculptingart.com"
+                  href="mailto:Businesselom@gmail.com"
                   className="text-black hover:text-gray-700 transition duration-300"
                 >
-                  info@thesculptingart.com
+                  Businesselom@gmail.com 
                 </a>
               </li>
               <li className="mt-3">
