@@ -12,6 +12,8 @@ import Booking from "@/pages/Booking";
 import Pricing from "@/pages/Pricing";
 import Cart from "@/pages/Cart";
 import Checkout from "@/pages/Checkout";
+import Privacy from "@/pages/Privacy";
+import Terms from "@/pages/Terms";
 import NotFound from "@/pages/not-found";
 import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
@@ -40,6 +42,8 @@ function App() {
         <Route path="/pricing" component={Pricing} />
         <Route path="/cart" component={Cart} />
         <Route path="/checkout" component={Checkout} />
+        <Route path="/privacy" component={Privacy} />
+        <Route path="/terms" component={Terms} />
         <Route path="/image-test" component={ImageTest} />
         <Route component={NotFound} />
       </Switch>
