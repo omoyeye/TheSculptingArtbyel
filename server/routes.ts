@@ -78,6 +78,14 @@ const insertInstagramPostSchema = z.object({
   url: z.string().optional(),
 });
 
+const insertProductReviewSchema = z.object({
+  productId: z.number(),
+  customerName: z.string(),
+  rating: z.number().min(1).max(5),
+  reviewText: z.string(),
+  verified: z.boolean().default(false),
+});
+
 // Helper function to validate request body with zod schema
 function validateBody<T>(schema: z.ZodType<T>) {
   return (req: Request, res: Response, next: () => void) => {
@@ -406,6 +414,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(post);
     } catch (error) {
       res.status(500).json({ message: "Failed to create Instagram post" });
+    }
+  });
+
+  // Product Reviews routes
+  app.get("/api/products/:id/reviews", async (req, res) => {
+    try {
+      const productId = parseInt(req.params.id);
+      const reviews = await storage.getProductReviews(productId);
+      res.json(reviews);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch product reviews" });
+    }
+  });
+
+  app.post("/api/products/:id/reviews", validateBody(insertProductReviewSchema), async (req, res) => {
+    try {
+      const productId = parseInt(req.params.id);
+      const reviewData = { ...req.body, productId };
+      const review = await storage.createProductReview(reviewData);
+      res.status(201).json(review);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create product review" });
+    }
+  });
+
+  app.get("/api/products/:id/rating", async (req, res) => {
+    try {
+      const productId = parseInt(req.params.id);
+      const averageRating = await storage.getAverageRating(productId);
+      res.json({ averageRating });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch product rating" });
     }
   });
   

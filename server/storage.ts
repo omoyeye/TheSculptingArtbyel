@@ -118,6 +118,7 @@ export class MemStorage implements IStorage {
     this.testimonialIdCounter = 1;
     this.galleryItemIdCounter = 1;
     this.instagramPostIdCounter = 1;
+    this.productReviewIdCounter = 1;
     
     // Initialize with sample data
     this.initializeData();
@@ -555,6 +556,53 @@ export class MemStorage implements IStorage {
       fullName: "Admin User",
       role: "admin"
     });
+
+    // Add sample product reviews for waist trainers
+    this.createProductReview({
+      productId: 1,
+      customerName: "Sarah J.",
+      rating: 5,
+      reviewText: "Amazing quality waist trainer! Really helps with posture and gives great support during workouts. Highly recommend!",
+      verified: true
+    });
+
+    this.createProductReview({
+      productId: 1,
+      customerName: "Emma R.",
+      rating: 4,
+      reviewText: "Good product, fits well and comfortable to wear. Noticed improvements in my silhouette after a few weeks.",
+      verified: true
+    });
+
+    this.createProductReview({
+      productId: 2,
+      customerName: "Maria L.",
+      rating: 5,
+      reviewText: "Excellent waist trainer! The quality is outstanding and it's very comfortable. Perfect for my daily workouts.",
+      verified: true
+    });
+  }
+
+  async getProductReviews(productId: number): Promise<ProductReview[]> {
+    return Array.from(this.productReviews.values()).filter(review => review.productId === productId);
+  }
+
+  async createProductReview(review: InsertProductReview): Promise<ProductReview> {
+    const id = this.productReviewIdCounter++;
+    const newReview: ProductReview = { 
+      ...review, 
+      id,
+      createdAt: new Date()
+    };
+    this.productReviews.set(id, newReview);
+    return newReview;
+  }
+
+  async getAverageRating(productId: number): Promise<number> {
+    const reviews = await this.getProductReviews(productId);
+    if (reviews.length === 0) return 0;
+    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+    return Math.round((totalRating / reviews.length) * 10) / 10; // Round to 1 decimal place
   }
 }
 
