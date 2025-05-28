@@ -222,8 +222,8 @@ export default function Contact() {
                     <div>
                       <h3 className="font-medium text-lg mb-1">Visit Us</h3>
                       <p className="text-gray-600">
-                        123 Wellness Way<br />
-                        Beverly Hills, CA 90210
+                        Manchester<br />
+                        United Kingdom
                       </p>
                     </div>
                   </div>
@@ -235,8 +235,8 @@ export default function Contact() {
                     <div>
                       <h3 className="font-medium text-lg mb-1">Call Us</h3>
                       <p className="text-gray-600">
-                        <a href="tel:+13105550123" className="hover:text-secondary">
-                          (310) 555-0123
+                        <a href="tel:+447570618832" className="hover:text-secondary">
+                          +447570618832
                         </a>
                       </p>
                     </div>
@@ -249,8 +249,8 @@ export default function Contact() {
                     <div>
                       <h3 className="font-medium text-lg mb-1">Email Us</h3>
                       <p className="text-gray-600">
-                        <a href="mailto:info@thesculptingart.com" className="hover:text-secondary">
-                          info@thesculptingart.com
+                        <a href="mailto:Businesselom@gmail.com" className="hover:text-secondary">
+                          Businesselom@gmail.com
                         </a>
                       </p>
                     </div>

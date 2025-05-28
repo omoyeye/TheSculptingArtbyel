@@ -20,10 +20,10 @@ export default function BusinessHours() {
           Book your appointment today and start your transformation journey.
         </p>
         <a 
-          href="tel:+447000000000" 
+          href="tel:+447570618832" 
           className="mt-2 inline-block text-primary hover:text-primary/80"
         >
-          +44 7000 000000
+          +447570618832
         </a>
       </div>
     </div>
