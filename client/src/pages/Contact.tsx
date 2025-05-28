@@ -104,8 +104,8 @@ export default function Contact() {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <div>
-              <h2 className="text-2xl font-playfair text-secondary mb-6">Send Us a Message</h2>
+            <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-lg">
+              <h2 className="text-2xl font-playfair text-secondary mb-6 font-bold">Send Us a Message</h2>
               
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -114,9 +114,13 @@ export default function Contact() {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Name</FormLabel>
+                        <FormLabel className="text-gray-800 font-semibold text-sm">Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Your full name" {...field} />
+                          <Input 
+                            placeholder="Your full name" 
+                            className="border-2 border-gray-300 focus:border-secondary focus:ring-2 focus:ring-secondary/20 bg-white text-gray-900 placeholder:text-gray-500" 
+                            {...field} 
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -129,9 +133,13 @@ export default function Contact() {
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Email</FormLabel>
+                          <FormLabel className="text-gray-800 font-semibold text-sm">Email</FormLabel>
                           <FormControl>
-                            <Input placeholder="Your email address" {...field} />
+                            <Input 
+                              placeholder="Your email address" 
+                              className="border-2 border-gray-300 focus:border-secondary focus:ring-2 focus:ring-secondary/20 bg-white text-gray-900 placeholder:text-gray-500" 
+                              {...field} 
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -143,9 +151,13 @@ export default function Contact() {
                       name="phone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Phone</FormLabel>
+                          <FormLabel className="text-gray-800 font-semibold text-sm">Phone</FormLabel>
                           <FormControl>
-                            <Input placeholder="Your phone number" {...field} />
+                            <Input 
+                              placeholder="Your phone number" 
+                              className="border-2 border-gray-300 focus:border-secondary focus:ring-2 focus:ring-secondary/20 bg-white text-gray-900 placeholder:text-gray-500" 
+                              {...field} 
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -158,22 +170,22 @@ export default function Contact() {
                     name="subject"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Subject</FormLabel>
+                        <FormLabel className="text-gray-800 font-semibold text-sm">Subject</FormLabel>
                         <Select 
                           onValueChange={field.onChange} 
                           defaultValue={field.value}
                         >
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a subject" />
+                            <SelectTrigger className="border-2 border-gray-300 focus:border-secondary focus:ring-2 focus:ring-secondary/20 bg-white text-gray-900">
+                              <SelectValue placeholder="Select a subject" className="text-gray-500" />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent>
-                            <SelectItem value="general">General Inquiry</SelectItem>
-                            <SelectItem value="booking">Booking Information</SelectItem>
-                            <SelectItem value="pricing">Pricing & Packages</SelectItem>
-                            <SelectItem value="products">Product Information</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
+                          <SelectContent className="bg-white border-2 border-gray-200">
+                            <SelectItem value="general" className="text-gray-900 hover:bg-secondary/10">General Inquiry</SelectItem>
+                            <SelectItem value="booking" className="text-gray-900 hover:bg-secondary/10">Booking Information</SelectItem>
+                            <SelectItem value="pricing" className="text-gray-900 hover:bg-secondary/10">Pricing & Packages</SelectItem>
+                            <SelectItem value="products" className="text-gray-900 hover:bg-secondary/10">Product Information</SelectItem>
+                            <SelectItem value="other" className="text-gray-900 hover:bg-secondary/10">Other</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -186,11 +198,11 @@ export default function Contact() {
                     name="message"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Message</FormLabel>
+                        <FormLabel className="text-gray-800 font-semibold text-sm">Message</FormLabel>
                         <FormControl>
                           <Textarea 
                             placeholder="How can we help you?" 
-                            className="min-h-[150px]" 
+                            className="min-h-[150px] border-2 border-gray-300 focus:border-secondary focus:ring-2 focus:ring-secondary/20 bg-white text-gray-900 placeholder:text-gray-500" 
                             {...field}
                           />
                         </FormControl>
@@ -201,7 +213,7 @@ export default function Contact() {
                   
                   <Button 
                     type="submit" 
-                    className="w-full bg-secondary hover:bg-secondary/90"
+                    className="w-full bg-secondary hover:bg-secondary/90 text-white font-semibold py-3 text-base shadow-lg hover:shadow-xl transition-all duration-200"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? "Sending..." : "Send Message"}
@@ -211,17 +223,17 @@ export default function Contact() {
             </div>
             
             <div>
-              <h2 className="text-2xl font-playfair text-secondary mb-6">Contact Information</h2>
+              <h2 className="text-2xl font-playfair text-secondary mb-6 font-bold">Contact Information</h2>
               
-              <div className="bg-muted p-8 rounded-xl">
+              <div className="bg-secondary/5 border-2 border-secondary/20 p-8 rounded-xl shadow-lg">
                 <div className="space-y-6">
                   <div className="flex items-start">
-                    <div className="mt-1 mr-4 bg-secondary/10 p-2 rounded-full">
-                      <MapPin className="h-5 w-5 text-secondary" />
+                    <div className="mt-1 mr-4 bg-secondary p-3 rounded-full shadow-md">
+                      <MapPin className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-medium text-lg mb-1">Visit Us</h3>
-                      <p className="text-gray-600">
+                      <h3 className="font-bold text-lg mb-2 text-gray-900">Visit Us</h3>
+                      <p className="text-gray-700 font-medium">
                         Manchester<br />
                         United Kingdom
                       </p>
@@ -229,13 +241,13 @@ export default function Contact() {
                   </div>
                   
                   <div className="flex items-start">
-                    <div className="mt-1 mr-4 bg-secondary/10 p-2 rounded-full">
-                      <Phone className="h-5 w-5 text-secondary" />
+                    <div className="mt-1 mr-4 bg-secondary p-3 rounded-full shadow-md">
+                      <Phone className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-medium text-lg mb-1">Call Us</h3>
-                      <p className="text-gray-600">
-                        <a href="tel:+447570618832" className="hover:text-secondary">
+                      <h3 className="font-bold text-lg mb-2 text-gray-900">Call Us</h3>
+                      <p className="text-gray-700 font-medium">
+                        <a href="tel:+447570618832" className="hover:text-secondary font-semibold transition-colors duration-200">
                           +447570618832
                         </a>
                       </p>
@@ -243,13 +255,13 @@ export default function Contact() {
                   </div>
                   
                   <div className="flex items-start">
-                    <div className="mt-1 mr-4 bg-secondary/10 p-2 rounded-full">
-                      <Mail className="h-5 w-5 text-secondary" />
+                    <div className="mt-1 mr-4 bg-secondary p-3 rounded-full shadow-md">
+                      <Mail className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-medium text-lg mb-1">Email Us</h3>
-                      <p className="text-gray-600">
-                        <a href="mailto:Businesselom@gmail.com" className="hover:text-secondary">
+                      <h3 className="font-bold text-lg mb-2 text-gray-900">Email Us</h3>
+                      <p className="text-gray-700 font-medium">
+                        <a href="mailto:Businesselom@gmail.com" className="hover:text-secondary font-semibold transition-colors duration-200">
                           Businesselom@gmail.com
                         </a>
                       </p>
@@ -257,12 +269,12 @@ export default function Contact() {
                   </div>
                   
                   <div className="flex items-start">
-                    <div className="mt-1 mr-4 bg-secondary/10 p-2 rounded-full">
-                      <Clock className="h-5 w-5 text-secondary" />
+                    <div className="mt-1 mr-4 bg-secondary p-3 rounded-full shadow-md">
+                      <Clock className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-medium text-lg mb-1">Business Hours</h3>
-                      <p className="text-gray-600">
+                      <h3 className="font-bold text-lg mb-2 text-gray-900">Business Hours</h3>
+                      <p className="text-gray-700 font-medium">
                         Monday: Closed<br />
                         Tuesday - Sunday: 8am - 5pm
                       </p>
@@ -271,9 +283,9 @@ export default function Contact() {
                 </div>
               </div>
               
-              <div className="mt-8 h-64 bg-gray-200 rounded-xl">
+              <div className="mt-8 h-64 bg-gray-300 border-2 border-gray-400 rounded-xl shadow-inner">
                 {/* Google Maps Embed would go here in a real implementation */}
-                <div className="w-full h-full flex items-center justify-center text-gray-500">
+                <div className="w-full h-full flex items-center justify-center text-gray-600 font-semibold text-lg">
                   Interactive Map
                 </div>
               </div>
