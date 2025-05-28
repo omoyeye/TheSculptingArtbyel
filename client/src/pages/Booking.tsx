@@ -196,7 +196,7 @@ export default function Booking() {
                       <Alert className="bg-muted border-primary/20 mt-4">
                         <Info className="h-4 w-4 text-primary" />
                         <AlertDescription>
-                          A £50 deposit is required to secure your booking, which will be deducted from your final payment.
+                          A £20 deposit is required to secure your booking, which will be deducted from your final payment.
                         </AlertDescription>
                       </Alert>
                     </div>
