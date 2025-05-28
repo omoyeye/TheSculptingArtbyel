@@ -172,7 +172,7 @@ export default function Booking() {
                     <SelectContent>
                       {treatments.map((treatment) => (
                         <SelectItem key={treatment.id} value={treatment.id}>
-                          {treatment.title} - ${treatment.price} ({treatment.duration} min)
+                          {treatment.title} - £{treatment.price} ({treatment.duration} min)
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -186,7 +186,7 @@ export default function Booking() {
                       </div>
                       
                       <h3 className="text-xl font-medium">
-                        ${selectedTreatmentData.price}
+                        £{selectedTreatmentData.price}
                       </h3>
                       
                       <p className="text-gray-600">
@@ -196,7 +196,7 @@ export default function Booking() {
                       <Alert className="bg-muted border-primary/20 mt-4">
                         <Info className="h-4 w-4 text-primary" />
                         <AlertDescription>
-                          A $50 deposit is required to secure your booking, which will be deducted from your final payment.
+                          A £50 deposit is required to secure your booking, which will be deducted from your final payment.
                         </AlertDescription>
                       </Alert>
                     </div>
@@ -318,7 +318,7 @@ export default function Booking() {
                       
                       <div className="flex justify-between text-lg font-medium mb-6">
                         <span>Total:</span>
-                        <span>${selectedTreatmentData?.price.toFixed(2)}</span>
+                        <span>£{selectedTreatmentData?.price.toFixed(2)}</span>
                       </div>
                       
                       <div className="flex flex-col sm:flex-row sm:justify-between space-y-3 sm:space-y-0 sm:space-x-3">
