@@ -24,37 +24,37 @@ const slides: Slide[] = [
     id: 1,
     heading: "Redefine Your Body's Natural Beauty",
     subheading: "Experience transformative body sculpting and wellness treatments tailored to your unique needs.",
-    backgroundImage: img3361,
+    backgroundImage: "https://picsum.photos/1920/1080?random=1&blur=1",
   },
   {
     id: 2,
     heading: "Therapeutic Massage & Wellness",
     subheading: "Professional massage treatments designed to relax, rejuvenate, and restore your body's natural balance.",
-    backgroundImage: massageBack,
+    backgroundImage: "https://picsum.photos/1920/1080?random=2&blur=1",
   },
   {
     id: 3,
     heading: "Facial Treatments & Skincare",
     subheading: "Luxurious facial therapies that nourish your skin and enhance your natural radiance.",
-    backgroundImage: facialMassage,
+    backgroundImage: "https://picsum.photos/1920/1080?random=3&blur=1",
   },
   {
     id: 4,
     heading: "Advanced Body Sculpting",
     subheading: "Innovative sculpting techniques using specialized tools for targeted body contouring and wellness.",
-    backgroundImage: bodySculptingTool,
+    backgroundImage: "https://picsum.photos/1920/1080?random=4&blur=1",
   },
   {
     id: 5,
     heading: "Sculpt, Define, Transform",
     subheading: "Advanced non-invasive techniques to help you achieve your body goals.",
-    backgroundImage: img3361,
+    backgroundImage: "https://picsum.photos/1920/1080?random=5&blur=1",
   },
   {
     id: 6,
     heading: "Wellness from the Inside Out",
     subheading: "Holistic approach to body sculpting that benefits both body and mind.",
-    backgroundImage: img3362,
+    backgroundImage: "https://picsum.photos/1920/1080?random=6&blur=1",
   },
 ];
 
