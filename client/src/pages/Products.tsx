@@ -242,7 +242,7 @@ export default function Products() {
                         </Link>
                         <p className="text-gray-500 text-sm mb-2">{product.description.split(' ').slice(0, 3).join(' ')}</p>
                         <div className="flex justify-between items-center">
-                          <span className="font-medium">${product.price.toFixed(2)}</span>
+                          <span className="font-medium">£{product.price.toFixed(2)}</span>
                           <button 
                             className="text-secondary hover:text-secondary/80"
                             onClick={() => handleAddToCart(product.id)}

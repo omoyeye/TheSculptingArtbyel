@@ -114,7 +114,7 @@ export default function ProductDetail() {
               )}
               
               <h2 className="text-3xl font-playfair text-secondary mb-4">
-                ${product.price.toFixed(2)}
+                £{product.price.toFixed(2)}
               </h2>
               
               <div className="prose max-w-none mb-8">
@@ -164,7 +164,7 @@ export default function ProductDetail() {
                   <span className="font-medium mr-2">Product ID:</span> {product.id}
                 </p>
                 <p className="flex items-center">
-                  <span className="font-medium mr-2">Shipping:</span> Free shipping on orders over $100
+                  <span className="font-medium mr-2">Shipping:</span> Free shipping on orders over £100
                 </p>
               </div>
             </div>
