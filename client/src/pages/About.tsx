@@ -2,12 +2,12 @@ import { Helmet } from "react-helmet";
 import { CheckCircle, Award, Heart, Users } from "lucide-react";
 import Newsletter from "@/components/Newsletter";
 import { useCallback } from "react";
+import { getImage } from "@/assets/imageImports";
 
 export default function About() {
   const getImagePath = useCallback(() => {
     try {
-      const path = new URL(`@assets/images/Beige Nude Aesthetic Feminine Modern Gynecology Health Clinic Branding Logo.png`, import.meta.url).href;
-      return path;
+      return getImage("Beige Nude Aesthetic Feminine Modern Gynecology Health Clinic Branding Logo.png");
     } catch (error) {
       console.error("Error loading image:", error);
       return "";
