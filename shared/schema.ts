@@ -89,6 +89,16 @@ export interface InstagramPost {
   url?: string;
 }
 
+export interface ProductReview {
+  id: number;
+  productId: number;
+  customerName: string;
+  rating: number;
+  reviewText: string;
+  verified: boolean;
+  createdAt: Date;
+}
+
 // Insert types (for creating new records)
 export type InsertUser = Omit<User, 'id' | 'createdAt'>;
 export type InsertTreatment = Omit<Treatment, 'id'>;
@@ -99,3 +109,4 @@ export type InsertOrderItem = Omit<OrderItem, 'id'>;
 export type InsertTestimonial = Omit<Testimonial, 'id'>;
 export type InsertGalleryItem = Omit<GalleryItem, 'id'>;
 export type InsertInstagramPost = Omit<InstagramPost, 'id'>;
+export type InsertProductReview = Omit<ProductReview, 'id' | 'createdAt'>;

@@ -1,13 +1,14 @@
 import { 
-  users, type User, type InsertUser,
-  treatments, type Treatment, type InsertTreatment,
-  products, type Product, type InsertProduct,
-  bookings, type Booking, type InsertBooking,
-  orders, type Order, type InsertOrder,
-  orderItems, type OrderItem, type InsertOrderItem,
-  testimonials, type Testimonial, type InsertTestimonial,
-  galleryItems, type GalleryItem, type InsertGalleryItem,
-  instagramPosts, type InstagramPost, type InsertInstagramPost
+  type User, type InsertUser,
+  type Treatment, type InsertTreatment,
+  type Product, type InsertProduct,
+  type Booking, type InsertBooking,
+  type Order, type InsertOrder,
+  type OrderItem, type InsertOrderItem,
+  type Testimonial, type InsertTestimonial,
+  type GalleryItem, type InsertGalleryItem,
+  type InstagramPost, type InsertInstagramPost,
+  type ProductReview, type InsertProductReview
 } from "@shared/schema";
 
 // Define the storage interface
@@ -65,6 +66,11 @@ export interface IStorage {
   // Instagram Posts
   getInstagramPosts(): Promise<InstagramPost[]>;
   createInstagramPost(instagramPost: InsertInstagramPost): Promise<InstagramPost>;
+  
+  // Product Reviews
+  getProductReviews(productId: number): Promise<ProductReview[]>;
+  createProductReview(review: InsertProductReview): Promise<ProductReview>;
+  getAverageRating(productId: number): Promise<number>;
 }
 
 // In-memory storage implementation
@@ -78,6 +84,7 @@ export class MemStorage implements IStorage {
   private testimonials: Map<number, Testimonial>;
   private galleryItems: Map<number, GalleryItem>;
   private instagramPosts: Map<number, InstagramPost>;
+  private productReviews: Map<number, ProductReview>;
   
   private userIdCounter: number;
   private treatmentIdCounter: number;
@@ -88,6 +95,7 @@ export class MemStorage implements IStorage {
   private testimonialIdCounter: number;
   private galleryItemIdCounter: number;
   private instagramPostIdCounter: number;
+  private productReviewIdCounter: number;
   
   constructor() {
     this.users = new Map();
@@ -99,6 +107,7 @@ export class MemStorage implements IStorage {
     this.testimonials = new Map();
     this.galleryItems = new Map();
     this.instagramPosts = new Map();
+    this.productReviews = new Map();
     
     this.userIdCounter = 1;
     this.treatmentIdCounter = 1;
