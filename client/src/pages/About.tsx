@@ -124,54 +124,7 @@ export default function About() {
         </div>
       </section>
 
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-playfair text-secondary mb-4">Meet Our Team</h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Our skilled professionals bring years of expertise and a passion for transformation.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-32 h-32 bg-primary/10 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-primary text-4xl font-playfair">EL</span>
-              </div>
-              <h3 className="text-xl font-playfair text-secondary mb-1">Elena Lorenzo</h3>
-              <p className="text-primary font-medium mb-3">Founder & Lead Therapist</p>
-              <p className="text-gray-600 mb-4">
-                With over 15 years of experience in body sculpting and wellness treatments,
-                Elena founded The Sculpting Art to share her innovative techniques.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-32 h-32 bg-primary/10 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-primary text-4xl font-playfair">JR</span>
-              </div>
-              <h3 className="text-xl font-playfair text-secondary mb-1">James Rodriguez</h3>
-              <p className="text-primary font-medium mb-3">Senior Body Sculptor</p>
-              <p className="text-gray-600 mb-4">
-                James specializes in advanced body contouring techniques and
-                has helped hundreds of clients achieve their dream physique.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-32 h-32 bg-primary/10 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-primary text-4xl font-playfair">SN</span>
-              </div>
-              <h3 className="text-xl font-playfair text-secondary mb-1">Sofia Nguyen</h3>
-              <p className="text-primary font-medium mb-3">Wellness Specialist</p>
-              <p className="text-gray-600 mb-4">
-                Sofia combines traditional Eastern practices with modern techniques
-                to provide holistic treatments that balance body and mind.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      
 
       <Newsletter />
     </>
