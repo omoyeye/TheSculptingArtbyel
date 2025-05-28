@@ -2,17 +2,81 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
-import { 
-  insertTreatmentSchema, 
-  insertProductSchema, 
-  insertBookingSchema, 
-  insertOrderSchema, 
-  insertOrderItemSchema, 
-  insertUserSchema,
-  insertTestimonialSchema,
-  insertGalleryItemSchema,
-  insertInstagramPostSchema
-} from "@shared/schema";
+
+// Simple validation schemas for the in-memory storage
+const insertUserSchema = z.object({
+  username: z.string(),
+  password: z.string(),
+  email: z.string().email(),
+  fullName: z.string(),
+  role: z.string().default("customer"),
+});
+
+const insertTreatmentSchema = z.object({
+  slug: z.string(),
+  title: z.string(),
+  description: z.string(),
+  price: z.number(),
+  duration: z.number(),
+  image: z.string(),
+  featured: z.boolean().optional(),
+});
+
+const insertProductSchema = z.object({
+  slug: z.string(),
+  title: z.string(),
+  description: z.string(),
+  price: z.number(),
+  image: z.string(),
+  category: z.string(),
+  badge: z.string().optional(),
+  featured: z.boolean().optional(),
+  stockQuantity: z.number().default(0),
+});
+
+const insertBookingSchema = z.object({
+  userId: z.number().optional(),
+  treatmentId: z.number(),
+  date: z.string(),
+  time: z.string(),
+  status: z.string().default("pending"),
+  price: z.number(),
+});
+
+const insertOrderSchema = z.object({
+  userId: z.number().optional(),
+  status: z.string().default("pending"),
+  total: z.number(),
+});
+
+const insertOrderItemSchema = z.object({
+  orderId: z.number(),
+  productId: z.number(),
+  quantity: z.number(),
+  price: z.number(),
+});
+
+const insertTestimonialSchema = z.object({
+  name: z.string(),
+  treatment: z.string(),
+  rating: z.number(),
+  content: z.string(),
+  initials: z.string(),
+  featured: z.boolean().optional(),
+});
+
+const insertGalleryItemSchema = z.object({
+  title: z.string(),
+  category: z.string(),
+  image: z.string(),
+  featured: z.boolean().optional(),
+});
+
+const insertInstagramPostSchema = z.object({
+  image: z.string(),
+  likes: z.number().default(0),
+  url: z.string().optional(),
+});
 
 // Helper function to validate request body with zod schema
 function validateBody<T>(schema: z.ZodType<T>) {
