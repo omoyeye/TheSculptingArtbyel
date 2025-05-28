@@ -283,11 +283,18 @@ export default function Contact() {
                 </div>
               </div>
               
-              <div className="mt-8 h-64 bg-gray-300 border-2 border-gray-400 rounded-xl shadow-inner">
-                {/* Google Maps Embed would go here in a real implementation */}
-                <div className="w-full h-full flex items-center justify-center text-gray-600 font-semibold text-lg">
-                  Interactive Map
-                </div>
+              <div className="mt-8 h-64 rounded-xl shadow-inner overflow-hidden border-2 border-gray-200">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d9487.642849526936!2d-2.2426!3d53.4808!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x487bb1b3e3d0c3d3%3A0x2acd4fcd2bc9b244!2sManchester%2C%20UK!5e0!3m2!1sen!2sus!4v1633024800000!5m2!1sen!2sus"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="The Sculpting Art Location - Manchester, UK"
+                  className="rounded-xl"
+                />
               </div>
             </div>
           </div>
