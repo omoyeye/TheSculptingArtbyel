@@ -6,6 +6,9 @@ import { cn } from "@/lib/utils";
 import {
   img3361, 
   img3362,
+  massageBack,
+  facialMassage,
+  bodySculptingTool,
   getImage
 } from "@/assets/imageImports";
 
@@ -25,12 +28,30 @@ const slides: Slide[] = [
   },
   {
     id: 2,
+    heading: "Therapeutic Massage & Wellness",
+    subheading: "Professional massage treatments designed to relax, rejuvenate, and restore your body's natural balance.",
+    backgroundImage: massageBack,
+  },
+  {
+    id: 3,
+    heading: "Facial Treatments & Skincare",
+    subheading: "Luxurious facial therapies that nourish your skin and enhance your natural radiance.",
+    backgroundImage: facialMassage,
+  },
+  {
+    id: 4,
+    heading: "Advanced Body Sculpting",
+    subheading: "Innovative sculpting techniques using specialized tools for targeted body contouring and wellness.",
+    backgroundImage: bodySculptingTool,
+  },
+  {
+    id: 5,
     heading: "Sculpt, Define, Transform",
     subheading: "Advanced non-invasive techniques to help you achieve your body goals.",
     backgroundImage: img3361,
   },
   {
-    id: 3,
+    id: 6,
     heading: "Wellness from the Inside Out",
     subheading: "Holistic approach to body sculpting that benefits both body and mind.",
     backgroundImage: img3362,
