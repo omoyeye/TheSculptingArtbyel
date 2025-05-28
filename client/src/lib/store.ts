@@ -217,7 +217,7 @@ export const useStore = create<StoreState>()(
           name: 'Jessica M.',
           treatment: 'Wood Therapy Client',
           rating: 5,
-          content: 'After just 4 sessions of wood therapy, the difference in my body is incredible. Not only do I look better, but I feel more confident and energized. The staff is professional, knowledgeable, and truly caring.',
+          content: 'Had an amazing experience with El she is very delicate she explained everything to me and she is very delicate. I recommend 100% and will definitely go back for other treatments.',
           initials: 'JM',
         },
         {
@@ -281,18 +281,18 @@ export const useStore = create<StoreState>()(
       addToCart: (item) => {
         const cart = get().cart;
         const cartItemId = `${item.type}-${item.itemId}-${Date.now()}`;
-        
+
         // For products, check if it already exists and update quantity
         if (item.type === 'product') {
           const existingItem = cart.find(
             (cartItem) => cartItem.type === 'product' && cartItem.itemId === item.itemId
           );
-          
+
           if (existingItem) {
             return get().updateQuantity(existingItem.id, existingItem.quantity + (item.quantity || 1));
           }
         }
-        
+
         // Add new item to cart
         set({ 
           cart: [...cart, { ...item, id: cartItemId, quantity: item.quantity || 1 }],
@@ -306,7 +306,7 @@ export const useStore = create<StoreState>()(
         if (quantity <= 0) {
           return get().removeFromCart(id);
         }
-        
+
         set({
           cart: get().cart.map((item) => 
             item.id === id ? { ...item, quantity } : item
