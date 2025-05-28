@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Minus, Plus, ShoppingBag } from "lucide-react";
 import Newsletter from "@/components/Newsletter";
+import ProductReviews from "@/components/ProductReviews";
 import { getImage } from "@/assets/imageImports";
 
 export default function ProductDetail() {
@@ -169,6 +170,13 @@ export default function ProductDetail() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Product Reviews Section */}
+      <section className="py-16 bg-muted">
+        <div className="container mx-auto px-4">
+          <ProductReviews productId={product.id} />
         </div>
       </section>
 

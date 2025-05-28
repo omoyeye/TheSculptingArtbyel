@@ -72,7 +72,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
     setSubmitting(true);
 
     try {
-      const response = await apiRequest(`/api/products/${productId}/reviews`, {
+      const response = await fetch(`/api/products/${productId}/reviews`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
