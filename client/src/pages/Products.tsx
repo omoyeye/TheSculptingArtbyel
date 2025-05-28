@@ -17,6 +17,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useCallback } from "react";
+import { getImage } from "@/assets/imageImports";
 
 // Get all unique categories from products
 const getCategories = (products: any[]) => {
@@ -34,8 +35,7 @@ export default function Products() {
 
   const getImagePath = useCallback((filename: string) => {
     try {
-      const path = new URL(`@assets/${filename}`, import.meta.url).href;
-      return path;
+      return getImage(filename);
     } catch (error) {
       console.error("Error loading image:", error);
       return "";
