@@ -21,7 +21,7 @@ export default function Gallery() {
   const { treatments } = useStore();
   
   // Create gallery items based on treatments and add Before/After images
-  const galleryItems: GalleryItem[] = [
+  const allGalleryItems: GalleryItem[] = [
     {
       id: "before-after-1",
       title: "Abdominal Sculpting Results",
@@ -65,6 +65,12 @@ export default function Gallery() {
       image: treatment.image
     }))
   ];
+
+  // Remove duplicates based on image filename
+  const galleryItems: GalleryItem[] = allGalleryItems.filter((item, index, array) => {
+    const firstIndex = array.findIndex(otherItem => otherItem.image === item.image);
+    return firstIndex === index;
+  });
 
   const getImagePath = useCallback((filename: string) => {
     try {
