@@ -123,8 +123,7 @@ export default function AdminDashboard() {
         }
         
         // Then fetch from API
-        const response = await apiRequest('/api/settings');
-        const apiSettings = response;
+        const apiSettings = await apiRequest('/api/settings');
         setSettings(apiSettings);
         localStorage.setItem('adminSettings', JSON.stringify(apiSettings));
       } catch (error) {
@@ -177,9 +176,6 @@ export default function AdminDashboard() {
       // Update API
       await apiRequest('/api/settings', {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         body: JSON.stringify(updatedSettings)
       });
       
@@ -200,7 +196,6 @@ export default function AdminDashboard() {
       };
       return await apiRequest('/api/treatments', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(treatmentData)
       });
     },
@@ -219,7 +214,6 @@ export default function AdminDashboard() {
     mutationFn: async (treatment: any) => {
       return await apiRequest(`/api/treatments/${treatment.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(treatment)
       });
     },
@@ -256,7 +250,6 @@ export default function AdminDashboard() {
       };
       return await apiRequest('/api/products', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(productData)
       });
     },
@@ -275,7 +268,6 @@ export default function AdminDashboard() {
     mutationFn: async (product: any) => {
       return await apiRequest(`/api/products/${product.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(product)
       });
     },

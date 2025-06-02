@@ -90,7 +90,7 @@ export class MemStorage implements IStorage {
   private galleryItems: Map<number, GalleryItem>;
   private instagramPosts: Map<number, InstagramPost>;
   private productReviews: Map<number, ProductReview>;
-  private websiteSettings: WebsiteSettings;
+  private websiteSettings!: WebsiteSettings;
   
   private userIdCounter: number;
   private treatmentIdCounter: number;
