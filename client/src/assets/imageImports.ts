@@ -12,6 +12,7 @@ import screenshot160111 from './images/Screenshot 2025-05-04 160111.png';
 import waistTrainer1 from './images/1.jpg';
 import waistTrainer2 from './images/2.jpg';
 import woodTherapy from './images/wood-therapy.jpg';
+import defaultTreatment from './images/default-treatment.jpg';
 
 // Define a map for easy lookup by filename
 const imageMap: Record<string, string> = {
@@ -28,11 +29,17 @@ const imageMap: Record<string, string> = {
   '1.jpg': waistTrainer1,
   '2.jpg': waistTrainer2,
   'wood-therapy.jpg': woodTherapy,
+  'default-treatment.jpg': defaultTreatment,
 };
 
 // Helper function to get image by filename
 export function getImage(filename: string): string {
-  return imageMap[filename] || brandingLogo; // Fallback to logo if image not found
+  const image = imageMap[filename as keyof typeof imageMap];
+  if (!image) {
+    console.warn(`Image not found: ${filename}`);
+    return defaultTreatment;
+  }
+  return image;
 }
 
 // Named exports for direct access
