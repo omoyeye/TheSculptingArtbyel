@@ -39,7 +39,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { useStore } from "@/lib/store";
 import { 
   Users, 
   ShoppingBag, 
@@ -63,7 +62,8 @@ import {
   TrendingUp,
   AlertTriangle,
   Eye,
-  EyeOff
+  EyeOff,
+  Save
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -74,162 +74,311 @@ export default function AdminDashboard() {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
   
-  // State for forms
-  const [editingTreatment, setEditingTreatment] = useState(null);
-  const [editingProduct, setEditingProduct] = useState(null);
+  // Dialog states
+  const [isAddTreatmentOpen, setIsAddTreatmentOpen] = useState(false);
+  const [isEditTreatmentOpen, setIsEditTreatmentOpen] = useState(false);
+  const [isAddProductOpen, setIsAddProductOpen] = useState(false);
+  const [isEditProductOpen, setIsEditProductOpen] = useState(false);
+  
+  // Form states
+  const [editingTreatment, setEditingTreatment] = useState<any>(null);
+  const [editingProduct, setEditingProduct] = useState<any>(null);
   const [newTreatment, setNewTreatment] = useState({
-    title: "", description: "", price: 0, duration: 30, slug: "", image: "", featured: false
+    title: "", description: "", price: 0, duration: 30, featured: false
   });
   const [newProduct, setNewProduct] = useState({
-    title: "", description: "", price: 0, slug: "", image: "", category: "", stockQuantity: 0, featured: false
+    title: "", description: "", price: 0, category: "Body Sculpting", stockQuantity: 0, featured: false
   });
+  const [settings, setSettings] = useState<any>(null);
 
-  // Fetch data
-  const { data: treatments = [] } = useQuery({
+  // Fetch data with proper typing
+  const { data: treatments = [], isLoading: treatmentsLoading } = useQuery({
     queryKey: ['/api/treatments'],
     enabled: activeTab === 'treatments' || activeTab === 'overview'
   });
 
-  const { data: products = [] } = useQuery({
+  const { data: products = [], isLoading: productsLoading } = useQuery({
     queryKey: ['/api/products'],
     enabled: activeTab === 'products' || activeTab === 'overview'
   });
 
-  const { data: bookings = [] } = useQuery({
+  const { data: bookings = [], isLoading: bookingsLoading } = useQuery({
     queryKey: ['/api/bookings'],
     enabled: activeTab === 'bookings' || activeTab === 'overview'
   });
 
-  const { data: orders = [] } = useQuery({
+  const { data: orders = [], isLoading: ordersLoading } = useQuery({
     queryKey: ['/api/orders'],
     enabled: activeTab === 'orders' || activeTab === 'overview'
   });
 
-  const { data: settings } = useQuery({
-    queryKey: ['/api/settings'],
-    enabled: activeTab === 'settings'
-  });
+  // Load settings from localStorage and API
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        // Load from localStorage first for real-time updates
+        const localSettings = localStorage.getItem('adminSettings');
+        if (localSettings) {
+          setSettings(JSON.parse(localSettings));
+        }
+        
+        // Then fetch from API
+        const response = await apiRequest('/api/settings');
+        const apiSettings = response;
+        setSettings(apiSettings);
+        localStorage.setItem('adminSettings', JSON.stringify(apiSettings));
+      } catch (error) {
+        console.error('Failed to load settings:', error);
+        // Fallback to default settings
+        const defaultSettings = {
+          id: 1,
+          bookingEnabled: true,
+          maintenanceMode: false,
+          businessHours: {
+            monday: { closed: true },
+            tuesday: { closed: false, open: "8:00", close: "17:00" },
+            wednesday: { closed: false, open: "8:00", close: "17:00" },
+            thursday: { closed: false, open: "8:00", close: "17:00" },
+            friday: { closed: false, open: "8:00", close: "17:00" },
+            saturday: { closed: false, open: "8:00", close: "17:00" },
+            sunday: { closed: false, open: "8:00", close: "17:00" }
+          },
+          contactInfo: {
+            phone: "+44 123 456 7890",
+            email: "info@thesculptingart.com",
+            address: "123 Beauty Street, London, UK"
+          },
+          socialMedia: {
+            instagram: "@thesculptingart",
+            facebook: "The Sculpting Art",
+            twitter: "@sculptigart"
+          },
+          siteContent: {
+            heroTitle: "Transform Your Body, Elevate Your Confidence",
+            heroSubtitle: "Experience Professional Body Sculpting & Wellness Treatments",
+            aboutText: "The Sculpting Art specializes in non-invasive body sculpting treatments that help you achieve your wellness goals."
+          }
+        };
+        setSettings(defaultSettings);
+        localStorage.setItem('adminSettings', JSON.stringify(defaultSettings));
+      }
+    };
+    
+    loadSettings();
+  }, []);
+
+  // Real-time settings update function
+  const updateSettings = async (newSettings: any) => {
+    try {
+      const updatedSettings = { ...settings, ...newSettings };
+      setSettings(updatedSettings);
+      localStorage.setItem('adminSettings', JSON.stringify(updatedSettings));
+      
+      // Update API
+      await apiRequest('/api/settings', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedSettings)
+      });
+      
+      toast({ title: "Settings updated successfully" });
+    } catch (error) {
+      console.error('Failed to update settings:', error);
+      toast({ title: "Failed to update settings", variant: "destructive" });
+    }
+  };
 
   // Mutations for CRUD operations
-  const updateSettingsMutation = useMutation({
-    mutationFn: (newSettings) => 
-      apiRequest('/api/settings', { method: 'PUT', body: JSON.stringify(newSettings) }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/settings'] });
-      toast({ title: "Settings updated successfully" });
-    }
-  });
-
   const createTreatmentMutation = useMutation({
-    mutationFn: (treatment) => 
-      apiRequest('/api/treatments', { method: 'POST', body: JSON.stringify(treatment) }),
+    mutationFn: async (treatment: any) => {
+      const treatmentData = {
+        ...treatment,
+        slug: treatment.title.toLowerCase().replace(/\s+/g, '-'),
+        image: "wood-therapy-1.jpg"
+      };
+      return await apiRequest('/api/treatments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(treatmentData)
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/treatments'] });
-      setNewTreatment({ title: "", description: "", price: 0, duration: 30, slug: "", image: "", featured: false });
+      setNewTreatment({ title: "", description: "", price: 0, duration: 30, featured: false });
+      setIsAddTreatmentOpen(false);
       toast({ title: "Treatment created successfully" });
+    },
+    onError: () => {
+      toast({ title: "Failed to create treatment", variant: "destructive" });
     }
   });
 
   const updateTreatmentMutation = useMutation({
-    mutationFn: ({ id, ...treatment }) => 
-      apiRequest(`/api/treatments/${id}`, { method: 'PUT', body: JSON.stringify(treatment) }),
+    mutationFn: async (treatment: any) => {
+      return await apiRequest(`/api/treatments/${treatment.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(treatment)
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/treatments'] });
       setEditingTreatment(null);
+      setIsEditTreatmentOpen(false);
       toast({ title: "Treatment updated successfully" });
+    },
+    onError: () => {
+      toast({ title: "Failed to update treatment", variant: "destructive" });
     }
   });
 
   const deleteTreatmentMutation = useMutation({
-    mutationFn: (id) => 
-      apiRequest(`/api/treatments/${id}`, { method: 'DELETE' }),
+    mutationFn: async (id: number) => {
+      return await apiRequest(`/api/treatments/${id}`, { method: 'DELETE' });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/treatments'] });
       toast({ title: "Treatment deleted successfully" });
+    },
+    onError: () => {
+      toast({ title: "Failed to delete treatment", variant: "destructive" });
     }
   });
 
   const createProductMutation = useMutation({
-    mutationFn: (product) => 
-      apiRequest('/api/products', { method: 'POST', body: JSON.stringify(product) }),
+    mutationFn: async (product: any) => {
+      const productData = {
+        ...product,
+        slug: product.title.toLowerCase().replace(/\s+/g, '-'),
+        image: "waist-trainer-1.jpg"
+      };
+      return await apiRequest('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(productData)
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/products'] });
-      setNewProduct({ title: "", description: "", price: 0, slug: "", image: "", category: "", stockQuantity: 0, featured: false });
+      setNewProduct({ title: "", description: "", price: 0, category: "Body Sculpting", stockQuantity: 0, featured: false });
+      setIsAddProductOpen(false);
       toast({ title: "Product created successfully" });
+    },
+    onError: () => {
+      toast({ title: "Failed to create product", variant: "destructive" });
     }
   });
 
   const updateProductMutation = useMutation({
-    mutationFn: ({ id, ...product }) => 
-      apiRequest(`/api/products/${id}`, { method: 'PUT', body: JSON.stringify(product) }),
+    mutationFn: async (product: any) => {
+      return await apiRequest(`/api/products/${product.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(product)
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/products'] });
       setEditingProduct(null);
+      setIsEditProductOpen(false);
       toast({ title: "Product updated successfully" });
+    },
+    onError: () => {
+      toast({ title: "Failed to update product", variant: "destructive" });
     }
   });
 
   const deleteProductMutation = useMutation({
-    mutationFn: (id) => 
-      apiRequest(`/api/products/${id}`, { method: 'DELETE' }),
+    mutationFn: async (id: number) => {
+      return await apiRequest(`/api/products/${id}`, { method: 'DELETE' });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/products'] });
       toast({ title: "Product deleted successfully" });
+    },
+    onError: () => {
+      toast({ title: "Failed to delete product", variant: "destructive" });
     }
   });
 
   const updateBookingMutation = useMutation({
-    mutationFn: ({ id, status }) => 
-      apiRequest(`/api/bookings/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+    mutationFn: async ({ id, status }: { id: number; status: string }) => {
+      return await apiRequest(`/api/bookings/${id}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/bookings'] });
       toast({ title: "Booking status updated successfully" });
+    },
+    onError: () => {
+      toast({ title: "Failed to update booking status", variant: "destructive" });
     }
   });
 
   const updateOrderMutation = useMutation({
-    mutationFn: ({ id, status }) => 
-      apiRequest(`/api/orders/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+    mutationFn: async ({ id, status }: { id: number; status: string }) => {
+      return await apiRequest(`/api/orders/${id}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/orders'] });
       toast({ title: "Order status updated successfully" });
+    },
+    onError: () => {
+      toast({ title: "Failed to update order status", variant: "destructive" });
     }
   });
 
   // Toggle booking system
-  const toggleBookingSystem = (enabled) => {
-    updateSettingsMutation.mutate({ 
-      ...settings, 
-      bookingEnabled: enabled 
-    });
+  const toggleBookingSystem = (enabled: boolean) => {
+    updateSettings({ bookingEnabled: enabled });
   };
 
   // Calculate statistics
-  const totalRevenue = orders?.reduce((sum, order) => sum + order.total, 0) || 0;
-  const totalBookings = bookings?.length || 0;
-  const pendingBookings = bookings?.filter(b => b.status === 'pending').length || 0;
-  const completedOrders = orders?.filter(o => o.status === 'completed').length || 0;
+  const totalRevenue = Array.isArray(orders) ? orders.reduce((sum: number, order: any) => sum + (order.total || 0), 0) : 0;
+  const totalBookings = Array.isArray(bookings) ? bookings.length : 0;
+  const pendingBookings = Array.isArray(bookings) ? bookings.filter((b: any) => b.status === 'pending').length : 0;
+  const completedOrders = Array.isArray(orders) ? orders.filter((o: any) => o.status === 'completed').length : 0;
 
   // Filter data based on search
-  const filteredTreatments = treatments.filter(t => 
-    t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    t.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredTreatments = Array.isArray(treatments) ? treatments.filter((t: any) => 
+    t.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    t.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  ) : [];
 
-  const filteredProducts = products.filter(p => 
-    p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredProducts = Array.isArray(products) ? products.filter((p: any) => 
+    p.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.category?.toLowerCase().includes(searchQuery.toLowerCase())
+  ) : [];
 
-  const filteredBookings = bookings.filter(b => 
+  const filteredBookings = Array.isArray(bookings) ? bookings.filter((b: any) => 
     b.customerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     b.treatmentTitle?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  ) : [];
 
-  const filteredOrders = orders.filter(o => 
+  const filteredOrders = Array.isArray(orders) ? orders.filter((o: any) => 
     o.customerName?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  ) : [];
+
+  // Edit handlers
+  const handleEditTreatment = (treatment: any) => {
+    setEditingTreatment(treatment);
+    setIsEditTreatmentOpen(true);
+  };
+
+  const handleEditProduct = (product: any) => {
+    setEditingProduct(product);
+    setIsEditProductOpen(true);
+  };
 
   return (
     <>
@@ -378,9 +527,9 @@ export default function AdminDashboard() {
                     <Users className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{treatments.length}</div>
+                    <div className="text-2xl font-bold">{Array.isArray(treatments) ? treatments.length : 0}</div>
                     <p className="text-xs text-muted-foreground">
-                      {treatments.filter(t => t.featured).length} featured
+                      {Array.isArray(treatments) ? treatments.filter((t: any) => t.featured).length : 0} featured
                     </p>
                   </CardContent>
                 </Card>
@@ -391,9 +540,9 @@ export default function AdminDashboard() {
                     <Package className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{products.length}</div>
+                    <div className="text-2xl font-bold">{Array.isArray(products) ? products.length : 0}</div>
                     <p className="text-xs text-muted-foreground">
-                      {products.filter(p => p.stockQuantity > 0).length} in stock
+                      {Array.isArray(products) ? products.filter((p: any) => p.stockQuantity > 0).length : 0} in stock
                     </p>
                   </CardContent>
                 </Card>
@@ -404,40 +553,50 @@ export default function AdminDashboard() {
                   <CardHeader>
                     <CardTitle>Recent Bookings</CardTitle>
                     <CardDescription>
-                      Latest {Math.min(5, bookings.length)} bookings
+                      Latest {Math.min(5, totalBookings)} bookings
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Customer</TableHead>
-                          <TableHead>Treatment</TableHead>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Status</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {bookings.slice(0, 5).map((booking) => (
-                          <TableRow key={booking.id}>
-                            <TableCell>{booking.customerName || 'Guest'}</TableCell>
-                            <TableCell>{booking.treatmentTitle}</TableCell>
-                            <TableCell>{booking.date} • {booking.time}</TableCell>
-                            <TableCell>
-                              <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                                booking.status === 'confirmed' 
-                                  ? 'bg-green-100 text-green-800' 
-                                  : booking.status === 'cancelled' 
-                                    ? 'bg-red-100 text-red-800' 
-                                    : 'bg-yellow-100 text-yellow-800'
-                              }`}>
-                                {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
-                              </span>
-                            </TableCell>
+                    {bookingsLoading ? (
+                      <p>Loading bookings...</p>
+                    ) : (
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Customer</TableHead>
+                            <TableHead>Treatment</TableHead>
+                            <TableHead>Date</TableHead>
+                            <TableHead>Status</TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                        </TableHeader>
+                        <TableBody>
+                          {Array.isArray(bookings) && bookings.length > 0 ? bookings.slice(0, 5).map((booking: any) => (
+                            <TableRow key={booking.id}>
+                              <TableCell>{booking.customerName || 'Guest'}</TableCell>
+                              <TableCell>{booking.treatmentTitle || 'N/A'}</TableCell>
+                              <TableCell>{booking.date} • {booking.time}</TableCell>
+                              <TableCell>
+                                <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                                  booking.status === 'confirmed' 
+                                    ? 'bg-green-100 text-green-800' 
+                                    : booking.status === 'cancelled' 
+                                      ? 'bg-red-100 text-red-800' 
+                                      : 'bg-yellow-100 text-yellow-800'
+                                }`}>
+                                  {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                                </span>
+                              </TableCell>
+                            </TableRow>
+                          )) : (
+                            <TableRow>
+                              <TableCell colSpan={4} className="text-center text-muted-foreground">
+                                No bookings yet
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </TableBody>
+                      </Table>
+                    )}
                   </CardContent>
                 </Card>
                 
@@ -445,40 +604,50 @@ export default function AdminDashboard() {
                   <CardHeader>
                     <CardTitle>Recent Orders</CardTitle>
                     <CardDescription>
-                      Latest {Math.min(5, orders.length)} orders
+                      Latest {Math.min(5, Array.isArray(orders) ? orders.length : 0)} orders
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Customer</TableHead>
-                          <TableHead>Total</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Date</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {orders.slice(0, 5).map((order) => (
-                          <TableRow key={order.id}>
-                            <TableCell>{order.customerName || 'Guest'}</TableCell>
-                            <TableCell>£{order.total.toFixed(2)}</TableCell>
-                            <TableCell>
-                              <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                                order.status === 'completed' 
-                                  ? 'bg-green-100 text-green-800' 
-                                  : order.status === 'shipped' 
-                                    ? 'bg-blue-100 text-blue-800' 
-                                    : 'bg-yellow-100 text-yellow-800'
-                              }`}>
-                                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                              </span>
-                            </TableCell>
-                            <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
+                    {ordersLoading ? (
+                      <p>Loading orders...</p>
+                    ) : (
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Customer</TableHead>
+                            <TableHead>Total</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Date</TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                        </TableHeader>
+                        <TableBody>
+                          {Array.isArray(orders) && orders.length > 0 ? orders.slice(0, 5).map((order: any) => (
+                            <TableRow key={order.id}>
+                              <TableCell>{order.customerName || 'Guest'}</TableCell>
+                              <TableCell>£{(order.total || 0).toFixed(2)}</TableCell>
+                              <TableCell>
+                                <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                                  order.status === 'completed' 
+                                    ? 'bg-green-100 text-green-800' 
+                                    : order.status === 'shipped' 
+                                      ? 'bg-blue-100 text-blue-800' 
+                                      : 'bg-yellow-100 text-yellow-800'
+                                }`}>
+                                  {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                </span>
+                              </TableCell>
+                              <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
+                            </TableRow>
+                          )) : (
+                            <TableRow>
+                              <TableCell colSpan={4} className="text-center text-muted-foreground">
+                                No orders yet
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </TableBody>
+                      </Table>
+                    )}
                   </CardContent>
                 </Card>
               </div>
@@ -498,7 +667,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {!settings?.bookingEnabled && (
+              {settings && !settings.bookingEnabled && (
                 <Card className="border-orange-200 bg-orange-50">
                   <CardContent className="pt-6">
                     <div className="flex items-center gap-2 text-orange-800">
@@ -520,53 +689,63 @@ export default function AdminDashboard() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>ID</TableHead>
-                        <TableHead>Customer</TableHead>
-                        <TableHead>Treatment</TableHead>
-                        <TableHead>Date & Time</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredBookings.map((booking) => (
-                        <TableRow key={booking.id}>
-                          <TableCell>#{booking.id}</TableCell>
-                          <TableCell>{booking.customerName || 'Guest'}</TableCell>
-                          <TableCell>{booking.treatmentTitle}</TableCell>
-                          <TableCell>{booking.date} • {booking.time}</TableCell>
-                          <TableCell>£{booking.price.toFixed(2)}</TableCell>
-                          <TableCell>
-                            <Select 
-                              value={booking.status} 
-                              onValueChange={(status) => 
-                                updateBookingMutation.mutate({ id: booking.id, status })
-                              }
-                            >
-                              <SelectTrigger className="w-32">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="pending">Pending</SelectItem>
-                                <SelectItem value="confirmed">Confirmed</SelectItem>
-                                <SelectItem value="completed">Completed</SelectItem>
-                                <SelectItem value="cancelled">Cancelled</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
-                          <TableCell>
-                            <Button variant="outline" size="sm">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </TableCell>
+                  {bookingsLoading ? (
+                    <p>Loading bookings...</p>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>ID</TableHead>
+                          <TableHead>Customer</TableHead>
+                          <TableHead>Treatment</TableHead>
+                          <TableHead>Date & Time</TableHead>
+                          <TableHead>Price</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Actions</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredBookings.length > 0 ? filteredBookings.map((booking: any) => (
+                          <TableRow key={booking.id}>
+                            <TableCell>#{booking.id}</TableCell>
+                            <TableCell>{booking.customerName || 'Guest'}</TableCell>
+                            <TableCell>{booking.treatmentTitle || 'N/A'}</TableCell>
+                            <TableCell>{booking.date} • {booking.time}</TableCell>
+                            <TableCell>£{(booking.price || 0).toFixed(2)}</TableCell>
+                            <TableCell>
+                              <Select 
+                                value={booking.status} 
+                                onValueChange={(status) => 
+                                  updateBookingMutation.mutate({ id: booking.id, status })
+                                }
+                              >
+                                <SelectTrigger className="w-32">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="pending">Pending</SelectItem>
+                                  <SelectItem value="confirmed">Confirmed</SelectItem>
+                                  <SelectItem value="completed">Completed</SelectItem>
+                                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </TableCell>
+                            <TableCell>
+                              <Button variant="outline" size="sm">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        )) : (
+                          <TableRow>
+                            <TableCell colSpan={7} className="text-center text-muted-foreground">
+                              No bookings found
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -575,7 +754,7 @@ export default function AdminDashboard() {
             <TabsContent value="treatments" className="space-y-6">
               <div className="flex justify-between items-center">
                 <h2 className="text-3xl font-playfair text-secondary">Treatment Management</h2>
-                <Dialog>
+                <Dialog open={isAddTreatmentOpen} onOpenChange={setIsAddTreatmentOpen}>
                   <DialogTrigger asChild>
                     <Button>
                       <PlusCircle className="mr-2 h-4 w-4" />
@@ -609,7 +788,7 @@ export default function AdminDashboard() {
                           id="price"
                           type="number"
                           value={newTreatment.price}
-                          onChange={(e) => setNewTreatment({...newTreatment, price: parseFloat(e.target.value)})}
+                          onChange={(e) => setNewTreatment({...newTreatment, price: parseFloat(e.target.value) || 0})}
                           className="col-span-3"
                         />
                       </div>
@@ -621,7 +800,7 @@ export default function AdminDashboard() {
                           id="duration"
                           type="number"
                           value={newTreatment.duration}
-                          onChange={(e) => setNewTreatment({...newTreatment, duration: parseInt(e.target.value)})}
+                          onChange={(e) => setNewTreatment({...newTreatment, duration: parseInt(e.target.value) || 30})}
                           className="col-span-3"
                         />
                       </div>
@@ -636,17 +815,24 @@ export default function AdminDashboard() {
                           className="col-span-3"
                         />
                       </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="featured" className="text-right">
+                          Featured
+                        </Label>
+                        <Switch
+                          id="featured"
+                          checked={newTreatment.featured}
+                          onCheckedChange={(featured) => setNewTreatment({...newTreatment, featured})}
+                        />
+                      </div>
                     </div>
                     <DialogFooter>
                       <Button 
                         type="submit" 
-                        onClick={() => createTreatmentMutation.mutate({
-                          ...newTreatment,
-                          slug: newTreatment.title.toLowerCase().replace(/\s+/g, '-'),
-                          image: "wood-therapy-1.jpg"
-                        })}
+                        onClick={() => createTreatmentMutation.mutate(newTreatment)}
+                        disabled={createTreatmentMutation.isPending}
                       >
-                        Create Treatment
+                        {createTreatmentMutation.isPending ? 'Creating...' : 'Create Treatment'}
                       </Button>
                     </DialogFooter>
                   </DialogContent>
@@ -661,64 +847,160 @@ export default function AdminDashboard() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Treatment</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>Duration</TableHead>
-                        <TableHead>Featured</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredTreatments.map((treatment) => (
-                        <TableRow key={treatment.id}>
-                          <TableCell>
-                            <div>
-                              <p className="font-medium">{treatment.title}</p>
-                              <p className="text-sm text-muted-foreground truncate max-w-[200px]">
-                                {treatment.description}
-                              </p>
-                            </div>
-                          </TableCell>
-                          <TableCell>£{treatment.price.toFixed(2)}</TableCell>
-                          <TableCell>{treatment.duration} min</TableCell>
-                          <TableCell>
-                            <Switch
-                              checked={treatment.featured || false}
-                              onCheckedChange={(featured) =>
-                                updateTreatmentMutation.mutate({ id: treatment.id, featured })
-                              }
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex gap-2">
-                              <Button variant="outline" size="sm">
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => deleteTreatmentMutation.mutate(treatment.id)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
+                  {treatmentsLoading ? (
+                    <p>Loading treatments...</p>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Treatment</TableHead>
+                          <TableHead>Price</TableHead>
+                          <TableHead>Duration</TableHead>
+                          <TableHead>Featured</TableHead>
+                          <TableHead>Actions</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredTreatments.length > 0 ? filteredTreatments.map((treatment: any) => (
+                          <TableRow key={treatment.id}>
+                            <TableCell>
+                              <div>
+                                <p className="font-medium">{treatment.title}</p>
+                                <p className="text-sm text-muted-foreground truncate max-w-[200px]">
+                                  {treatment.description}
+                                </p>
+                              </div>
+                            </TableCell>
+                            <TableCell>£{(treatment.price || 0).toFixed(2)}</TableCell>
+                            <TableCell>{treatment.duration || 0} min</TableCell>
+                            <TableCell>
+                              <Switch
+                                checked={treatment.featured || false}
+                                onCheckedChange={(featured) =>
+                                  updateTreatmentMutation.mutate({ ...treatment, featured })
+                                }
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-2">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleEditTreatment(treatment)}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => deleteTreatmentMutation.mutate(treatment.id)}
+                                  disabled={deleteTreatmentMutation.isPending}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )) : (
+                          <TableRow>
+                            <TableCell colSpan={5} className="text-center text-muted-foreground">
+                              No treatments found
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  )}
                 </CardContent>
               </Card>
+
+              {/* Edit Treatment Dialog */}
+              <Dialog open={isEditTreatmentOpen} onOpenChange={setIsEditTreatmentOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Edit Treatment</DialogTitle>
+                    <DialogDescription>
+                      Update treatment details.
+                    </DialogDescription>
+                  </DialogHeader>
+                  {editingTreatment && (
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="edit-title" className="text-right">
+                          Title
+                        </Label>
+                        <Input
+                          id="edit-title"
+                          value={editingTreatment.title}
+                          onChange={(e) => setEditingTreatment({...editingTreatment, title: e.target.value})}
+                          className="col-span-3"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="edit-price" className="text-right">
+                          Price (£)
+                        </Label>
+                        <Input
+                          id="edit-price"
+                          type="number"
+                          value={editingTreatment.price}
+                          onChange={(e) => setEditingTreatment({...editingTreatment, price: parseFloat(e.target.value) || 0})}
+                          className="col-span-3"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="edit-duration" className="text-right">
+                          Duration (min)
+                        </Label>
+                        <Input
+                          id="edit-duration"
+                          type="number"
+                          value={editingTreatment.duration}
+                          onChange={(e) => setEditingTreatment({...editingTreatment, duration: parseInt(e.target.value) || 30})}
+                          className="col-span-3"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="edit-description" className="text-right">
+                          Description
+                        </Label>
+                        <Textarea
+                          id="edit-description"
+                          value={editingTreatment.description}
+                          onChange={(e) => setEditingTreatment({...editingTreatment, description: e.target.value})}
+                          className="col-span-3"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="edit-featured" className="text-right">
+                          Featured
+                        </Label>
+                        <Switch
+                          id="edit-featured"
+                          checked={editingTreatment.featured}
+                          onCheckedChange={(featured) => setEditingTreatment({...editingTreatment, featured})}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <DialogFooter>
+                    <Button 
+                      type="submit" 
+                      onClick={() => updateTreatmentMutation.mutate(editingTreatment)}
+                      disabled={updateTreatmentMutation.isPending}
+                    >
+                      {updateTreatmentMutation.isPending ? 'Updating...' : 'Update Treatment'}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </TabsContent>
 
             {/* Products Tab */}
             <TabsContent value="products" className="space-y-6">
               <div className="flex justify-between items-center">
                 <h2 className="text-3xl font-playfair text-secondary">Product Management</h2>
-                <Dialog>
+                <Dialog open={isAddProductOpen} onOpenChange={setIsAddProductOpen}>
                   <DialogTrigger asChild>
                     <Button>
                       <PlusCircle className="mr-2 h-4 w-4" />
@@ -752,7 +1034,7 @@ export default function AdminDashboard() {
                           id="product-price"
                           type="number"
                           value={newProduct.price}
-                          onChange={(e) => setNewProduct({...newProduct, price: parseFloat(e.target.value)})}
+                          onChange={(e) => setNewProduct({...newProduct, price: parseFloat(e.target.value) || 0})}
                           className="col-span-3"
                         />
                       </div>
@@ -760,12 +1042,17 @@ export default function AdminDashboard() {
                         <Label htmlFor="product-category" className="text-right">
                           Category
                         </Label>
-                        <Input
-                          id="product-category"
-                          value={newProduct.category}
-                          onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
-                          className="col-span-3"
-                        />
+                        <Select value={newProduct.category} onValueChange={(category) => setNewProduct({...newProduct, category})}>
+                          <SelectTrigger className="col-span-3">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Body Sculpting">Body Sculpting</SelectItem>
+                            <SelectItem value="Waist Trainers">Waist Trainers</SelectItem>
+                            <SelectItem value="Skincare">Skincare</SelectItem>
+                            <SelectItem value="Accessories">Accessories</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="product-stock" className="text-right">
@@ -775,7 +1062,7 @@ export default function AdminDashboard() {
                           id="product-stock"
                           type="number"
                           value={newProduct.stockQuantity}
-                          onChange={(e) => setNewProduct({...newProduct, stockQuantity: parseInt(e.target.value)})}
+                          onChange={(e) => setNewProduct({...newProduct, stockQuantity: parseInt(e.target.value) || 0})}
                           className="col-span-3"
                         />
                       </div>
@@ -790,17 +1077,24 @@ export default function AdminDashboard() {
                           className="col-span-3"
                         />
                       </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="product-featured" className="text-right">
+                          Featured
+                        </Label>
+                        <Switch
+                          id="product-featured"
+                          checked={newProduct.featured}
+                          onCheckedChange={(featured) => setNewProduct({...newProduct, featured})}
+                        />
+                      </div>
                     </div>
                     <DialogFooter>
                       <Button 
                         type="submit" 
-                        onClick={() => createProductMutation.mutate({
-                          ...newProduct,
-                          slug: newProduct.title.toLowerCase().replace(/\s+/g, '-'),
-                          image: "waist-trainer-1.jpg"
-                        })}
+                        onClick={() => createProductMutation.mutate(newProduct)}
+                        disabled={createProductMutation.isPending}
                       >
-                        Create Product
+                        {createProductMutation.isPending ? 'Creating...' : 'Create Product'}
                       </Button>
                     </DialogFooter>
                   </DialogContent>
@@ -815,63 +1109,175 @@ export default function AdminDashboard() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Product</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>Stock</TableHead>
-                        <TableHead>Featured</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredProducts.map((product) => (
-                        <TableRow key={product.id}>
-                          <TableCell>
-                            <div>
-                              <p className="font-medium">{product.title}</p>
-                              <p className="text-sm text-muted-foreground truncate max-w-[200px]">
-                                {product.description}
-                              </p>
-                            </div>
-                          </TableCell>
-                          <TableCell>{product.category}</TableCell>
-                          <TableCell>£{product.price.toFixed(2)}</TableCell>
-                          <TableCell>
-                            <span className={`${product.stockQuantity <= 0 ? 'text-red-600' : 'text-green-600'}`}>
-                              {product.stockQuantity}
-                            </span>
-                          </TableCell>
-                          <TableCell>
-                            <Switch
-                              checked={product.featured || false}
-                              onCheckedChange={(featured) =>
-                                updateProductMutation.mutate({ id: product.id, featured })
-                              }
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex gap-2">
-                              <Button variant="outline" size="sm">
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => deleteProductMutation.mutate(product.id)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
+                  {productsLoading ? (
+                    <p>Loading products...</p>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Product</TableHead>
+                          <TableHead>Category</TableHead>
+                          <TableHead>Price</TableHead>
+                          <TableHead>Stock</TableHead>
+                          <TableHead>Featured</TableHead>
+                          <TableHead>Actions</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredProducts.length > 0 ? filteredProducts.map((product: any) => (
+                          <TableRow key={product.id}>
+                            <TableCell>
+                              <div>
+                                <p className="font-medium">{product.title}</p>
+                                <p className="text-sm text-muted-foreground truncate max-w-[200px]">
+                                  {product.description}
+                                </p>
+                              </div>
+                            </TableCell>
+                            <TableCell>{product.category}</TableCell>
+                            <TableCell>£{(product.price || 0).toFixed(2)}</TableCell>
+                            <TableCell>
+                              <span className={`${(product.stockQuantity || 0) <= 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                {product.stockQuantity || 0}
+                              </span>
+                            </TableCell>
+                            <TableCell>
+                              <Switch
+                                checked={product.featured || false}
+                                onCheckedChange={(featured) =>
+                                  updateProductMutation.mutate({ ...product, featured })
+                                }
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-2">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleEditProduct(product)}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => deleteProductMutation.mutate(product.id)}
+                                  disabled={deleteProductMutation.isPending}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )) : (
+                          <TableRow>
+                            <TableCell colSpan={6} className="text-center text-muted-foreground">
+                              No products found
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  )}
                 </CardContent>
               </Card>
+
+              {/* Edit Product Dialog */}
+              <Dialog open={isEditProductOpen} onOpenChange={setIsEditProductOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Edit Product</DialogTitle>
+                    <DialogDescription>
+                      Update product details.
+                    </DialogDescription>
+                  </DialogHeader>
+                  {editingProduct && (
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="edit-product-title" className="text-right">
+                          Title
+                        </Label>
+                        <Input
+                          id="edit-product-title"
+                          value={editingProduct.title}
+                          onChange={(e) => setEditingProduct({...editingProduct, title: e.target.value})}
+                          className="col-span-3"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="edit-product-price" className="text-right">
+                          Price (£)
+                        </Label>
+                        <Input
+                          id="edit-product-price"
+                          type="number"
+                          value={editingProduct.price}
+                          onChange={(e) => setEditingProduct({...editingProduct, price: parseFloat(e.target.value) || 0})}
+                          className="col-span-3"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="edit-product-category" className="text-right">
+                          Category
+                        </Label>
+                        <Select value={editingProduct.category} onValueChange={(category) => setEditingProduct({...editingProduct, category})}>
+                          <SelectTrigger className="col-span-3">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Body Sculpting">Body Sculpting</SelectItem>
+                            <SelectItem value="Waist Trainers">Waist Trainers</SelectItem>
+                            <SelectItem value="Skincare">Skincare</SelectItem>
+                            <SelectItem value="Accessories">Accessories</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="edit-product-stock" className="text-right">
+                          Stock
+                        </Label>
+                        <Input
+                          id="edit-product-stock"
+                          type="number"
+                          value={editingProduct.stockQuantity}
+                          onChange={(e) => setEditingProduct({...editingProduct, stockQuantity: parseInt(e.target.value) || 0})}
+                          className="col-span-3"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="edit-product-description" className="text-right">
+                          Description
+                        </Label>
+                        <Textarea
+                          id="edit-product-description"
+                          value={editingProduct.description}
+                          onChange={(e) => setEditingProduct({...editingProduct, description: e.target.value})}
+                          className="col-span-3"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="edit-product-featured" className="text-right">
+                          Featured
+                        </Label>
+                        <Switch
+                          id="edit-product-featured"
+                          checked={editingProduct.featured}
+                          onCheckedChange={(featured) => setEditingProduct({...editingProduct, featured})}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <DialogFooter>
+                    <Button 
+                      type="submit" 
+                      onClick={() => updateProductMutation.mutate(editingProduct)}
+                      disabled={updateProductMutation.isPending}
+                    >
+                      {updateProductMutation.isPending ? 'Updating...' : 'Update Product'}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </TabsContent>
 
             {/* Orders Tab */}
@@ -886,52 +1292,62 @@ export default function AdminDashboard() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Order ID</TableHead>
-                        <TableHead>Customer</TableHead>
-                        <TableHead>Total</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredOrders.map((order) => (
-                        <TableRow key={order.id}>
-                          <TableCell>#{order.id}</TableCell>
-                          <TableCell>{order.customerName || 'Guest'}</TableCell>
-                          <TableCell>£{order.total.toFixed(2)}</TableCell>
-                          <TableCell>
-                            <Select 
-                              value={order.status} 
-                              onValueChange={(status) => 
-                                updateOrderMutation.mutate({ id: order.id, status })
-                              }
-                            >
-                              <SelectTrigger className="w-32">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="pending">Pending</SelectItem>
-                                <SelectItem value="processing">Processing</SelectItem>
-                                <SelectItem value="shipped">Shipped</SelectItem>
-                                <SelectItem value="completed">Completed</SelectItem>
-                                <SelectItem value="cancelled">Cancelled</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
-                          <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
-                          <TableCell>
-                            <Button variant="outline" size="sm">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </TableCell>
+                  {ordersLoading ? (
+                    <p>Loading orders...</p>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Order ID</TableHead>
+                          <TableHead>Customer</TableHead>
+                          <TableHead>Total</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Actions</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredOrders.length > 0 ? filteredOrders.map((order: any) => (
+                          <TableRow key={order.id}>
+                            <TableCell>#{order.id}</TableCell>
+                            <TableCell>{order.customerName || 'Guest'}</TableCell>
+                            <TableCell>£{(order.total || 0).toFixed(2)}</TableCell>
+                            <TableCell>
+                              <Select 
+                                value={order.status} 
+                                onValueChange={(status) => 
+                                  updateOrderMutation.mutate({ id: order.id, status })
+                                }
+                              >
+                                <SelectTrigger className="w-32">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="pending">Pending</SelectItem>
+                                  <SelectItem value="processing">Processing</SelectItem>
+                                  <SelectItem value="shipped">Shipped</SelectItem>
+                                  <SelectItem value="completed">Completed</SelectItem>
+                                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </TableCell>
+                            <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
+                            <TableCell>
+                              <Button variant="outline" size="sm">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        )) : (
+                          <TableRow>
+                            <TableCell colSpan={6} className="text-center text-muted-foreground">
+                              No orders found
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -977,7 +1393,7 @@ export default function AdminDashboard() {
                         id="maintenance-mode"
                         checked={settings?.maintenanceMode || false}
                         onCheckedChange={(maintenanceMode) =>
-                          updateSettingsMutation.mutate({ ...settings, maintenanceMode })
+                          updateSettings({ maintenanceMode })
                         }
                       />
                     </div>
@@ -997,7 +1413,7 @@ export default function AdminDashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {settings && Object.entries(settings.businessHours).map(([day, hours]) => (
+                      {settings && settings.businessHours && Object.entries(settings.businessHours).map(([day, hours]: [string, any]) => (
                         <div key={day} className="flex items-center justify-between">
                           <div className="capitalize font-medium">{day}</div>
                           <div className="flex items-center gap-2">
@@ -1010,10 +1426,7 @@ export default function AdminDashboard() {
                                     ? { closed: false, open: "8:00", close: "17:00" }
                                     : { closed: true }
                                 };
-                                updateSettingsMutation.mutate({
-                                  ...settings,
-                                  businessHours: updatedHours
-                                });
+                                updateSettings({ businessHours: updatedHours });
                               }}
                             />
                             {!hours.closed && (
@@ -1027,10 +1440,7 @@ export default function AdminDashboard() {
                                       ...settings.businessHours,
                                       [day]: { ...hours, open: e.target.value }
                                     };
-                                    updateSettingsMutation.mutate({
-                                      ...settings,
-                                      businessHours: updatedHours
-                                    });
+                                    updateSettings({ businessHours: updatedHours });
                                   }}
                                 />
                                 <span>to</span>
@@ -1043,10 +1453,7 @@ export default function AdminDashboard() {
                                       ...settings.businessHours,
                                       [day]: { ...hours, close: e.target.value }
                                     };
-                                    updateSettingsMutation.mutate({
-                                      ...settings,
-                                      businessHours: updatedHours
-                                    });
+                                    updateSettings({ businessHours: updatedHours });
                                   }}
                                 />
                               </div>
@@ -1079,8 +1486,7 @@ export default function AdminDashboard() {
                         <Input
                           id="phone"
                           value={settings?.contactInfo?.phone || ""}
-                          onChange={(e) => updateSettingsMutation.mutate({
-                            ...settings,
+                          onChange={(e) => updateSettings({
                             contactInfo: { ...settings?.contactInfo, phone: e.target.value }
                           })}
                         />
@@ -1091,8 +1497,7 @@ export default function AdminDashboard() {
                           id="email"
                           type="email"
                           value={settings?.contactInfo?.email || ""}
-                          onChange={(e) => updateSettingsMutation.mutate({
-                            ...settings,
+                          onChange={(e) => updateSettings({
                             contactInfo: { ...settings?.contactInfo, email: e.target.value }
                           })}
                         />
@@ -1103,8 +1508,7 @@ export default function AdminDashboard() {
                       <Textarea
                         id="address"
                         value={settings?.contactInfo?.address || ""}
-                        onChange={(e) => updateSettingsMutation.mutate({
-                          ...settings,
+                        onChange={(e) => updateSettings({
                           contactInfo: { ...settings?.contactInfo, address: e.target.value }
                         })}
                       />
@@ -1130,8 +1534,7 @@ export default function AdminDashboard() {
                         <Input
                           id="instagram"
                           value={settings?.socialMedia?.instagram || ""}
-                          onChange={(e) => updateSettingsMutation.mutate({
-                            ...settings,
+                          onChange={(e) => updateSettings({
                             socialMedia: { ...settings?.socialMedia, instagram: e.target.value }
                           })}
                         />
@@ -1141,8 +1544,7 @@ export default function AdminDashboard() {
                         <Input
                           id="facebook"
                           value={settings?.socialMedia?.facebook || ""}
-                          onChange={(e) => updateSettingsMutation.mutate({
-                            ...settings,
+                          onChange={(e) => updateSettings({
                             socialMedia: { ...settings?.socialMedia, facebook: e.target.value }
                           })}
                         />
@@ -1152,8 +1554,7 @@ export default function AdminDashboard() {
                         <Input
                           id="twitter"
                           value={settings?.socialMedia?.twitter || ""}
-                          onChange={(e) => updateSettingsMutation.mutate({
-                            ...settings,
+                          onChange={(e) => updateSettings({
                             socialMedia: { ...settings?.socialMedia, twitter: e.target.value }
                           })}
                         />
@@ -1176,8 +1577,7 @@ export default function AdminDashboard() {
                       <Input
                         id="hero-title"
                         value={settings?.siteContent?.heroTitle || ""}
-                        onChange={(e) => updateSettingsMutation.mutate({
-                          ...settings,
+                        onChange={(e) => updateSettings({
                           siteContent: { ...settings?.siteContent, heroTitle: e.target.value }
                         })}
                       />
@@ -1187,8 +1587,7 @@ export default function AdminDashboard() {
                       <Input
                         id="hero-subtitle"
                         value={settings?.siteContent?.heroSubtitle || ""}
-                        onChange={(e) => updateSettingsMutation.mutate({
-                          ...settings,
+                        onChange={(e) => updateSettings({
                           siteContent: { ...settings?.siteContent, heroSubtitle: e.target.value }
                         })}
                       />
@@ -1198,13 +1597,18 @@ export default function AdminDashboard() {
                       <Textarea
                         id="about-text"
                         value={settings?.siteContent?.aboutText || ""}
-                        onChange={(e) => updateSettingsMutation.mutate({
-                          ...settings,
+                        onChange={(e) => updateSettings({
                           siteContent: { ...settings?.siteContent, aboutText: e.target.value }
                         })}
                       />
                     </div>
                   </CardContent>
+                  <CardFooter>
+                    <Button onClick={() => toast({ title: "All changes are saved automatically" })}>
+                      <Save className="mr-2 h-4 w-4" />
+                      Auto-Saved
+                    </Button>
+                  </CardFooter>
                 </Card>
               </div>
             </TabsContent>
