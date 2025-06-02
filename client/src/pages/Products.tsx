@@ -30,7 +30,7 @@ export default function Products() {
   const [sortBy, setSortBy] = useState("featured");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const { toast } = useToast();
-  
+
   const categories = getCategories(products);
 
   const getImagePath = useCallback((filename: string) => {
@@ -132,9 +132,9 @@ export default function Products() {
                         </div>
                       ))}
                     </div>
-                    
+
                     <Separator className="my-6" />
-                    
+
                     <h3 className="text-lg font-medium mb-4">Sort By</h3>
                     <Select value={sortBy} onValueChange={setSortBy}>
                       <SelectTrigger className="w-full">
@@ -146,7 +146,7 @@ export default function Products() {
                         <SelectItem value="price-high">Price: High to Low</SelectItem>
                       </SelectContent>
                     </Select>
-                    
+
                     <Button onClick={clearFilters} variant="ghost" className="mt-6 w-full">
                       Clear Filters
                     </Button>
@@ -154,13 +154,13 @@ export default function Products() {
                 </SheetContent>
               </Sheet>
             </div>
-            
+
             <div className="hidden lg:block">
               <span className="text-gray-600">
                 Showing {sortedProducts.length} of {products.length} products
               </span>
             </div>
-            
+
             <div>
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-[180px]">
@@ -174,7 +174,7 @@ export default function Products() {
               </Select>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Sidebar Filters (Desktop) */}
             <div className="hidden lg:block">
@@ -192,7 +192,7 @@ export default function Products() {
                     </div>
                   ))}
                 </div>
-                
+
                 {selectedCategories.length > 0 && (
                   <Button onClick={clearFilters} variant="ghost" className="mt-4 w-full">
                     Clear Filters
@@ -200,7 +200,7 @@ export default function Products() {
                 )}
               </div>
             </div>
-            
+
             {/* Product Grid */}
             <div className="lg:col-span-3">
               {sortedProducts.length === 0 ? (

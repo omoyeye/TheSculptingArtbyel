@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useSettings } from "@/hooks/use-settings";
-import { Link } from "@/components/ui/link";
+import { Link } from "wouter";
 
 // Define available time slots
 const timeSlots = [
