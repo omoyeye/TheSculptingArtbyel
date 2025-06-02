@@ -6,9 +6,8 @@ import { useStore } from "@/lib/store";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils";
 import { Link } from "wouter";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { getImage } from "@/assets/imageImports";
-import { useQuery } from "@tanstack/react-query";
 import { ShoppingBag, Filter } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
