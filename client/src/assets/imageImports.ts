@@ -11,6 +11,7 @@ import screenshot154211 from './images/Screenshot 2025-05-04 154211.png';
 import screenshot160111 from './images/Screenshot 2025-05-04 160111.png';
 import waistTrainer1 from './images/1.jpg';
 import waistTrainer2 from './images/2.jpg';
+import woodTherapy from './images/wood-therapy.jpg';
 
 // Define a map for easy lookup by filename
 const imageMap: Record<string, string> = {
@@ -26,6 +27,7 @@ const imageMap: Record<string, string> = {
   'Screenshot 2025-05-04 160111.png': screenshot160111,
   '1.jpg': waistTrainer1,
   '2.jpg': waistTrainer2,
+  'wood-therapy.jpg': woodTherapy,
 };
 
 // Helper function to get image by filename
@@ -46,5 +48,6 @@ export {
   screenshot154211,
   screenshot160111,
   waistTrainer1,
-  waistTrainer2
+  waistTrainer2,
+  woodTherapy
 };

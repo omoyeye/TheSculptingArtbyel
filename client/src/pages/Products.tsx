@@ -1,10 +1,15 @@
 import { useState } from "react";
-import { Helmet } from "react-helmet";
-import { useStore } from "@/lib/store";
+import { Helmet } from "react-helmet-async";
+import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, Filter } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useStore } from "@/lib/store";
+import { Badge } from "@/components/ui/badge";
+import { formatCurrency } from "@/lib/utils";
 import { Link } from "wouter";
+import { toast } from "@/hooks/use-toast";
+import { getImage } from "@/assets/imageImports";
+import { useQuery } from "@tanstack/react-query";
+import { ShoppingBag, Filter } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Select,
@@ -17,7 +22,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useCallback } from "react";
-import { getImage } from "@/assets/imageImports";
 
 // Get all unique categories from products
 const getCategories = (products: any[]) => {
