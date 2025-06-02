@@ -245,6 +245,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.post("/api/bookings", validateBody(insertBookingSchema), async (req, res) => {
     try {
+      // Check if booking is enabled
+      const settings = await storage.getWebsiteSettings();
+      if (!settings.bookingEnabled) {
+        return res.status(503).json({ 
+          message: "Booking system is currently disabled. Please contact us directly to schedule your appointment." 
+        });
+      }
+
       const booking = await storage.createBooking(req.body);
       res.status(201).json(booking);
     } catch (error) {

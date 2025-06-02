@@ -16,6 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useSettings } from "@/hooks/use-settings";
+import { Link } from "@/components/ui/link";
 
 // Define available time slots
 const timeSlots = [
@@ -28,17 +30,18 @@ export default function Booking() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  
+
   const { treatments, addToCart } = useStore();
   const { toast } = useToast();
   const [, params] = useRoute("/booking");
   const [location] = useLocation();
-  
+  const { settings, loading } = useSettings();
+
   // Extract treatment ID from URL if present
   useEffect(() => {
     const searchParams = new URLSearchParams(location.split("?")[1]);
     const treatmentId = searchParams.get("treatment");
-    
+
     if (treatmentId && treatments.some(t => t.id === treatmentId)) {
       setSelectedTreatment(treatmentId);
     } else if (treatments.length > 0) {
@@ -109,7 +112,7 @@ export default function Booking() {
       });
       return;
     }
-    
+
     handleAddToCart();
     // Redirect to checkout page
     window.location.href = "/checkout";
@@ -136,6 +139,60 @@ export default function Booking() {
 
   const selectedTreatmentData = treatments.find(t => t.id === selectedTreatment);
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white py-16">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <div className="animate-pulse">Loading booking system...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!settings?.bookingEnabled) {
+    return (
+      <div className="min-h-screen bg-white py-16">
+        <Helmet>
+          <title>Booking Unavailable | The Sculpting Art</title>
+          <meta name="description" content="Online booking is temporarily unavailable. Contact us directly to schedule your appointment." />
+        </Helmet>
+
+        <div className="container mx-auto px-4">
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-8">
+              <h1 className="text-3xl font-playfair text-secondary mb-4">
+                Booking Temporarily Unavailable
+              </h1>
+              <p className="text-lg text-gray-700 mb-6">
+                Our online booking system is currently disabled for maintenance. 
+                We apologize for any inconvenience.
+              </p>
+              <p className="text-gray-600 mb-8">
+                Please contact us directly to schedule your appointment. 
+                We're here to help you achieve your wellness goals!
+              </p>
+              <div className="space-y-4">
+                <div>
+                  <strong>Phone:</strong> +44 123 456 7890
+                </div>
+                <div>
+                  <strong>Email:</strong> info@thesculptingart.com
+                </div>
+              </div>
+              <div className="mt-8">
+                <Button asChild className="bg-secondary hover:bg-secondary/90">
+                  <Link href="/contact">Contact Us</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <Helmet>
@@ -161,7 +218,7 @@ export default function Booking() {
               <Card>
                 <CardContent className="pt-6">
                   <h2 className="text-2xl font-playfair text-secondary mb-6">Select Treatment</h2>
-                  
+
                   <Select 
                     value={selectedTreatment} 
                     onValueChange={setSelectedTreatment}
@@ -177,22 +234,22 @@ export default function Booking() {
                       ))}
                     </SelectContent>
                   </Select>
-                  
+
                   {selectedTreatmentData && (
                     <div className="mt-6 space-y-4">
                       <div className="flex items-center text-primary">
                         <Clock className="h-5 w-5 mr-2" />
                         <span>{selectedTreatmentData.duration} minutes</span>
                       </div>
-                      
+
                       <h3 className="text-xl font-medium">
                         £{selectedTreatmentData.price}
                       </h3>
-                      
+
                       <p className="text-gray-600">
                         {selectedTreatmentData.description}
                       </p>
-                      
+
                       <Alert className="bg-muted border-primary/20 mt-4">
                         <Info className="h-4 w-4 text-primary" />
                         <AlertDescription>
@@ -204,12 +261,12 @@ export default function Booking() {
                 </CardContent>
               </Card>
             </div>
-            
+
             <div>
               <Card>
                 <CardContent className="pt-6">
                   <h2 className="text-2xl font-playfair text-secondary mb-6">Select Date & Time</h2>
-                  
+
                   {/* Month Navigation */}
                   <div className="flex justify-between items-center mb-4">
                     <button 
@@ -230,18 +287,18 @@ export default function Booking() {
                       <ChevronRight className="h-5 w-5" />
                     </button>
                   </div>
-                  
+
                   {/* Calendar */}
                   <div className="grid grid-cols-7 gap-1 mb-6">
                     {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
                       <div key={day} className="text-center text-sm text-gray-500 py-1">{day}</div>
                     ))}
-                    
+
                     {allCalendarDays.map((day, index) => {
                       const isCurrentMonth = day.getMonth() === currentMonth.getMonth();
                       const isSelected = selectedDate && isSameDay(day, selectedDate);
                       const isPast = isBefore(day, new Date()) && !isToday(day);
-                      
+
                       return (
                         <div key={index} className="text-center py-2">
                           <button
@@ -266,7 +323,7 @@ export default function Booking() {
                       );
                     })}
                   </div>
-                  
+
                   {/* Available Time Slots */}
                   {selectedDate && (
                     <>
@@ -291,36 +348,36 @@ export default function Booking() {
                       </div>
                     </>
                   )}
-                  
+
                   {selectedDate && selectedTime && (
                     <div className="mt-6">
                       <Separator className="mb-4" />
-                      
+
                       <div className="flex justify-between text-sm mb-2">
                         <span className="text-gray-600">Selected Treatment:</span>
                         <span className="font-medium">{selectedTreatmentData?.title}</span>
                       </div>
-                      
+
                       <div className="flex justify-between text-sm mb-2">
                         <span className="text-gray-600">Date:</span>
                         <span className="font-medium">{format(selectedDate, "MMMM d, yyyy")}</span>
                       </div>
-                      
+
                       <div className="flex justify-between text-sm mb-2">
                         <span className="text-gray-600">Time:</span>
                         <span className="font-medium">{selectedTime}</span>
                       </div>
-                      
+
                       <div className="flex justify-between text-sm mb-4">
                         <span className="text-gray-600">Duration:</span>
                         <span className="font-medium">{selectedTreatmentData?.duration} minutes</span>
                       </div>
-                      
+
                       <div className="flex justify-between text-lg font-medium mb-6">
                         <span>Total:</span>
                         <span>£{selectedTreatmentData?.price.toFixed(2)}</span>
                       </div>
-                      
+
                       <div className="flex flex-col sm:flex-row sm:justify-between space-y-3 sm:space-y-0 sm:space-x-3">
                         <Button
                           variant="outline"

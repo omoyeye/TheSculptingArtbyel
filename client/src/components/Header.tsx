@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, ChevronDown, ShoppingBag } from "lucide-react";
+import { ShoppingBag, Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,12 +10,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useStore } from "@/lib/store";
 import logoPng from "@assets/Beige Nude Aesthetic Feminine Modern Gynecology Health Clinic Branding Logo.png";
+import { useSettings } from "@/hooks/use-settings";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [location] = useLocation();
   const { setCartOpen, getTotalItems } = useStore();
   const totalItems = getTotalItems();
+  const { settings } = useSettings();
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -160,7 +162,7 @@ export default function Header() {
               )}
             </button>
             <Button asChild variant="default" className="bg-secondary hover:bg-secondary/90">
-              <Link href="/booking">Book Now</Link>
+              <Link href="/booking">{settings?.bookingEnabled ? "Book Now" : "Bookings Disabled"}</Link>
             </Button>
           </div>
         </div>
@@ -273,7 +275,7 @@ export default function Header() {
               className="bg-secondary hover:bg-secondary/90"
               onClick={closeMobileMenu}
             >
-              <Link href="/booking">Book Now</Link>
+              <Link href="/booking">{settings?.bookingEnabled ? "Book Now" : "Bookings Disabled"}</Link>
             </Button>
           </div>
         </div>

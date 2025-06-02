@@ -15,7 +15,7 @@ export default function BookingSection() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  
+
   const { treatments, addToCart } = useStore();
   const { toast } = useToast();
 
@@ -102,6 +102,25 @@ export default function BookingSection() {
   const regularTreatments = treatments.filter(t => !t.id.includes('package'));
   const packageTreatments = treatments.filter(t => t.id.includes('package'));
 
+  if (loading) {
+    return <div className="text-center p-8">Loading booking system...</div>;
+  }
+
+  if (!settings?.bookingEnabled) {
+    return (
+      <div className="text-center p-8 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <h3 className="text-lg font-medium text-yellow-800 mb-2">Booking Temporarily Unavailable</h3>
+        <p className="text-yellow-700">
+          Our online booking system is currently disabled for maintenance. 
+          Please contact us directly to schedule your appointment.
+        </p>
+        <div className="mt-4">
+          <a href="/contact" className="text-primary hover:underline">Contact Us</a>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <section id="booking" className="py-20 bg-white">
       <div className="container mx-auto px-4">
@@ -114,17 +133,17 @@ export default function BookingSection() {
               Schedule your body sculpting session today and start your journey to a more confident you. 
               Our expert therapists will customize each treatment to meet your specific goals.
             </p>
-            
+
             {/* Treatment Selection */}
             <div className="mb-8">
               <h3 className="text-xl font-playfair text-secondary mb-4">Select Treatment</h3>
-              
+
               <div className="bg-blue-50 border border-blue-200 p-4 rounded-md mb-4">
                 <p className="text-sm text-blue-800">
                   <strong>Note:</strong> A £20 deposit is required for all treatments at the time of booking. This amount will be deducted from the total price of your service.
                 </p>
               </div>
-              
+
               {/* Regular Treatments */}
               <h4 className="text-lg font-medium mb-2">Individual Treatments</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -150,7 +169,7 @@ export default function BookingSection() {
                   </div>
                 ))}
               </div>
-              
+
               {/* Treatment Packages */}
               <h4 className="text-lg font-medium mb-2">Treatment Packages</h4>
               <div className="grid grid-cols-1 gap-4">
@@ -179,12 +198,12 @@ export default function BookingSection() {
               </div>
             </div>
           </div>
-          
+
           <div>
             {/* Date Picker */}
             <div className="bg-muted rounded-xl p-6 shadow-lg">
               <h3 className="text-xl font-playfair text-secondary mb-4">Select Date & Time</h3>
-              
+
               {/* Month Navigation */}
               <div className="flex justify-between items-center mb-4">
                 <button 
@@ -205,18 +224,18 @@ export default function BookingSection() {
                   <ChevronRight className="h-5 w-5" />
                 </button>
               </div>
-              
+
               {/* Calendar */}
               <div className="grid grid-cols-7 gap-1 mb-6">
                 {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
                   <div key={day} className="text-center text-sm text-gray-500 py-1">{day}</div>
                 ))}
-                
+
                 {allCalendarDays.map((day, index) => {
                   const isCurrentMonth = day.getMonth() === currentMonth.getMonth();
                   const isSelected = selectedDate && isSameDay(day, selectedDate);
                   const isPast = day < new Date() && !isToday(day);
-                  
+
                   return (
                     <div key={index} className="text-center py-2">
                       <button
@@ -240,7 +259,7 @@ export default function BookingSection() {
                   );
                 })}
               </div>
-              
+
               {/* Available Time Slots */}
               {selectedDate && (
                 <>
@@ -264,7 +283,7 @@ export default function BookingSection() {
                   </div>
                 </>
               )}
-              
+
               <div className="flex flex-col sm:flex-row sm:justify-between space-y-3 sm:space-y-0">
                 <Button
                   variant="outline"

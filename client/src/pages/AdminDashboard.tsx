@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -102,11 +102,48 @@ export default function AdminDashboard() {
     }
   });
 
-  const handleBusinessSettingsUpdate = () => {
-    toast({
-      title: "Settings Updated",
-      description: "Business settings have been saved successfully."
-    });
+  // Load settings from backend on component mount
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch('/api/settings');
+        if (response.ok) {
+          const settings = await response.json();
+          setBusinessSettings(settings);
+        }
+      } catch (error) {
+        console.error('Failed to fetch settings:', error);
+      }
+    };
+    
+    fetchSettings();
+  }, []);
+
+  const handleBusinessSettingsUpdate = async () => {
+    try {
+      const response = await fetch('/api/settings', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(businessSettings),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Settings Updated",
+          description: "Business settings have been saved successfully."
+        });
+      } else {
+        throw new Error('Failed to update settings');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update settings. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleAddTreatment = () => {
