@@ -299,7 +299,6 @@ export default function AdminDashboard() {
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
       return await apiRequest(`/api/bookings/${id}/status`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status })
       });
     },
@@ -316,7 +315,6 @@ export default function AdminDashboard() {
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
       return await apiRequest(`/api/orders/${id}/status`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status })
       });
     },
