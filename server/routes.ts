@@ -497,6 +497,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to login" });
     }
   });
+
+  // API routes for website settings (Admin functionality)
+  app.get("/api/settings", async (req, res) => {
+    try {
+      const settings = await storage.getWebsiteSettings();
+      res.json(settings);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch website settings" });
+    }
+  });
+
+  app.put("/api/settings", async (req, res) => {
+    try {
+      const settings = await storage.updateWebsiteSettings(req.body);
+      res.json(settings);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update website settings" });
+    }
+  });
+
+  // Admin-specific routes for managing bookings and orders
+  app.put("/api/bookings/:id/status", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { status } = req.body;
+      const booking = await storage.updateBookingStatus(id, status);
+      if (!booking) {
+        return res.status(404).json({ message: "Booking not found" });
+      }
+      res.json(booking);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update booking status" });
+    }
+  });
+
+  app.delete("/api/bookings/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteBooking(id);
+      if (!success) {
+        return res.status(404).json({ message: "Booking not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete booking" });
+    }
+  });
   
   // Create HTTP server
   const httpServer = createServer(app);

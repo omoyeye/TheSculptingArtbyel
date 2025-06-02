@@ -14,6 +14,7 @@ import Cart from "@/pages/Cart";
 import Checkout from "@/pages/Checkout";
 import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/Terms";
+import AdminDashboard from "@/pages/AdminDashboard";
 import NotFound from "@/pages/not-found";
 import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
@@ -44,6 +45,7 @@ function App() {
         <Route path="/checkout" component={Checkout} />
         <Route path="/privacy" component={Privacy} />
         <Route path="/terms" component={Terms} />
+        <Route path="/admin" component={AdminDashboard} />
         <Route path="/image-test" component={ImageTest} />
         <Route component={NotFound} />
       </Switch>

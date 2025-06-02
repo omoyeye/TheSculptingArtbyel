@@ -641,6 +641,16 @@ export class MemStorage implements IStorage {
     const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
     return Math.round((totalRating / reviews.length) * 10) / 10; // Round to 1 decimal place
   }
+
+  // Website Settings methods
+  async getWebsiteSettings(): Promise<WebsiteSettings> {
+    return this.websiteSettings;
+  }
+
+  async updateWebsiteSettings(settings: Partial<InsertWebsiteSettings>): Promise<WebsiteSettings> {
+    this.websiteSettings = { ...this.websiteSettings, ...settings };
+    return this.websiteSettings;
+  }
 }
 
 // Export storage instance
