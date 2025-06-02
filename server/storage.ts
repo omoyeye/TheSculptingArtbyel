@@ -442,51 +442,27 @@ export class MemStorage implements IStorage {
       featured: false
     });
     
-    // Sample products
+    // Your actual products
     this.createProduct({
-      slug: "sculpting-oil",
-      title: "Sculpting Body Oil",
-      description: "Firming & Toning formula that enhances the results of your treatments.",
-      price: 42,
-      image: "images/Soft Brown Massage Treatment Relaxing Your Body Instagram Story.png",
-      category: "Body Oils",
-      badge: "NEW",
-      featured: true,
-      stockQuantity: 25
-    });
-    
-    this.createProduct({
-      slug: "detox-scrub",
-      title: "Detox Body Scrub",
-      description: "Exfoliating & Smoothing scrub that removes dead skin cells and improves circulation.",
-      price: 38,
-      image: "images/Screenshot 2025-05-04 160111.png",
-      category: "Scrubs",
-      featured: true,
-      stockQuantity: 30
-    });
-    
-    this.createProduct({
-      slug: "massage-kit",
-      title: "Home Massage Kit",
-      description: "Self-Care Essentials to maintain your results between professional treatments.",
-      price: 75,
-      image: "images/IMG_3361.jpeg",
-      category: "Tools",
-      badge: "BEST SELLER",
+      slug: "waist-trainer-1",
+      title: "Waist Trainer",
+      description: "Premium quality waist trainer designed for body sculpting and support during workouts.",
+      price: 25,
+      image: "image_1747338239575.png",
+      category: "Waist Trainers",
       featured: true,
       stockQuantity: 15
     });
     
     this.createProduct({
-      slug: "firming-cream",
-      title: "Firming Body Cream",
-      description: "Hydrating & Tightening cream that improves skin elasticity and firmness.",
-      price: 48,
-      image: "images/DE40158A-B168-46C1-B082-94E9F91478C5.jpeg",
-      category: "Body Creams",
+      slug: "waist-trainer-2",
+      title: "Premium Waist Trainer",
+      description: "Advanced waist trainer with enhanced compression and comfort for maximum body sculpting results.",
+      price: 29.12,
+      image: "image_1747337696802.png",
+      category: "Waist Trainers",
       featured: true,
-      stockQuantity: 20
+      stockQuantity: 12
     });
     
     // Sample testimonials
