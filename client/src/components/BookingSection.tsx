@@ -18,7 +18,7 @@ export default function BookingSection() {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
   const { treatments } = useStore();
-  const { data: settings, isLoading: loading } = useSettings();
+  const { settings, loading } = useSettings();
   const { toast } = useToast();
 
   const getDaysInMonth = () => {

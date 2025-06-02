@@ -85,7 +85,7 @@ export const useStore = create<StoreState>()(
           description: 'Natural technique using wooden tools to break down cellulite and aid in lymphatic drainage.',
           price: 40,
           duration: 30,
-          image: 'wood-therapy.jpg',
+          image: 'Before After Beauty Skincare Minimlasit Instagram Post.png',
         },
         {
           id: 'wood-therapy-60',
@@ -93,7 +93,7 @@ export const useStore = create<StoreState>()(
           description: 'Extended wood therapy session for deeper treatment and more comprehensive results.',
           price: 56.99,
           duration: 60,
-          image: 'wood-therapy.jpg',
+          image: 'Before After Beauty Skincare Minimlasit Instagram Post.png',
         },
         {
           id: 'lymphatic-drainage-30',

@@ -25,7 +25,7 @@ export default function TreatmentCard({ treatment }: TreatmentCardProps) {
         alt={`${title} Treatment`} 
         onError={(e) => {
           console.error(`Failed to load image: ${image}`);
-          e.currentTarget.src = getImagePath('default-treatment.jpg');
+          e.currentTarget.src = "https://placehold.co/600x400/e9e2dd/a17a69?text=Image+Unavailable";
         }}
       />
       <div className="p-6">
