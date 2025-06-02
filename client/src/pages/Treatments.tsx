@@ -1,9 +1,11 @@
 import { Helmet } from "react-helmet";
-import { useStore } from "@/lib/store";
+import { useQuery } from "@tanstack/react-query";
 import TreatmentCard from "@/components/TreatmentCard";
 
 export default function Treatments() {
-  const { treatments } = useStore();
+  const { data: treatments = [] } = useQuery({
+    queryKey: ['/api/treatments']
+  });
 
   return (
     <>
@@ -26,7 +28,7 @@ export default function Treatments() {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {treatments.map((treatment) => (
+            {Array.isArray(treatments) && treatments.map((treatment: any) => (
               <TreatmentCard key={treatment.id} treatment={treatment} />
             ))}
           </div>

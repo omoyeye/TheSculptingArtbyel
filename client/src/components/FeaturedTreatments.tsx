@@ -1,10 +1,12 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import TreatmentCard from "./TreatmentCard";
-import { useStore } from "@/lib/store";
+import { useQuery } from "@tanstack/react-query";
 
 export default function FeaturedTreatments() {
-  const { treatments } = useStore();
+  const { data: treatments = [] } = useQuery({
+    queryKey: ['/api/treatments']
+  });
 
   return (
     <section id="treatments" className="py-20 bg-white">
@@ -20,7 +22,7 @@ export default function FeaturedTreatments() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {treatments.slice(0, 3).map((treatment) => (
+          {Array.isArray(treatments) && treatments.filter((t: any) => t.featured).slice(0, 3).map((treatment: any) => (
             <TreatmentCard key={treatment.id} treatment={treatment} />
           ))}
         </div>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet";
+import { useQuery } from "@tanstack/react-query";
 import { useStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag, Filter } from "lucide-react";
@@ -26,12 +27,15 @@ const getCategories = (products: any[]) => {
 };
 
 export default function Products() {
-  const { products, addToCart } = useStore();
+  const { data: products = [] } = useQuery({
+    queryKey: ['/api/products']
+  });
+  const { addToCart } = useStore();
   const [sortBy, setSortBy] = useState("featured");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const { toast } = useToast();
   
-  const categories = getCategories(products);
+  const categories = getCategories(Array.isArray(products) ? products : []);
 
   const getImagePath = useCallback((filename: string) => {
     try {
@@ -42,10 +46,10 @@ export default function Products() {
     }
   }, []);
 
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = Array.isArray(products) ? products.filter((product: any) => {
     if (selectedCategories.length === 0) return true;
     return selectedCategories.includes(product.category);
-  });
+  }) : [];
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     if (sortBy === "price-low") return a.price - b.price;
