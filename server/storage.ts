@@ -8,7 +8,8 @@ import {
   type Testimonial, type InsertTestimonial,
   type GalleryItem, type InsertGalleryItem,
   type InstagramPost, type InsertInstagramPost,
-  type ProductReview, type InsertProductReview
+  type ProductReview, type InsertProductReview,
+  type WebsiteSettings, type InsertWebsiteSettings
 } from "@shared/schema";
 
 // Define the storage interface
@@ -71,6 +72,10 @@ export interface IStorage {
   getProductReviews(productId: number): Promise<ProductReview[]>;
   createProductReview(review: InsertProductReview): Promise<ProductReview>;
   getAverageRating(productId: number): Promise<number>;
+  
+  // Website Settings
+  getWebsiteSettings(): Promise<WebsiteSettings>;
+  updateWebsiteSettings(settings: Partial<InsertWebsiteSettings>): Promise<WebsiteSettings>;
 }
 
 // In-memory storage implementation
@@ -85,6 +90,7 @@ export class MemStorage implements IStorage {
   private galleryItems: Map<number, GalleryItem>;
   private instagramPosts: Map<number, InstagramPost>;
   private productReviews: Map<number, ProductReview>;
+  private websiteSettings: WebsiteSettings;
   
   private userIdCounter: number;
   private treatmentIdCounter: number;
@@ -119,6 +125,37 @@ export class MemStorage implements IStorage {
     this.galleryItemIdCounter = 1;
     this.instagramPostIdCounter = 1;
     this.productReviewIdCounter = 1;
+    
+    // Initialize website settings
+    this.websiteSettings = {
+      id: 1,
+      bookingEnabled: true,
+      maintenanceMode: false,
+      businessHours: {
+        monday: { closed: true },
+        tuesday: { closed: false, open: "8:00", close: "17:00" },
+        wednesday: { closed: false, open: "8:00", close: "17:00" },
+        thursday: { closed: false, open: "8:00", close: "17:00" },
+        friday: { closed: false, open: "8:00", close: "17:00" },
+        saturday: { closed: false, open: "8:00", close: "17:00" },
+        sunday: { closed: false, open: "8:00", close: "17:00" }
+      },
+      contactInfo: {
+        phone: "+44 123 456 7890",
+        email: "info@thesculptingart.com",
+        address: "123 Beauty Street, London, UK"
+      },
+      socialMedia: {
+        instagram: "@thesculptingart",
+        facebook: "The Sculpting Art",
+        twitter: "@sculptigart"
+      },
+      siteContent: {
+        heroTitle: "Transform Your Body, Elevate Your Confidence",
+        heroSubtitle: "Experience Professional Body Sculpting & Wellness Treatments",
+        aboutText: "The Sculpting Art specializes in non-invasive body sculpting treatments that help you achieve your wellness goals."
+      }
+    };
     
     // Initialize with sample data
     this.initializeData();

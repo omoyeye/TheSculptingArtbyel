@@ -99,6 +99,36 @@ export interface ProductReview {
   createdAt: Date;
 }
 
+export interface WebsiteSettings {
+  id: number;
+  bookingEnabled: boolean;
+  maintenanceMode: boolean;
+  businessHours: {
+    monday: { closed: boolean; open?: string; close?: string; };
+    tuesday: { closed: boolean; open?: string; close?: string; };
+    wednesday: { closed: boolean; open?: string; close?: string; };
+    thursday: { closed: boolean; open?: string; close?: string; };
+    friday: { closed: boolean; open?: string; close?: string; };
+    saturday: { closed: boolean; open?: string; close?: string; };
+    sunday: { closed: boolean; open?: string; close?: string; };
+  };
+  contactInfo: {
+    phone: string;
+    email: string;
+    address: string;
+  };
+  socialMedia: {
+    instagram?: string;
+    facebook?: string;
+    twitter?: string;
+  };
+  siteContent: {
+    heroTitle: string;
+    heroSubtitle: string;
+    aboutText: string;
+  };
+}
+
 // Insert types (for creating new records)
 export type InsertUser = Omit<User, 'id' | 'createdAt'>;
 export type InsertTreatment = Omit<Treatment, 'id'>;
@@ -110,3 +140,4 @@ export type InsertTestimonial = Omit<Testimonial, 'id'>;
 export type InsertGalleryItem = Omit<GalleryItem, 'id'>;
 export type InsertInstagramPost = Omit<InstagramPost, 'id'>;
 export type InsertProductReview = Omit<ProductReview, 'id' | 'createdAt'>;
+export type InsertWebsiteSettings = Omit<WebsiteSettings, 'id'>;

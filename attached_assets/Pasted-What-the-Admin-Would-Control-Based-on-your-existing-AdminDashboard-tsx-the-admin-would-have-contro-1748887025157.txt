@@ -1,0 +1,61 @@
+What the Admin Would Control
+Based on your existing AdminDashboard.tsx, the admin would have control over:
+
+Current Admin Features
+Bookings Management: View, edit, cancel, and update booking statuses
+Treatments Management: Add, edit, delete, and modify treatment details (title, price, duration, description)
+Products Management: Add, edit, delete, and manage product catalog
+Orders Management: View and update order statuses, track shipments
+Website Settings: Update contact info, business hours, social media links
+Content Management: Modify website text, descriptions, and basic content
+Additional Admin Controls (Not Currently Implemented)
+Booking System Toggle: Enable/disable the entire booking system
+Individual Treatment Availability: Toggle specific treatments on/off
+Business Hours Management: Set available booking times and dates
+Pricing Controls: Dynamic pricing updates
+User Management: If you add user accounts later
+Analytics Dashboard: Revenue, popular treatments, customer insights
+Email/SMS Notifications: Control automated messaging
+Gallery Management: Upload/remove before/after photos
+How Booking Toggle Would Work
+1. Database/Storage Level
+You'd add a settings object to your server/storage.ts file:
+
+const settings = {
+  bookingEnabled: true,
+  maintenanceMode: false,
+  // other global settings
+}
+2. Admin Interface
+In the AdminDashboard settings tab, add a toggle switch:
+
+// Toggle component for enabling/disabling bookings
+<Switch 
+  checked={bookingEnabled} 
+  onCheckedChange={setBookingEnabled}
+/>
+3. Frontend Implementation
+The booking functionality would check this setting:
+
+Booking Page: Show "Bookings temporarily unavailable" message when disabled
+Treatment Cards: Hide "Book Now" buttons when booking is disabled
+Booking Components: Display maintenance notice instead of calendar/time slots
+4. API Endpoint Protection
+Your booking-related API routes would check the setting:
+
+if (!settings.bookingEnabled) {
+  return res.status(503).json({ error: "Booking system temporarily disabled" });
+}
+5. Real-time Updates
+Using your existing store system, the toggle would immediately affect:
+
+All booking-related UI components
+API availability
+User experience across the site
+Implementation Flow
+Admin toggles booking off → Setting saved to storage
+Frontend components check setting → Hide booking UI elements
+API routes validate setting → Reject booking requests
+Users see maintenance message → Clear communication about unavailability
+Admin toggles back on → Everything returns to normal
+This would give you granular control over when bookings are available, useful for maintenance, holidays, or when you're fully booked.
