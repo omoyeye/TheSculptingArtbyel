@@ -781,7 +781,11 @@ export default function AdminDashboard() {
                     title: "Logged Out",
                     description: "You have been successfully logged out."
                   });
-                  setLocation("/admin-login");
+                  // Force immediate redirect
+                  setTimeout(() => {
+                    setLocation("/admin-login");
+                    window.location.reload();
+                  }, 100);
                 }}
                 className="w-full flex items-center px-4 py-3 text-left rounded-lg text-red-600 hover:bg-red-50 transition-colors"
               >

@@ -23,8 +23,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (authenticated === "true" && session) {
       const sessionTime = parseInt(session);
       const now = Date.now();
-      // Session expires after 24 hours
-      const sessionValid = (now - sessionTime) < (24 * 60 * 60 * 1000);
+      // Session expires after 2 hours for security
+      const sessionValid = (now - sessionTime) < (2 * 60 * 60 * 1000);
       
       if (sessionValid) {
         setIsAuthenticated(true);
@@ -35,7 +35,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
     
-    setIsAuthenticated(false);
+    // Always clear auth state if not properly authenticated
+    logout();
     return false;
   };
 
