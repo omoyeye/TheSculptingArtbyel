@@ -175,14 +175,14 @@ export default function AdminDashboard() {
     fetchData();
   }, [isAuthenticated]);
 
-  const handleBusinessSettingsUpdate = async () => {
+  const handleBusinessSettingsUpdate = async (settingsToSave = businessSettings) => {
     try {
       const response = await fetch('/api/settings', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(businessSettings),
+        body: JSON.stringify(settingsToSave),
       });
 
       if (response.ok) {
@@ -200,6 +200,16 @@ export default function AdminDashboard() {
         variant: "destructive"
       });
     }
+  };
+
+  const handleToggleChange = async (field: string, value: boolean) => {
+    const updatedSettings = {
+      ...businessSettings,
+      [field]: value
+    };
+    setBusinessSettings(updatedSettings);
+    // Save immediately when toggle changes
+    await handleBusinessSettingsUpdate(updatedSettings);
   };
 
   const handleAddTreatment = () => {
@@ -584,9 +594,7 @@ export default function AdminDashboard() {
             <Switch 
               id="booking-enabled" 
               checked={businessSettings.bookingEnabled}
-              onCheckedChange={(checked) => 
-                setBusinessSettings(prev => ({ ...prev, bookingEnabled: checked }))
-              }
+              onCheckedChange={(checked) => handleToggleChange('bookingEnabled', checked)}
             />
             <Label htmlFor="booking-enabled">Enable Online Booking</Label>
           </div>
@@ -595,9 +603,7 @@ export default function AdminDashboard() {
             <Switch 
               id="maintenance-mode" 
               checked={businessSettings.maintenanceMode}
-              onCheckedChange={(checked) => 
-                setBusinessSettings(prev => ({ ...prev, maintenanceMode: checked }))
-              }
+              onCheckedChange={(checked) => handleToggleChange('maintenanceMode', checked)}
             />
             <Label htmlFor="maintenance-mode">Maintenance Mode</Label>
           </div>
@@ -710,7 +716,7 @@ export default function AdminDashboard() {
           </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={handleBusinessSettingsUpdate} className="ml-auto">
+          <Button onClick={() => handleBusinessSettingsUpdate()} className="ml-auto">
             <Save className="w-4 h-4 mr-2" />
             Save Settings
           </Button>

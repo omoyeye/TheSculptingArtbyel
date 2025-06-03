@@ -58,6 +58,13 @@ function AppRoutes() {
             </ProtectedRoute>
           )}
         </Route>
+        <Route path="/admin-dashboard">
+          {() => (
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          )}
+        </Route>
         <Route path="/image-test" component={ImageTest} />
         <Route component={NotFound} />
       </Switch>
