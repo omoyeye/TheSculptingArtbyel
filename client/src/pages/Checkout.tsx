@@ -268,7 +268,14 @@ Thank you for your order!
         throw new Error('Failed to create order in database');
       }
 
-      const { order, downloadData } = await response.json();
+      const responseData = await response.json();
+      console.log("API Response:", responseData);
+      
+      if (!responseData.order || !responseData.downloadData) {
+        throw new Error('Invalid response from server');
+      }
+
+      const { order, downloadData } = responseData;
       
       // Download order details instantly
       downloadOrderDetails(downloadData);
