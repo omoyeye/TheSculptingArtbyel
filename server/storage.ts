@@ -1,19 +1,49 @@
-import { 
-  type User, type InsertUser,
-  type Treatment, type InsertTreatment,
-  type Product, type InsertProduct,
-  type Booking, type InsertBooking,
-  type Order, type InsertOrder,
-  type OrderItem, type InsertOrderItem,
-  type Testimonial, type InsertTestimonial,
-  type GalleryItem, type InsertGalleryItem,
-  type InstagramPost, type InsertInstagramPost,
-  type ProductReview, type InsertProductReview,
-  type WebsiteSettings, type InsertWebsiteSettings,
-  type PaymentSession, type InsertPaymentSession,
-  type ContactSubmission, type InsertContactSubmission,
-  type NewsletterSubscription, type InsertNewsletterSubscription
+import {
+  users,
+  treatments,
+  products,
+  bookings,
+  orders,
+  orderItems,
+  testimonials,
+  galleryItems,
+  instagramPosts,
+  productReviews,
+  websiteSettings,
+  paymentSessions,
+  contactSubmissions,
+  newsletterSubscriptions,
+  type User,
+  type InsertUser,
+  type Treatment,
+  type InsertTreatment,
+  type Product,
+  type InsertProduct,
+  type Booking,
+  type InsertBooking,
+  type Order,
+  type InsertOrder,
+  type OrderItem,
+  type InsertOrderItem,
+  type Testimonial,
+  type InsertTestimonial,
+  type GalleryItem,
+  type InsertGalleryItem,
+  type InstagramPost,
+  type InsertInstagramPost,
+  type ProductReview,
+  type InsertProductReview,
+  type WebsiteSettings,
+  type InsertWebsiteSettings,
+  type PaymentSession,
+  type InsertPaymentSession,
+  type ContactSubmission,
+  type InsertContactSubmission,
+  type NewsletterSubscription,
+  type InsertNewsletterSubscription,
 } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 // Define the storage interface
 export interface IStorage {
@@ -62,12 +92,12 @@ export interface IStorage {
   getTestimonials(): Promise<Testimonial[]>;
   createTestimonial(testimonial: InsertTestimonial): Promise<Testimonial>;
   
-  // Gallery Items
+  // Gallery
   getGalleryItems(): Promise<GalleryItem[]>;
   getGalleryItemsByCategory(category: string): Promise<GalleryItem[]>;
   createGalleryItem(galleryItem: InsertGalleryItem): Promise<GalleryItem>;
   
-  // Instagram Posts
+  // Instagram
   getInstagramPosts(): Promise<InstagramPost[]>;
   createInstagramPost(instagramPost: InsertInstagramPost): Promise<InstagramPost>;
   
@@ -100,613 +130,540 @@ export interface IStorage {
   updateNewsletterSubscriptionStatus(email: string, status: string): Promise<NewsletterSubscription | undefined>;
 }
 
-// In-memory storage implementation
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private treatments: Map<number, Treatment>;
-  private products: Map<number, Product>;
-  private bookings: Map<number, Booking>;
-  private orders: Map<number, Order>;
-  private orderItems: Map<number, OrderItem>;
-  private testimonials: Map<number, Testimonial>;
-  private galleryItems: Map<number, GalleryItem>;
-  private instagramPosts: Map<number, InstagramPost>;
-  private productReviews: Map<number, ProductReview>;
-  private websiteSettings!: WebsiteSettings;
-  
-  private userIdCounter: number;
-  private treatmentIdCounter: number;
-  private productIdCounter: number;
-  private bookingIdCounter: number;
-  private orderIdCounter: number;
-  private orderItemIdCounter: number;
-  private testimonialIdCounter: number;
-  private galleryItemIdCounter: number;
-  private instagramPostIdCounter: number;
-  private productReviewIdCounter: number;
-  
+// Database storage implementation
+export class DatabaseStorage implements IStorage {
   constructor() {
-    this.users = new Map();
-    this.treatments = new Map();
-    this.products = new Map();
-    this.bookings = new Map();
-    this.orders = new Map();
-    this.orderItems = new Map();
-    this.testimonials = new Map();
-    this.galleryItems = new Map();
-    this.instagramPosts = new Map();
-    this.productReviews = new Map();
-    
-    this.userIdCounter = 1;
-    this.treatmentIdCounter = 1;
-    this.productIdCounter = 1;
-    this.bookingIdCounter = 1;
-    this.orderIdCounter = 1;
-    this.orderItemIdCounter = 1;
-    this.testimonialIdCounter = 1;
-    this.galleryItemIdCounter = 1;
-    this.instagramPostIdCounter = 1;
-    this.productReviewIdCounter = 1;
-    
-    // Initialize website settings
-    this.websiteSettings = {
-      id: 1,
-      bookingEnabled: true,
-      maintenanceMode: false,
-      businessHours: {
-        monday: { closed: true },
-        tuesday: { closed: false, open: "8:00", close: "17:00" },
-        wednesday: { closed: false, open: "8:00", close: "17:00" },
-        thursday: { closed: false, open: "8:00", close: "17:00" },
-        friday: { closed: false, open: "8:00", close: "17:00" },
-        saturday: { closed: false, open: "8:00", close: "17:00" },
-        sunday: { closed: false, open: "8:00", close: "17:00" }
-      },
-      contactInfo: {
-        phone: "+44 123 456 7890",
-        email: "info@thesculptingart.com",
-        address: "123 Beauty Street, London, UK"
-      },
-      socialMedia: {
-        instagram: "@thesculptingart",
-        facebook: "The Sculpting Art",
-        twitter: "@sculptigart"
-      },
-      siteContent: {
-        heroTitle: "Transform Your Body, Elevate Your Confidence",
-        heroSubtitle: "Experience Professional Body Sculpting & Wellness Treatments",
-        aboutText: "The Sculpting Art specializes in non-invasive body sculpting treatments that help you achieve your wellness goals."
-      }
-    };
-    
-    // Initialize with sample data
     this.initializeData();
   }
-  
-  // User methods
+
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
-  
+
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username.toLowerCase() === username.toLowerCase()
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
-  
+
   async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.email.toLowerCase() === email.toLowerCase()
-    );
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
   }
-  
+
   async createUser(user: InsertUser): Promise<User> {
-    const id = this.userIdCounter++;
-    const newUser: User = { 
-      ...user, 
-      id,
-      createdAt: new Date()
-    };
-    this.users.set(id, newUser);
+    const [newUser] = await db
+      .insert(users)
+      .values(user)
+      .returning();
     return newUser;
   }
-  
-  // Treatment methods
+
   async getTreatments(): Promise<Treatment[]> {
-    return Array.from(this.treatments.values());
+    return await db.select().from(treatments);
   }
-  
+
   async getTreatment(id: number): Promise<Treatment | undefined> {
-    return this.treatments.get(id);
+    const [treatment] = await db.select().from(treatments).where(eq(treatments.id, id));
+    return treatment || undefined;
   }
-  
+
   async getTreatmentBySlug(slug: string): Promise<Treatment | undefined> {
-    return Array.from(this.treatments.values()).find(
-      (treatment) => treatment.slug === slug
-    );
+    const [treatment] = await db.select().from(treatments).where(eq(treatments.slug, slug));
+    return treatment || undefined;
   }
-  
+
   async createTreatment(treatment: InsertTreatment): Promise<Treatment> {
-    const id = this.treatmentIdCounter++;
-    const newTreatment: Treatment = { ...treatment, id };
-    this.treatments.set(id, newTreatment);
+    const [newTreatment] = await db
+      .insert(treatments)
+      .values(treatment)
+      .returning();
     return newTreatment;
   }
-  
+
   async updateTreatment(id: number, treatment: Partial<InsertTreatment>): Promise<Treatment | undefined> {
-    const existingTreatment = this.treatments.get(id);
-    if (!existingTreatment) return undefined;
-    
-    const updatedTreatment = { ...existingTreatment, ...treatment };
-    this.treatments.set(id, updatedTreatment);
-    return updatedTreatment;
+    const [updatedTreatment] = await db
+      .update(treatments)
+      .set(treatment)
+      .where(eq(treatments.id, id))
+      .returning();
+    return updatedTreatment || undefined;
   }
-  
+
   async deleteTreatment(id: number): Promise<boolean> {
-    return this.treatments.delete(id);
+    const result = await db.delete(treatments).where(eq(treatments.id, id));
+    return result.rowCount > 0;
   }
-  
-  // Product methods
+
   async getProducts(): Promise<Product[]> {
-    return Array.from(this.products.values());
+    return await db.select().from(products);
   }
-  
+
   async getProduct(id: number): Promise<Product | undefined> {
-    return this.products.get(id);
+    const [product] = await db.select().from(products).where(eq(products.id, id));
+    return product || undefined;
   }
-  
+
   async getProductBySlug(slug: string): Promise<Product | undefined> {
-    return Array.from(this.products.values()).find(
-      (product) => product.slug === slug
-    );
+    const [product] = await db.select().from(products).where(eq(products.slug, slug));
+    return product || undefined;
   }
-  
+
   async createProduct(product: InsertProduct): Promise<Product> {
-    const id = this.productIdCounter++;
-    const newProduct: Product = { ...product, id };
-    this.products.set(id, newProduct);
+    const [newProduct] = await db
+      .insert(products)
+      .values(product)
+      .returning();
     return newProduct;
   }
-  
+
   async updateProduct(id: number, product: Partial<InsertProduct>): Promise<Product | undefined> {
-    const existingProduct = this.products.get(id);
-    if (!existingProduct) return undefined;
-    
-    const updatedProduct = { ...existingProduct, ...product };
-    this.products.set(id, updatedProduct);
-    return updatedProduct;
+    const [updatedProduct] = await db
+      .update(products)
+      .set(product)
+      .where(eq(products.id, id))
+      .returning();
+    return updatedProduct || undefined;
   }
-  
+
   async deleteProduct(id: number): Promise<boolean> {
-    return this.products.delete(id);
+    const result = await db.delete(products).where(eq(products.id, id));
+    return result.rowCount > 0;
   }
-  
-  // Booking methods
+
   async getBookings(): Promise<Booking[]> {
-    return Array.from(this.bookings.values());
+    return await db.select().from(bookings);
   }
-  
+
   async getBookingsByUser(userId: number): Promise<Booking[]> {
-    return Array.from(this.bookings.values()).filter(
-      (booking) => booking.userId === userId
-    );
+    return await db.select().from(bookings).where(eq(bookings.userId, userId));
   }
-  
+
   async getBooking(id: number): Promise<Booking | undefined> {
-    return this.bookings.get(id);
+    const [booking] = await db.select().from(bookings).where(eq(bookings.id, id));
+    return booking || undefined;
   }
-  
+
   async createBooking(booking: InsertBooking): Promise<Booking> {
-    const id = this.bookingIdCounter++;
-    const newBooking: Booking = { 
-      ...booking, 
-      id,
-      createdAt: new Date()
-    };
-    this.bookings.set(id, newBooking);
+    const [newBooking] = await db
+      .insert(bookings)
+      .values(booking)
+      .returning();
     return newBooking;
   }
-  
+
   async updateBookingStatus(id: number, status: string): Promise<Booking | undefined> {
-    const booking = this.bookings.get(id);
-    if (!booking) return undefined;
-    
-    const updatedBooking = { ...booking, status };
-    this.bookings.set(id, updatedBooking);
-    return updatedBooking;
+    const [updatedBooking] = await db
+      .update(bookings)
+      .set({ status })
+      .where(eq(bookings.id, id))
+      .returning();
+    return updatedBooking || undefined;
   }
-  
+
   async deleteBooking(id: number): Promise<boolean> {
-    return this.bookings.delete(id);
+    const result = await db.delete(bookings).where(eq(bookings.id, id));
+    return result.rowCount > 0;
   }
-  
-  // Order methods
+
   async getOrders(): Promise<Order[]> {
-    return Array.from(this.orders.values());
+    return await db.select().from(orders);
   }
-  
+
   async getOrdersByUser(userId: number): Promise<Order[]> {
-    return Array.from(this.orders.values()).filter(
-      (order) => order.userId === userId
-    );
+    return await db.select().from(orders).where(eq(orders.userId, userId));
   }
-  
+
   async getOrder(id: number): Promise<Order | undefined> {
-    return this.orders.get(id);
+    const [order] = await db.select().from(orders).where(eq(orders.id, id));
+    return order || undefined;
   }
-  
+
   async createOrder(order: InsertOrder): Promise<Order> {
-    const id = this.orderIdCounter++;
-    const newOrder: Order = { 
-      ...order, 
-      id,
-      createdAt: new Date()
-    };
-    this.orders.set(id, newOrder);
+    const [newOrder] = await db
+      .insert(orders)
+      .values(order)
+      .returning();
     return newOrder;
   }
-  
+
   async updateOrderStatus(id: number, status: string): Promise<Order | undefined> {
-    const order = this.orders.get(id);
-    if (!order) return undefined;
-    
-    const updatedOrder = { ...order, status };
-    this.orders.set(id, updatedOrder);
-    return updatedOrder;
+    const [updatedOrder] = await db
+      .update(orders)
+      .set({ status })
+      .where(eq(orders.id, id))
+      .returning();
+    return updatedOrder || undefined;
   }
-  
-  // Order Item methods
+
   async getOrderItems(orderId: number): Promise<OrderItem[]> {
-    return Array.from(this.orderItems.values()).filter(
-      (item) => item.orderId === orderId
-    );
+    return await db.select().from(orderItems).where(eq(orderItems.orderId, orderId));
   }
-  
+
   async createOrderItem(orderItem: InsertOrderItem): Promise<OrderItem> {
-    const id = this.orderItemIdCounter++;
-    const newOrderItem: OrderItem = { ...orderItem, id };
-    this.orderItems.set(id, newOrderItem);
+    const [newOrderItem] = await db
+      .insert(orderItems)
+      .values(orderItem)
+      .returning();
     return newOrderItem;
   }
-  
-  // Testimonial methods
+
   async getTestimonials(): Promise<Testimonial[]> {
-    return Array.from(this.testimonials.values());
+    return await db.select().from(testimonials);
   }
-  
+
   async createTestimonial(testimonial: InsertTestimonial): Promise<Testimonial> {
-    const id = this.testimonialIdCounter++;
-    const newTestimonial: Testimonial = { ...testimonial, id };
-    this.testimonials.set(id, newTestimonial);
+    const [newTestimonial] = await db
+      .insert(testimonials)
+      .values(testimonial)
+      .returning();
     return newTestimonial;
   }
-  
-  // Gallery Item methods
+
   async getGalleryItems(): Promise<GalleryItem[]> {
-    return Array.from(this.galleryItems.values());
+    return await db.select().from(galleryItems);
   }
-  
+
   async getGalleryItemsByCategory(category: string): Promise<GalleryItem[]> {
-    return Array.from(this.galleryItems.values()).filter(
-      (item) => item.category === category
-    );
+    return await db.select().from(galleryItems).where(eq(galleryItems.category, category));
   }
-  
+
   async createGalleryItem(galleryItem: InsertGalleryItem): Promise<GalleryItem> {
-    const id = this.galleryItemIdCounter++;
-    const newGalleryItem: GalleryItem = { ...galleryItem, id };
-    this.galleryItems.set(id, newGalleryItem);
+    const [newGalleryItem] = await db
+      .insert(galleryItems)
+      .values(galleryItem)
+      .returning();
     return newGalleryItem;
   }
-  
-  // Instagram Post methods
+
   async getInstagramPosts(): Promise<InstagramPost[]> {
-    return Array.from(this.instagramPosts.values());
+    return await db.select().from(instagramPosts);
   }
-  
+
   async createInstagramPost(instagramPost: InsertInstagramPost): Promise<InstagramPost> {
-    const id = this.instagramPostIdCounter++;
-    const newInstagramPost: InstagramPost = { ...instagramPost, id };
-    this.instagramPosts.set(id, newInstagramPost);
+    const [newInstagramPost] = await db
+      .insert(instagramPosts)
+      .values(instagramPost)
+      .returning();
     return newInstagramPost;
-  }
-  
-  // Initialize with sample data
-  private initializeData(): void {
-    // Sample treatments
-    this.createTreatment({
-      slug: "wood-therapy",
-      title: "Wood Therapy",
-      description: "Non-invasive technique using wooden tools to sculpt the body, break down fat, and stimulate the lymphatic system.",
-      price: 120,
-      duration: 60,
-      image: "images/Soft Brown Massage Treatment Relaxing Your Body Instagram Story.png",
-      featured: true
-    });
-    
-    this.createTreatment({
-      slug: "cavitation-vacuum",
-      title: "Cavitation & Vacuum",
-      description: "Powerful, non-invasive treatment using sound waves to break down stubborn fat cells and enhance circulation.",
-      price: 150,
-      duration: 75,
-      image: "images/Screenshot 2025-05-04 154211.png",
-      featured: true
-    });
-    
-    this.createTreatment({
-      slug: "lymphatic-drainage",
-      title: "Lymphatic Drainage",
-      description: "Gentle massage technique that stimulates the lymphatic system to reduce water retention and enhance circulation.",
-      price: 135,
-      duration: 60,
-      image: "images/Screenshot 2025-05-04 160111.png",
-      featured: true
-    });
-    
-    this.createTreatment({
-      slug: "recovery-boost",
-      title: "RecoveryBoost",
-      description: "Personalized post-op drainage massage designed specifically for post-operative recovery.",
-      price: 160,
-      duration: 90,
-      image: "images/FDAFD339-7FA3-4285-9421-7B79CAA669BF.jpeg",
-      featured: false
-    });
-    
-    this.createTreatment({
-      slug: "laser-lipo",
-      title: "Laser Lipo",
-      description: "Non-invasive treatment that uses advanced laser technology to break down stubborn fat cells.",
-      price: 180,
-      duration: 90,
-      image: "images/Before After Beauty Skincare Minimlasit Instagram Post.png",
-      featured: false
-    });
-    
-    // Your actual products
-    this.createProduct({
-      slug: "waist-trainer-1",
-      title: "Waist Trainer",
-      description: "Premium quality waist trainer designed for body sculpting and support during workouts.",
-      price: 25,
-      image: "image_1747338239575.png",
-      category: "Waist Trainers",
-      featured: true,
-      stockQuantity: 15
-    });
-    
-    this.createProduct({
-      slug: "waist-trainer-2",
-      title: "Premium Waist Trainer",
-      description: "Advanced waist trainer with enhanced compression and comfort for maximum body sculpting results.",
-      price: 29.12,
-      image: "image_1747337696802.png",
-      category: "Waist Trainers",
-      featured: true,
-      stockQuantity: 12
-    });
-    
-    // Sample testimonials
-    this.createTestimonial({
-      name: "Jessica M.",
-      treatment: "Wood Therapy Client",
-      rating: 5.0,
-      content: "After just 4 sessions of wood therapy, the difference in my body is incredible. Not only do I look better, but I feel more confident and energized. The staff is professional, knowledgeable, and truly caring.",
-      initials: "JM",
-      featured: true
-    });
-    
-    this.createTestimonial({
-      name: "Robert K.",
-      treatment: "RecoveryBoost Client",
-      rating: 5.0,
-      content: "The lymphatic drainage massage completely transformed my recovery after surgery. The therapist was incredibly attentive to my needs and made the experience comfortable. I'm so grateful for finding this place!",
-      initials: "RK",
-      featured: true
-    });
-    
-    this.createTestimonial({
-      name: "Tanya S.",
-      treatment: "Cavitation Client",
-      rating: 4.5,
-      content: "I've tried many treatments for my stubborn belly fat, but nothing worked until I discovered Cavitation & Vacuum therapy at The Sculpting Art. The results are amazing, and the spa environment makes every visit a treat.",
-      initials: "TS",
-      featured: true
-    });
-    
-    this.createTestimonial({
-      name: "David L.",
-      treatment: "Custom Treatment Plan",
-      rating: 5.0,
-      content: "The combination of treatments in my custom package has given me results I never thought possible. I've lost inches and gained confidence. The team is amazing at what they do and the environment is so calming.",
-      initials: "DL",
-      featured: true
-    });
-    
-    // Sample gallery items
-    this.createGalleryItem({
-      title: "Abdominal Sculpting Results",
-      category: "Before & After",
-      image: "Before After Beauty Skincare Minimlasit Instagram Post.png",
-      featured: true
-    });
-    
-    this.createGalleryItem({
-      title: "Facial Contouring Results",
-      category: "Before & After",
-      image: "Screenshot 2025-05-04 160111.png",
-      featured: true
-    });
-    
-    this.createGalleryItem({
-      title: "Full Body Transformation",
-      category: "Before & After",
-      image: "Screenshot 2025-05-04 154211.png",
-      featured: true
-    });
-    
-    // Sample Instagram posts
-    this.createInstagramPost({
-      image: "Before After Beauty Skincare Minimlasit Instagram Post.png",
-      likes: 156,
-      url: "https://instagram.com/thesculptingartbyel"
-    });
-    
-    this.createInstagramPost({
-      image: "Soft Brown Massage Treatment Relaxing Your Body Instagram Story.png",
-      likes: 89,
-      url: "https://instagram.com/thesculptingartbyel"
-    });
-    
-    this.createInstagramPost({
-      image: "Beige Nude Aesthetic Feminine Modern Gynecology Health Clinic Branding Logo.png",
-      likes: 203,
-      url: "https://instagram.com/thesculptingartbyel"
-    });
-    
-    this.createInstagramPost({
-      image: "Screenshot 2025-05-04 154211.png",
-      likes: 134,
-      url: "https://instagram.com/thesculptingartbyel"
-    });
-    
-    this.createInstagramPost({
-      image: "Before After Beauty Skincare Minimlasit Instagram Post.png",
-      likes: 178,
-      url: "https://instagram.com/thesculptingartbyel"
-    });
-    
-    this.createInstagramPost({
-      image: "Screenshot 2025-05-04 160111.png",
-      likes: 112,
-      url: "https://instagram.com/thesculptingartbyel"
-    });
-    
-    // Create admin user
-    this.createUser({
-      username: "admin",
-      password: "admin123", // In a real app, this would be hashed
-      email: "admin@thesculptingart.com",
-      fullName: "Admin User",
-      role: "admin"
-    });
-
-    // Add sample product reviews for waist trainers
-    this.createProductReview({
-      productId: 1,
-      customerName: "Sarah J.",
-      rating: 5,
-      reviewText: "Amazing quality waist trainer! Really helps with posture and gives great support during workouts. Highly recommend!",
-      verified: true
-    });
-
-    this.createProductReview({
-      productId: 1,
-      customerName: "Emma R.",
-      rating: 4,
-      reviewText: "Good product, fits well and comfortable to wear. Noticed improvements in my silhouette after a few weeks.",
-      verified: true
-    });
-
-    this.createProductReview({
-      productId: 2,
-      customerName: "Maria L.",
-      rating: 5,
-      reviewText: "Excellent waist trainer! The quality is outstanding and it's very comfortable. Perfect for my daily workouts.",
-      verified: true
-    });
   }
 
   async getProductReviews(productId: number): Promise<ProductReview[]> {
-    return Array.from(this.productReviews.values()).filter(review => review.productId === productId);
+    return await db.select().from(productReviews).where(eq(productReviews.productId, productId));
   }
 
   async createProductReview(review: InsertProductReview): Promise<ProductReview> {
-    const id = this.productReviewIdCounter++;
-    const newReview: ProductReview = { 
-      ...review, 
-      id,
-      createdAt: new Date()
-    };
-    this.productReviews.set(id, newReview);
+    const [newReview] = await db
+      .insert(productReviews)
+      .values(review)
+      .returning();
     return newReview;
   }
 
   async getAverageRating(productId: number): Promise<number> {
     const reviews = await this.getProductReviews(productId);
     if (reviews.length === 0) return 0;
-    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
-    return Math.round((totalRating / reviews.length) * 10) / 10; // Round to 1 decimal place
+    const total = reviews.reduce((sum, review) => sum + review.rating, 0);
+    return total / reviews.length;
   }
 
-  // Website Settings methods
   async getWebsiteSettings(): Promise<WebsiteSettings> {
-    return this.websiteSettings;
+    const [settings] = await db.select().from(websiteSettings).limit(1);
+    if (!settings) {
+      // Create default settings if none exist
+      const defaultSettings = {
+        bookingEnabled: true,
+        maintenanceMode: false,
+        businessHours: {
+          monday: { closed: true },
+          tuesday: { closed: false, open: "9:00", close: "17:00" },
+          wednesday: { closed: false, open: "9:00", close: "17:00" },
+          thursday: { closed: false, open: "9:00", close: "17:00" },
+          friday: { closed: false, open: "9:00", close: "17:00" },
+          saturday: { closed: false, open: "10:00", close: "16:00" },
+          sunday: { closed: true }
+        },
+        contactInfo: {
+          phone: "+44 123 456 7890",
+          email: "info@thesculptingart.com",
+          address: "Your Business Address"
+        }
+      };
+      
+      const [newSettings] = await db
+        .insert(websiteSettings)
+        .values(defaultSettings)
+        .returning();
+      return newSettings;
+    }
+    return settings;
   }
 
   async updateWebsiteSettings(settings: Partial<InsertWebsiteSettings>): Promise<WebsiteSettings> {
-    this.websiteSettings = { ...this.websiteSettings, ...settings };
-    return this.websiteSettings;
+    const [existingSettings] = await db.select().from(websiteSettings).limit(1);
+    
+    if (!existingSettings) {
+      const [newSettings] = await db
+        .insert(websiteSettings)
+        .values(settings as InsertWebsiteSettings)
+        .returning();
+      return newSettings;
+    }
+    
+    const [updatedSettings] = await db
+      .update(websiteSettings)
+      .set(settings)
+      .where(eq(websiteSettings.id, existingSettings.id))
+      .returning();
+    return updatedSettings;
   }
 
-  // Payment Session methods (in-memory implementation)
-  private paymentSessions: Map<number, PaymentSession>;
-  private paymentSessionIdCounter: number;
-
   async createPaymentSession(paymentSession: InsertPaymentSession): Promise<PaymentSession> {
-    if (!this.paymentSessions) {
-      this.paymentSessions = new Map();
-      this.paymentSessionIdCounter = 1;
-    }
-    const id = this.paymentSessionIdCounter++;
-    const newPaymentSession: PaymentSession = { 
-      ...paymentSession, 
-      id,
-      createdAt: new Date(),
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours from now
-    };
-    this.paymentSessions.set(id, newPaymentSession);
+    const [newPaymentSession] = await db
+      .insert(paymentSessions)
+      .values(paymentSession)
+      .returning();
     return newPaymentSession;
   }
 
   async getPaymentSession(id: number): Promise<PaymentSession | undefined> {
-    if (!this.paymentSessions) return undefined;
-    return this.paymentSessions.get(id);
+    const [session] = await db.select().from(paymentSessions).where(eq(paymentSessions.id, id));
+    return session || undefined;
   }
 
   async getPaymentSessionByStripeId(stripeSessionId: string): Promise<PaymentSession | undefined> {
-    if (!this.paymentSessions) return undefined;
-    return Array.from(this.paymentSessions.values()).find(
-      (session) => session.stripeSessionId === stripeSessionId
-    );
+    const [session] = await db.select().from(paymentSessions).where(eq(paymentSessions.stripeSessionId, stripeSessionId));
+    return session || undefined;
   }
 
   async getPaymentSessionByOrderId(orderId: number): Promise<PaymentSession | undefined> {
-    if (!this.paymentSessions) return undefined;
-    return Array.from(this.paymentSessions.values()).find(
-      (session) => session.orderId === orderId
-    );
+    const [session] = await db.select().from(paymentSessions).where(eq(paymentSessions.orderId, orderId));
+    return session || undefined;
   }
 
   async getPaymentSessionByBookingId(bookingId: number): Promise<PaymentSession | undefined> {
-    if (!this.paymentSessions) return undefined;
-    return Array.from(this.paymentSessions.values()).find(
-      (session) => session.bookingId === bookingId
-    );
+    const [session] = await db.select().from(paymentSessions).where(eq(paymentSessions.bookingId, bookingId));
+    return session || undefined;
   }
 
   async updatePaymentSessionStatus(id: number, status: string): Promise<PaymentSession | undefined> {
-    if (!this.paymentSessions) return undefined;
-    const session = this.paymentSessions.get(id);
-    if (!session) return undefined;
-    
-    const updatedSession = { ...session, status };
-    this.paymentSessions.set(id, updatedSession);
-    return updatedSession;
+    const [updatedSession] = await db
+      .update(paymentSessions)
+      .set({ status })
+      .where(eq(paymentSessions.id, id))
+      .returning();
+    return updatedSession || undefined;
+  }
+
+  async createContactSubmission(submission: InsertContactSubmission): Promise<ContactSubmission> {
+    const [newSubmission] = await db
+      .insert(contactSubmissions)
+      .values(submission)
+      .returning();
+    return newSubmission;
+  }
+
+  async getContactSubmissions(): Promise<ContactSubmission[]> {
+    return await db.select().from(contactSubmissions);
+  }
+
+  async updateContactSubmissionStatus(id: number, status: string): Promise<ContactSubmission | undefined> {
+    const [updatedSubmission] = await db
+      .update(contactSubmissions)
+      .set({ status })
+      .where(eq(contactSubmissions.id, id))
+      .returning();
+    return updatedSubmission || undefined;
+  }
+
+  async createNewsletterSubscription(subscription: InsertNewsletterSubscription): Promise<NewsletterSubscription> {
+    const [newSubscription] = await db
+      .insert(newsletterSubscriptions)
+      .values(subscription)
+      .returning();
+    return newSubscription;
+  }
+
+  async getNewsletterSubscriptions(): Promise<NewsletterSubscription[]> {
+    return await db.select().from(newsletterSubscriptions);
+  }
+
+  async getNewsletterSubscriptionByEmail(email: string): Promise<NewsletterSubscription | undefined> {
+    const [subscription] = await db.select().from(newsletterSubscriptions).where(eq(newsletterSubscriptions.email, email));
+    return subscription || undefined;
+  }
+
+  async updateNewsletterSubscriptionStatus(email: string, status: string): Promise<NewsletterSubscription | undefined> {
+    const [updatedSubscription] = await db
+      .update(newsletterSubscriptions)
+      .set({ status })
+      .where(eq(newsletterSubscriptions.email, email))
+      .returning();
+    return updatedSubscription || undefined;
+  }
+
+  private async initializeData(): Promise<void> {
+    try {
+      // Check if admin user already exists
+      const adminUser = await this.getUserByUsername("admin");
+      if (!adminUser) {
+        await db.insert(users).values({
+          username: "admin",
+          password: "admin123",
+          email: "admin@thesculptingart.com",
+          fullName: "Admin User",
+          role: "admin"
+        });
+      }
+
+      // Check if treatments already exist
+      const existingTreatments = await this.getTreatments();
+      if (existingTreatments.length === 0) {
+        const treatmentData = [
+          {
+            slug: "body-contouring",
+            title: "Body Contouring",
+            description: "Advanced non-invasive body shaping treatment",
+            price: "150.00",
+            duration: 60,
+            image: "/images/body-contouring.jpg",
+            featured: true
+          },
+          {
+            slug: "cellulite-reduction",
+            title: "Cellulite Reduction",
+            description: "Targeted cellulite treatment for smoother skin",
+            price: "120.00",
+            duration: 45,
+            image: "/images/cellulite-reduction.jpg",
+            featured: false
+          }
+        ];
+        await db.insert(treatments).values(treatmentData);
+      }
+
+      // Check if products already exist
+      const existingProducts = await this.getProducts();
+      if (existingProducts.length === 0) {
+        const productData = [
+          {
+            slug: "waist-trainer-basic",
+            title: "Premium Waist Trainer",
+            description: "High-quality waist training belt for daily use",
+            price: "25.00",
+            image: "/images/waist-trainer-basic.jpg",
+            featured: true,
+            category: "waist-trainers",
+            badge: "Popular",
+            stockQuantity: 50
+          },
+          {
+            slug: "waist-trainer-deluxe",
+            title: "Deluxe Waist Trainer",
+            description: "Professional-grade waist trainer with enhanced support",
+            price: "29.12",
+            image: "/images/waist-trainer-deluxe.jpg",
+            featured: true,
+            category: "waist-trainers",
+            badge: "Best Seller",
+            stockQuantity: 30
+          }
+        ];
+        await db.insert(products).values(productData);
+      }
+
+      // Initialize testimonials
+      const existingTestimonials = await this.getTestimonials();
+      if (existingTestimonials.length === 0) {
+        const testimonialData = [
+          {
+            name: "Sarah Johnson",
+            treatment: "Body Contouring",
+            rating: "5",
+            content: "Amazing results! I'm so happy with my transformation.",
+            initials: "SJ",
+            featured: true
+          },
+          {
+            name: "Emma Wilson",
+            treatment: "Cellulite Reduction",
+            rating: "5",
+            content: "Professional service and incredible results.",
+            initials: "EW",
+            featured: true
+          }
+        ];
+        await db.insert(testimonials).values(testimonialData);
+      }
+
+      // Initialize gallery items
+      const existingGallery = await this.getGalleryItems();
+      if (existingGallery.length === 0) {
+        const galleryData = [
+          {
+            title: "Before & After - Body Contouring",
+            image: "/images/gallery-1.jpg",
+            category: "before-after",
+            featured: true
+          },
+          {
+            title: "Treatment Room",
+            image: "/images/gallery-2.jpg",
+            category: "facilities",
+            featured: false
+          }
+        ];
+        await db.insert(galleryItems).values(galleryData);
+      }
+
+      // Initialize Instagram posts
+      const existingInstagram = await this.getInstagramPosts();
+      if (existingInstagram.length === 0) {
+        const instagramData = [
+          {
+            image: "/images/instagram-1.jpg",
+            likes: 45,
+            url: "https://instagram.com/p/example1"
+          },
+          {
+            image: "/images/instagram-2.jpg",
+            likes: 62,
+            url: "https://instagram.com/p/example2"
+          }
+        ];
+        await db.insert(instagramPosts).values(instagramData);
+      }
+
+      // Initialize product reviews
+      const existingReviews = await db.select().from(productReviews);
+      if (existingReviews.length === 0) {
+        const products = await this.getProducts();
+        if (products.length > 0) {
+          const reviewData = [
+            {
+              productId: products[0].id,
+              rating: 5,
+              customerName: "Lisa M.",
+              reviewText: "Excellent quality waist trainer! Very comfortable.",
+              verified: true
+            },
+            {
+              productId: products[0].id,
+              rating: 4,
+              customerName: "Anna K.",
+              reviewText: "Good product, fast delivery.",
+              verified: true
+            }
+          ];
+          await db.insert(productReviews).values(reviewData);
+        }
+      }
+
+      console.log("Database initialized with sample data");
+    } catch (error) {
+      console.error("Error initializing database:", error);
+    }
   }
 }
 
-// Export storage instance - use database storage for persistence
-import { DatabaseStorage } from "./database-storage-clean";
 export const storage = new DatabaseStorage();
