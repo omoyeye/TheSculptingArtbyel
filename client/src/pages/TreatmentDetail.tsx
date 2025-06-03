@@ -146,13 +146,6 @@ export default function TreatmentDetail() {
                 >
                   Book Now
                 </Button>
-                <Button 
-                  variant="outline" 
-                  className="border-secondary text-secondary hover:bg-secondary/10"
-                  onClick={handleAddToCart}
-                >
-                  Add to Cart
-                </Button>
               </div>
             </div>
           </div>
