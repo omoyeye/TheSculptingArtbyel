@@ -17,7 +17,7 @@ export default function BookingSection() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
-  const { treatments } = useStore();
+  const { treatments, addToCart } = useStore();
   const { settings, loading } = useSettings();
   const { toast } = useToast();
 
