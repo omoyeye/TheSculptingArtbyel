@@ -20,7 +20,7 @@ export default function TreatmentCard({ treatment }: TreatmentCardProps) {
   return (
     <div className="treatment-card bg-muted rounded-xl overflow-hidden shadow-lg transition duration-300">
       <img 
-        className="w-full h-64 object-cover" 
+        className="w-full h-64 object-cover mt-[0px] mb-[0px] ml-[0px] mr-[0px] pl-[58px] pr-[58px]" 
         src={getImagePath(image)} 
         alt={`${title} Treatment`} 
         onError={(e) => {
