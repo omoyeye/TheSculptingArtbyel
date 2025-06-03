@@ -9,7 +9,8 @@ import {
   type GalleryItem, type InsertGalleryItem,
   type InstagramPost, type InsertInstagramPost,
   type ProductReview, type InsertProductReview,
-  type WebsiteSettings, type InsertWebsiteSettings
+  type WebsiteSettings, type InsertWebsiteSettings,
+  type PaymentSession, type InsertPaymentSession
 } from "@shared/schema";
 
 // Define the storage interface
@@ -76,6 +77,14 @@ export interface IStorage {
   // Website Settings
   getWebsiteSettings(): Promise<WebsiteSettings>;
   updateWebsiteSettings(settings: Partial<InsertWebsiteSettings>): Promise<WebsiteSettings>;
+  
+  // Payment Sessions
+  createPaymentSession(paymentSession: InsertPaymentSession): Promise<PaymentSession>;
+  getPaymentSession(id: number): Promise<PaymentSession | undefined>;
+  getPaymentSessionByStripeId(stripeSessionId: string): Promise<PaymentSession | undefined>;
+  getPaymentSessionByOrderId(orderId: number): Promise<PaymentSession | undefined>;
+  getPaymentSessionByBookingId(bookingId: number): Promise<PaymentSession | undefined>;
+  updatePaymentSessionStatus(id: number, status: string): Promise<PaymentSession | undefined>;
 }
 
 // In-memory storage implementation
@@ -627,7 +636,65 @@ export class MemStorage implements IStorage {
     this.websiteSettings = { ...this.websiteSettings, ...settings };
     return this.websiteSettings;
   }
+
+  // Payment Session methods (in-memory implementation)
+  private paymentSessions: Map<number, PaymentSession>;
+  private paymentSessionIdCounter: number;
+
+  async createPaymentSession(paymentSession: InsertPaymentSession): Promise<PaymentSession> {
+    if (!this.paymentSessions) {
+      this.paymentSessions = new Map();
+      this.paymentSessionIdCounter = 1;
+    }
+    const id = this.paymentSessionIdCounter++;
+    const newPaymentSession: PaymentSession = { 
+      ...paymentSession, 
+      id,
+      createdAt: new Date(),
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours from now
+    };
+    this.paymentSessions.set(id, newPaymentSession);
+    return newPaymentSession;
+  }
+
+  async getPaymentSession(id: number): Promise<PaymentSession | undefined> {
+    if (!this.paymentSessions) return undefined;
+    return this.paymentSessions.get(id);
+  }
+
+  async getPaymentSessionByStripeId(stripeSessionId: string): Promise<PaymentSession | undefined> {
+    if (!this.paymentSessions) return undefined;
+    return Array.from(this.paymentSessions.values()).find(
+      (session) => session.stripeSessionId === stripeSessionId
+    );
+  }
+
+  async getPaymentSessionByOrderId(orderId: number): Promise<PaymentSession | undefined> {
+    if (!this.paymentSessions) return undefined;
+    return Array.from(this.paymentSessions.values()).find(
+      (session) => session.orderId === orderId
+    );
+  }
+
+  async getPaymentSessionByBookingId(bookingId: number): Promise<PaymentSession | undefined> {
+    if (!this.paymentSessions) return undefined;
+    return Array.from(this.paymentSessions.values()).find(
+      (session) => session.bookingId === bookingId
+    );
+  }
+
+  async updatePaymentSessionStatus(id: number, status: string): Promise<PaymentSession | undefined> {
+    if (!this.paymentSessions) return undefined;
+    const session = this.paymentSessions.get(id);
+    if (!session) return undefined;
+    
+    const updatedSession = { ...session, status };
+    this.paymentSessions.set(id, updatedSession);
+    return updatedSession;
+  }
 }
 
-// Export storage instance
-export const storage = new MemStorage();
+import { DatabaseStorage } from "./database-storage";
+
+// Export storage instance - switch to database storage
+export const storage = process.env.DATABASE_URL ? new DatabaseStorage() : new MemStorage();

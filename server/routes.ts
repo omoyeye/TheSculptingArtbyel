@@ -86,6 +86,16 @@ const insertProductReviewSchema = z.object({
   verified: z.boolean().default(false),
 });
 
+const insertPaymentSessionSchema = z.object({
+  orderId: z.number().optional(),
+  bookingId: z.number().optional(),
+  stripeSessionId: z.string(),
+  stripePaymentUrl: z.string(),
+  status: z.string().default("pending"),
+  amount: z.number(),
+  expiresAt: z.string().transform((val) => new Date(val)),
+});
+
 // Helper function to validate request body with zod schema
 function validateBody<T>(schema: z.ZodType<T>) {
   return (req: Request, res: Response, next: () => void) => {
@@ -550,6 +560,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete booking" });
+    }
+  });
+
+  // Payment session routes
+  app.post("/api/payment-sessions", validateBody(insertPaymentSessionSchema), async (req, res) => {
+    try {
+      const paymentSession = await storage.createPaymentSession(req.body);
+      res.status(201).json(paymentSession);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create payment session" });
+    }
+  });
+
+  app.get("/api/payment-sessions/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const paymentSession = await storage.getPaymentSession(id);
+      if (!paymentSession) {
+        return res.status(404).json({ message: "Payment session not found" });
+      }
+      res.json(paymentSession);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch payment session" });
+    }
+  });
+
+  app.get("/api/payment-sessions/stripe/:stripeSessionId", async (req, res) => {
+    try {
+      const stripeSessionId = req.params.stripeSessionId;
+      const paymentSession = await storage.getPaymentSessionByStripeId(stripeSessionId);
+      if (!paymentSession) {
+        return res.status(404).json({ message: "Payment session not found" });
+      }
+      res.json(paymentSession);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch payment session" });
+    }
+  });
+
+  app.get("/api/orders/:orderId/payment-session", async (req, res) => {
+    try {
+      const orderId = parseInt(req.params.orderId);
+      const paymentSession = await storage.getPaymentSessionByOrderId(orderId);
+      if (!paymentSession) {
+        return res.status(404).json({ message: "Payment session not found for this order" });
+      }
+      res.json(paymentSession);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch payment session for order" });
+    }
+  });
+
+  app.get("/api/bookings/:bookingId/payment-session", async (req, res) => {
+    try {
+      const bookingId = parseInt(req.params.bookingId);
+      const paymentSession = await storage.getPaymentSessionByBookingId(bookingId);
+      if (!paymentSession) {
+        return res.status(404).json({ message: "Payment session not found for this booking" });
+      }
+      res.json(paymentSession);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch payment session for booking" });
+    }
+  });
+
+  app.put("/api/payment-sessions/:id/status", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { status } = req.body;
+      
+      if (!status || typeof status !== 'string') {
+        return res.status(400).json({ message: "Status is required" });
+      }
+      
+      const paymentSession = await storage.updatePaymentSessionStatus(id, status);
+      if (!paymentSession) {
+        return res.status(404).json({ message: "Payment session not found" });
+      }
+      res.json(paymentSession);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update payment session status" });
     }
   });
   
