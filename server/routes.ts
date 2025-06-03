@@ -303,76 +303,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // API route to get payment URL for products/bookings
-  app.get("/api/payment-url/:type/:id", async (req, res) => {
+  // Create order with instant download data
+  app.post("/api/create-order-download", async (req, res) => {
     try {
-      const { type, id } = req.params;
-      const itemId = parseInt(id);
+      const orderData = req.body;
       
-      // Query payment_links table for the URL using raw SQL
-      const query = `SELECT stripe_url FROM payment_links WHERE product_type = $1 AND item_id = $2 AND active = true LIMIT 1`;
-      const { pool } = await import('./db');
-      const result = await pool.query(query, [type, itemId]);
+      // Generate order number
+      const orderNumber = `ORD-${Date.now()}`;
       
-      if (result.rows.length === 0) {
-        return res.status(404).json({ message: "Payment URL not found" });
-      }
-      
-      res.json({ url: result.rows[0].stripe_url });
-    } catch (error) {
-      console.error("Error fetching payment URL:", error);
-      res.status(500).json({ message: "Failed to fetch payment URL" });
-    }
-  });
-
-  // API route to create order and get downloadable receipt
-  app.post("/api/create-order-download", validateBody(insertOrderSchema), async (req, res) => {
-    try {
-      const { items, ...orderData } = req.body;
-      
-      // Create order
+      // Create order in database
       const order = await storage.createOrder({
-        ...orderData,
-        status: 'pending'
+        total: orderData.total.toString(),
+        status: "pending",
+        userId: null
       });
-      
+
       // Create order items
-      const orderItems = [];
-      if (items && Array.isArray(items)) {
-        for (const item of items) {
-          const orderItem = await storage.createOrderItem({
-            ...item,
-            orderId: order.id
-          });
-          orderItems.push(orderItem);
-        }
+      for (const item of orderData.items) {
+        await storage.createOrderItem({
+          orderId: order.id,
+          productId: item.productId || null,
+          quantity: item.quantity,
+          price: item.price.toString()
+        });
       }
-      
-      // Generate order details for download
-      const orderDetails = {
-        orderId: order.id,
-        orderNumber: `TSA-${order.id.toString().padStart(6, '0')}`,
+
+      // Prepare download data
+      const downloadData = {
+        orderNumber,
         date: new Date().toISOString(),
-        status: order.status,
-        total: order.total,
-        items: orderItems,
-        customerInfo: orderData,
+        status: "pending",
+        customerInfo: {
+          firstName: orderData.firstName,
+          lastName: orderData.lastName,
+          email: orderData.email,
+          phone: orderData.phone
+        },
+        items: orderData.items,
+        total: orderData.total,
         businessInfo: {
           name: "The Sculpting Art",
           email: "info@thesculptingart.com",
           phone: "+44 123 456 7890"
         }
       };
+
+      res.json({ order, downloadData });
       
-      res.json({
-        order,
-        downloadData: orderDetails
-      });
     } catch (error) {
       console.error("Error creating order:", error);
       res.status(500).json({ message: "Failed to create order" });
     }
   });
+
+  // API route to get payment URL for products/bookings
+  app.get("/api/payment-url/:type/:id", async (req, res) => {
+    try {
+      // Return the Stripe checkout URL
+      const paymentUrl = "https://buy.stripe.com/fZufZidtE52l9PseC0a7C00";
+      res.json({ url: paymentUrl });
+    } catch (error) {
+      console.error("Error fetching payment URL:", error);
+      res.status(500).json({ message: "Failed to fetch payment URL" });
+    }
+  });
+
+
 
   // API routes for orders
   app.get("/api/orders", async (req, res) => {

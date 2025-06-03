@@ -152,48 +152,37 @@ Thank you for your order!
     setIsSubmitting(true);
     
     try {
-      // Create order and get download data
-      const orderPayload = {
-        ...data,
-        total: finalTotal,
-        items: cart.map(item => ({
-          productId: item.type === 'product' ? item.id : null,
-          treatmentId: item.type === 'booking' ? item.id : null,
-          quantity: item.quantity || 1,
-          price: item.price,
-          title: item.title,
-          type: item.type
-        }))
-      };
-
-      const response = await fetch('/api/create-order-download', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      // Generate order details for instant download
+      const orderNumber = `ORD-${Date.now()}`;
+      const downloadData = {
+        orderNumber,
+        date: new Date().toISOString(),
+        status: "pending",
+        customerInfo: {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phone: data.phone
         },
-        body: JSON.stringify(orderPayload),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create order');
-      }
-
-      const { order, downloadData } = await response.json();
+        items: cart.map(item => ({
+          title: item.title,
+          quantity: item.quantity || 1,
+          price: item.price
+        })),
+        total: finalTotal,
+        businessInfo: {
+          name: "The Sculpting Art",
+          email: "info@thesculptingart.com",
+          phone: "+44 123 456 7890"
+        }
+      };
 
       // Download order details instantly
       downloadOrderDetails(downloadData);
 
-      // Get payment URL for the first product/booking in cart
-      const firstItem = cart[0];
-      if (firstItem) {
-        const paymentResponse = await fetch(`/api/payment-url/${firstItem.type === 'booking' ? 'booking' : 'product'}/${firstItem.id}`);
-        
-        if (paymentResponse.ok) {
-          const { url } = await paymentResponse.json();
-          // Open Stripe checkout in new tab
-          window.open(url, '_blank');
-        }
-      }
+      // Open Stripe checkout in new tab
+      const stripeUrl = "https://buy.stripe.com/fZufZidtE52l9PseC0a7C00";
+      window.open(stripeUrl, '_blank');
       
       // Show success message
       toast({
