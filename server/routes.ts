@@ -1,6 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { pool } from "./db";
 import { z } from "zod";
 
 // Simple validation schemas for the in-memory storage
@@ -310,6 +311,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Query payment_links table for the URL using raw SQL
       const query = `SELECT stripe_url FROM payment_links WHERE product_type = $1 AND item_id = $2 AND active = true LIMIT 1`;
+      const { pool } = await import('./db');
       const result = await pool.query(query, [type, itemId]);
       
       if (result.rows.length === 0) {

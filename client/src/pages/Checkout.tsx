@@ -111,17 +111,94 @@ export default function Checkout() {
   const tax = totalPrice * 0.08; // 8% tax rate
   const finalTotal = totalPrice + tax;
 
+  const downloadOrderDetails = (orderData: any) => {
+    const orderText = `
+THE SCULPTING ART - ORDER CONFIRMATION
+
+Order Number: ${orderData.orderNumber}
+Date: ${new Date(orderData.date).toLocaleDateString()}
+Status: ${orderData.status.toUpperCase()}
+
+CUSTOMER INFORMATION:
+Name: ${orderData.customerInfo.firstName} ${orderData.customerInfo.lastName}
+Email: ${orderData.customerInfo.email}
+Phone: ${orderData.customerInfo.phone}
+
+ORDER ITEMS:
+${orderData.items.map((item: any) => `- ${item.title || 'Item'} x${item.quantity || 1} - £${item.price}`).join('\n')}
+
+TOTAL: £${orderData.total}
+
+BUSINESS CONTACT:
+${orderData.businessInfo.name}
+Email: ${orderData.businessInfo.email}
+Phone: ${orderData.businessInfo.phone}
+
+Thank you for your order!
+    `;
+
+    const blob = new Blob([orderText], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `order-${orderData.orderNumber}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  };
+
   const onSubmit = async (data: CheckoutFormValues) => {
     setIsSubmitting(true);
     
     try {
-      // In a real app, this would be an API call to process payment and create order
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Create order and get download data
+      const orderPayload = {
+        ...data,
+        total: finalTotal,
+        items: cart.map(item => ({
+          productId: item.type === 'product' ? item.id : null,
+          treatmentId: item.type === 'booking' ? item.id : null,
+          quantity: item.quantity || 1,
+          price: item.price,
+          title: item.title,
+          type: item.type
+        }))
+      };
+
+      const response = await fetch('/api/create-order-download', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderPayload),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create order');
+      }
+
+      const { order, downloadData } = await response.json();
+
+      // Download order details instantly
+      downloadOrderDetails(downloadData);
+
+      // Get payment URL for the first product/booking in cart
+      const firstItem = cart[0];
+      if (firstItem) {
+        const paymentResponse = await fetch(`/api/payment-url/${firstItem.type === 'booking' ? 'booking' : 'product'}/${firstItem.id}`);
+        
+        if (paymentResponse.ok) {
+          const { url } = await paymentResponse.json();
+          // Open Stripe checkout in new tab
+          window.open(url, '_blank');
+        }
+      }
       
       // Show success message
       toast({
-        title: "Order placed successfully!",
-        description: "Thank you for your purchase. You'll receive a confirmation email shortly.",
+        title: "Order created successfully!",
+        description: "Your order details have been downloaded and Stripe checkout opened in a new tab.",
       });
       
       // Clear cart and redirect to confirmation page
@@ -129,6 +206,7 @@ export default function Checkout() {
       setLocation("/");
       
     } catch (error) {
+      console.error("Payment processing failed:", error);
       toast({
         title: "Payment failed",
         description: "There was an error processing your payment. Please try again.",
