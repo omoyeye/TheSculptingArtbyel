@@ -22,17 +22,29 @@ export default function Newsletter() {
 
     setIsSubmitting(true);
     
-    // Simulate API call
     try {
-      // In a real app, this would be an API call to your newsletter service
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast({
-        title: "Subscription successful!",
-        description: "Thank you for subscribing to our newsletter.",
+      const response = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
       });
-      
-      setEmail("");
+
+      if (response.ok) {
+        toast({
+          title: "Subscription successful!",
+          description: "Thank you for subscribing to our newsletter.",
+        });
+        setEmail("");
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: "Subscription failed",
+          description: errorData.message || "There was an error subscribing to the newsletter.",
+          variant: "destructive"
+        });
+      }
     } catch (error) {
       toast({
         title: "Subscription failed",

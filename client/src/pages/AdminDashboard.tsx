@@ -65,6 +65,8 @@ export default function AdminDashboard() {
   // Database data states
   const [orders, setOrders] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
+  const [contactSubmissions, setContactSubmissions] = useState<any[]>([]);
+  const [newsletterSubscriptions, setNewsletterSubscriptions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Dialog states
@@ -147,6 +149,20 @@ export default function AdminDashboard() {
         if (bookingsResponse.ok) {
           const bookingsData = await bookingsResponse.json();
           setBookings(bookingsData);
+        }
+        
+        // Fetch contact submissions
+        const contactResponse = await fetch('/api/contact-submissions');
+        if (contactResponse.ok) {
+          const contactData = await contactResponse.json();
+          setContactSubmissions(contactData);
+        }
+        
+        // Fetch newsletter subscriptions
+        const newsletterResponse = await fetch('/api/newsletter-subscriptions');
+        if (newsletterResponse.ok) {
+          const newsletterData = await newsletterResponse.json();
+          setNewsletterSubscriptions(newsletterData);
         }
         
       } catch (error) {
