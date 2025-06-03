@@ -63,8 +63,8 @@ export default function AdminDashboard() {
   const { treatments, products, cart } = useStore();
   
   // Database data states
-  const [orders, setOrders] = useState([]);
-  const [bookings, setBookings] = useState([]);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Dialog states
@@ -311,26 +311,59 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-          <CardDescription>Manage your content quickly</CardDescription>
-        </CardHeader>
-        <CardContent className="flex gap-4">
-          <Button onClick={() => setIsAddTreatmentOpen(true)}>
-            <PlusCircle className="w-4 h-4 mr-2" />
-            Add Treatment
-          </Button>
-          <Button onClick={() => setIsAddProductOpen(true)} variant="outline">
-            <PlusCircle className="w-4 h-4 mr-2" />
-            Add Product
-          </Button>
-          <Button onClick={() => setActiveTab("settings")} variant="outline">
-            <Settings className="w-4 h-4 mr-2" />
-            Settings
-          </Button>
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Orders</CardTitle>
+            <CardDescription>Latest customer orders</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="text-center py-4">Loading orders...</div>
+            ) : orders.length === 0 ? (
+              <div className="text-center py-4 text-muted-foreground">No orders yet</div>
+            ) : (
+              <div className="space-y-4">
+                {orders.slice(0, 5).map((order: any) => (
+                  <div key={order.id} className="flex justify-between items-center p-3 border rounded-lg">
+                    <div>
+                      <div className="font-medium">Order #{order.id}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {order.items?.length || 0} items • {new Date(order.createdAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-medium">£{order.total}</div>
+                      <div className="text-sm text-muted-foreground">{order.status}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>Manage your content quickly</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <Button onClick={() => setIsAddTreatmentOpen(true)}>
+              <PlusCircle className="w-4 h-4 mr-2" />
+              Add Treatment
+            </Button>
+            <Button onClick={() => setIsAddProductOpen(true)} variant="outline">
+              <PlusCircle className="w-4 h-4 mr-2" />
+              Add Product
+            </Button>
+            <Button onClick={() => setActiveTab("settings")} variant="outline">
+              <Settings className="w-4 h-4 mr-2" />
+              Settings
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 
