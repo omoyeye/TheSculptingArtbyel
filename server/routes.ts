@@ -333,9 +333,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create order items and handle both products and bookings
       const createdItems = [];
       for (const item of items) {
+        // Convert string productId to integer for database compatibility
+        let productId = null;
+        if (item.productId && typeof item.productId === 'string') {
+          // Extract numeric ID from string IDs like "product-waist-trainer-2-1748893458688"
+          const match = item.productId.match(/(\d+)$/);
+          if (match) {
+            productId = parseInt(match[1]);
+          }
+        } else if (typeof item.productId === 'number') {
+          productId = item.productId;
+        }
+
         const orderItem = await storage.createOrderItem({
           orderId: order.id,
-          productId: item.productId,
+          productId: productId,
           quantity: item.quantity,
           price: item.price.toString()
         });
