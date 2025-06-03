@@ -123,6 +123,26 @@ export const paymentSessions = pgTable("payment_sessions", {
   expiresAt: timestamp("expires_at").notNull(),
 });
 
+// Contact form submissions
+export const contactSubmissions = pgTable("contact_submissions", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  subject: text("subject").notNull(),
+  message: text("message").notNull(),
+  status: text("status").notNull().default("new"), // new, read, replied
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Newsletter subscriptions
+export const newsletterSubscriptions = pgTable("newsletter_subscriptions", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  status: text("status").notNull().default("active"), // active, unsubscribed
+  subscribedAt: timestamp("subscribed_at").defaultNow().notNull(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   bookings: many(bookings),
@@ -230,3 +250,9 @@ export type InsertWebsiteSettings = typeof websiteSettings.$inferInsert;
 
 export type PaymentSession = typeof paymentSessions.$inferSelect;
 export type InsertPaymentSession = typeof paymentSessions.$inferInsert;
+
+export type ContactSubmission = typeof contactSubmissions.$inferSelect;
+export type InsertContactSubmission = typeof contactSubmissions.$inferInsert;
+
+export type NewsletterSubscription = typeof newsletterSubscriptions.$inferSelect;
+export type InsertNewsletterSubscription = typeof newsletterSubscriptions.$inferInsert;
