@@ -302,6 +302,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // API route to get payment URL for products/bookings
+  app.get("/api/payment-url/:type/:id", async (req, res) => {
+    try {
+      const { type, id } = req.params;
+      const itemId = parseInt(id);
+      
+      // Query payment_links table for the URL using raw SQL
+      const query = `SELECT stripe_url FROM payment_links WHERE product_type = $1 AND item_id = $2 AND active = true LIMIT 1`;
+      const result = await pool.query(query, [type, itemId]);
+      
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: "Payment URL not found" });
+      }
+      
+      res.json({ url: result.rows[0].stripe_url });
+    } catch (error) {
+      console.error("Error fetching payment URL:", error);
+      res.status(500).json({ message: "Failed to fetch payment URL" });
+    }
+  });
+
+  // API route to create order and get downloadable receipt
+  app.post("/api/create-order-download", validateBody(insertOrderSchema), async (req, res) => {
+    try {
+      const { items, ...orderData } = req.body;
+      
+      // Create order
+      const order = await storage.createOrder({
+        ...orderData,
+        status: 'pending'
+      });
+      
+      // Create order items
+      const orderItems = [];
+      if (items && Array.isArray(items)) {
+        for (const item of items) {
+          const orderItem = await storage.createOrderItem({
+            ...item,
+            orderId: order.id
+          });
+          orderItems.push(orderItem);
+        }
+      }
+      
+      // Generate order details for download
+      const orderDetails = {
+        orderId: order.id,
+        orderNumber: `TSA-${order.id.toString().padStart(6, '0')}`,
+        date: new Date().toISOString(),
+        status: order.status,
+        total: order.total,
+        items: orderItems,
+        customerInfo: orderData,
+        businessInfo: {
+          name: "The Sculpting Art",
+          email: "info@thesculptingart.com",
+          phone: "+44 123 456 7890"
+        }
+      };
+      
+      res.json({
+        order,
+        downloadData: orderDetails
+      });
+    } catch (error) {
+      console.error("Error creating order:", error);
+      res.status(500).json({ message: "Failed to create order" });
+    }
+  });
+
   // API routes for orders
   app.get("/api/orders", async (req, res) => {
     try {
