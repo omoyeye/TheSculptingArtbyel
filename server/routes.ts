@@ -339,14 +339,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create bookings for treatment items
       for (const item of items) {
         if (item.type === 'booking' && item.treatmentId && item.date && item.time) {
-          await storage.createBooking({
-            treatmentId: item.treatmentId,
-            date: item.date,
-            time: item.time,
-            price: item.price.toString(),
-            status: "confirmed",
-            userId: null
-          });
+          // Extract numeric treatment ID from string (e.g., "booking-wood-therapy-30-12345" -> find treatment by slug)
+          let actualTreatmentId;
+          
+          if (typeof item.treatmentId === 'string' && item.treatmentId.startsWith('booking-')) {
+            // Parse the slug from the booking ID and find the treatment
+            const parts = item.treatmentId.split('-');
+            if (parts.length >= 4) {
+              const slug = parts.slice(1, -1).join('-'); // Extract slug (e.g., "wood-therapy-30")
+              const treatment = await storage.getTreatmentBySlug(slug);
+              actualTreatmentId = treatment?.id;
+            }
+          } else {
+            actualTreatmentId = typeof item.treatmentId === 'number' ? item.treatmentId : parseInt(item.treatmentId);
+          }
+          
+          if (actualTreatmentId) {
+            await storage.createBooking({
+              treatmentId: actualTreatmentId,
+              date: item.date,
+              time: item.time,
+              price: item.price.toString(),
+              status: "confirmed",
+              userId: null
+            });
+          }
         }
       }
 
