@@ -306,26 +306,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create order with instant download data
   app.post("/api/create-order-download", async (req, res) => {
     try {
-      const orderData = req.body;
+      const { customerInfo, total, items } = req.body;
       
       // Generate order number
-      const orderNumber = `ORD-${Date.now()}`;
+      const orderNumber = `TSA-${Date.now()}`;
       
       // Create order in database
       const order = await storage.createOrder({
-        total: orderData.total.toString(),
+        total: total.toString(),
         status: "pending",
         userId: null
       });
 
-      // Create order items
-      for (const item of orderData.items) {
-        await storage.createOrderItem({
+      // Create order items and handle both products and bookings
+      const createdItems = [];
+      for (const item of items) {
+        const orderItem = await storage.createOrderItem({
           orderId: order.id,
-          productId: item.productId || null,
+          productId: item.productId,
           quantity: item.quantity,
           price: item.price.toString()
         });
+        createdItems.push({
+          ...orderItem,
+          title: item.title,
+          type: item.type,
+          date: item.date,
+          time: item.time
+        });
+      }
+
+      // Create bookings for treatment items
+      for (const item of items) {
+        if (item.type === 'booking' && item.treatmentId && item.date && item.time) {
+          await storage.createBooking({
+            treatmentId: item.treatmentId,
+            date: item.date,
+            time: item.time,
+            price: item.price.toString(),
+            status: "confirmed",
+            userId: null
+          });
+        }
       }
 
       // Prepare download data
@@ -333,14 +355,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         orderNumber,
         date: new Date().toISOString(),
         status: "pending",
-        customerInfo: {
-          firstName: orderData.firstName,
-          lastName: orderData.lastName,
-          email: orderData.email,
-          phone: orderData.phone
-        },
-        items: orderData.items,
-        total: orderData.total,
+        customerInfo,
+        items: createdItems,
+        total,
         businessInfo: {
           name: "The Sculpting Art",
           email: "info@thesculptingart.com",
@@ -348,11 +365,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       };
 
+      console.log("Order created successfully:", {
+        orderId: order.id,
+        orderNumber,
+        itemCount: createdItems.length,
+        total
+      });
+
       res.json({ order, downloadData });
       
     } catch (error) {
       console.error("Error creating order:", error);
-      res.status(500).json({ message: "Failed to create order" });
+      res.status(500).json({ message: "Failed to create order", error: error.message });
     }
   });
 

@@ -230,31 +230,46 @@ Thank you for your order!
       // Get form values directly
       const formData = form.getValues();
       
-      // Generate order details for instant download
-      const orderNumber = `ORD-${Date.now()}`;
-      const downloadData = {
-        orderNumber,
-        date: new Date().toISOString(),
-        status: "pending",
+      // Create order payload for database
+      const orderPayload = {
         customerInfo: {
           firstName: formData.firstName || "Customer",
-          lastName: formData.lastName || "Guest",
+          lastName: formData.lastName || "Guest", 
           email: formData.email || "guest@example.com",
-          phone: formData.phone || "N/A"
+          phone: formData.phone || "N/A",
+          address: formData.address || "",
+          city: formData.city || "",
+          state: formData.state || "",
+          zipCode: formData.zipCode || ""
         },
-        items: cart.map(item => ({
-          title: item.title,
-          quantity: item.quantity || 1,
-          price: item.price
-        })),
         total: finalTotal,
-        businessInfo: {
-          name: "The Sculpting Art",
-          email: "info@thesculptingart.com",
-          phone: "+44 123 456 7890"
-        }
+        items: cart.map(item => ({
+          productId: item.type === 'product' ? item.id : null,
+          treatmentId: item.type === 'booking' ? item.id : null,
+          quantity: item.quantity || 1,
+          price: item.price,
+          title: item.title,
+          type: item.type,
+          date: item.date || null,
+          time: item.time || null
+        }))
       };
 
+      // Save order to database
+      const response = await fetch('/api/create-order-download', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderPayload),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create order in database');
+      }
+
+      const { order, downloadData } = await response.json();
+      
       // Download order details instantly
       downloadOrderDetails(downloadData);
 
@@ -265,7 +280,7 @@ Thank you for your order!
       // Show success message
       toast({
         title: "Order created successfully!",
-        description: "Your order details have been downloaded and Stripe checkout opened in a new tab.",
+        description: "Your order has been saved and Stripe checkout opened in a new tab.",
       });
       
       // Clear cart and redirect to confirmation page
