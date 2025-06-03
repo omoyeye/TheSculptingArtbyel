@@ -10,7 +10,9 @@ import {
   type InstagramPost, type InsertInstagramPost,
   type ProductReview, type InsertProductReview,
   type WebsiteSettings, type InsertWebsiteSettings,
-  type PaymentSession, type InsertPaymentSession
+  type PaymentSession, type InsertPaymentSession,
+  type ContactSubmission, type InsertContactSubmission,
+  type NewsletterSubscription, type InsertNewsletterSubscription
 } from "@shared/schema";
 
 // Define the storage interface
@@ -85,6 +87,17 @@ export interface IStorage {
   getPaymentSessionByOrderId(orderId: number): Promise<PaymentSession | undefined>;
   getPaymentSessionByBookingId(bookingId: number): Promise<PaymentSession | undefined>;
   updatePaymentSessionStatus(id: number, status: string): Promise<PaymentSession | undefined>;
+  
+  // Contact Submissions
+  createContactSubmission(submission: InsertContactSubmission): Promise<ContactSubmission>;
+  getContactSubmissions(): Promise<ContactSubmission[]>;
+  updateContactSubmissionStatus(id: number, status: string): Promise<ContactSubmission | undefined>;
+  
+  // Newsletter Subscriptions
+  createNewsletterSubscription(subscription: InsertNewsletterSubscription): Promise<NewsletterSubscription>;
+  getNewsletterSubscriptions(): Promise<NewsletterSubscription[]>;
+  getNewsletterSubscriptionByEmail(email: string): Promise<NewsletterSubscription | undefined>;
+  updateNewsletterSubscriptionStatus(email: string, status: string): Promise<NewsletterSubscription | undefined>;
 }
 
 // In-memory storage implementation

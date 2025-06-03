@@ -97,6 +97,18 @@ const insertPaymentSessionSchema = z.object({
   expiresAt: z.string().transform((val) => new Date(val)),
 });
 
+const insertContactSubmissionSchema = z.object({
+  name: z.string().min(2),
+  email: z.string().email(),
+  phone: z.string().min(10),
+  subject: z.string().min(1),
+  message: z.string().min(10),
+});
+
+const insertNewsletterSubscriptionSchema = z.object({
+  email: z.string().email(),
+});
+
 // Helper function to validate request body with zod schema
 function validateBody<T>(schema: z.ZodType<T>) {
   return (req: Request, res: Response, next: () => void) => {
@@ -672,6 +684,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Failed to fetch bookings:', error);
       res.status(500).json({ message: "Failed to fetch bookings" });
+    }
+  });
+
+  // Contact form submission endpoint
+  app.post("/api/contact", validateBody(insertContactSubmissionSchema), async (req, res) => {
+    try {
+      const contactData = req.body;
+      const submission = await storage.createContactSubmission(contactData);
+      res.status(201).json({ message: "Contact form submitted successfully", submission });
+    } catch (error) {
+      console.error('Failed to submit contact form:', error);
+      res.status(500).json({ message: "Failed to submit contact form" });
+    }
+  });
+
+  // Newsletter subscription endpoint
+  app.post("/api/newsletter", validateBody(insertNewsletterSubscriptionSchema), async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      // Check if email already exists
+      const existing = await storage.getNewsletterSubscriptionByEmail(email);
+      if (existing) {
+        if (existing.status === 'active') {
+          return res.status(400).json({ message: "Email already subscribed" });
+        } else {
+          // Reactivate subscription
+          await storage.updateNewsletterSubscriptionStatus(email, 'active');
+          return res.json({ message: "Subscription reactivated successfully" });
+        }
+      }
+      
+      const subscription = await storage.createNewsletterSubscription({ email });
+      res.status(201).json({ message: "Subscribed successfully", subscription });
+    } catch (error) {
+      console.error('Failed to subscribe to newsletter:', error);
+      res.status(500).json({ message: "Failed to subscribe to newsletter" });
+    }
+  });
+
+  // Admin endpoints for contact submissions and newsletter subscriptions
+  app.get("/api/contact-submissions", async (req, res) => {
+    try {
+      const submissions = await storage.getContactSubmissions();
+      res.json(submissions);
+    } catch (error) {
+      console.error('Failed to fetch contact submissions:', error);
+      res.status(500).json({ message: "Failed to fetch contact submissions" });
+    }
+  });
+
+  app.get("/api/newsletter-subscriptions", async (req, res) => {
+    try {
+      const subscriptions = await storage.getNewsletterSubscriptions();
+      res.json(subscriptions);
+    } catch (error) {
+      console.error('Failed to fetch newsletter subscriptions:', error);
+      res.status(500).json({ message: "Failed to fetch newsletter subscriptions" });
     }
   });
   app.put("/api/bookings/:id/status", async (req, res) => {

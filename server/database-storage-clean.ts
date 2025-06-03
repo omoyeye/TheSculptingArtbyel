@@ -3,14 +3,15 @@ import { eq, desc, and } from "drizzle-orm";
 import { 
   users, treatments, products, bookings, orders, orderItems, 
   testimonials, galleryItems, instagramPosts, productReviews, 
-  websiteSettings, paymentSessions 
+  websiteSettings, paymentSessions, contactSubmissions, newsletterSubscriptions
 } from "@shared/schema";
 import type { 
   User, InsertUser, Treatment, InsertTreatment, Product, InsertProduct,
   Booking, InsertBooking, Order, InsertOrder, OrderItem, InsertOrderItem,
   Testimonial, InsertTestimonial, GalleryItem, InsertGalleryItem,
   InstagramPost, InsertInstagramPost, ProductReview, InsertProductReview,
-  WebsiteSettings, InsertWebsiteSettings, PaymentSession, InsertPaymentSession
+  WebsiteSettings, InsertWebsiteSettings, PaymentSession, InsertPaymentSession,
+  ContactSubmission, InsertContactSubmission, NewsletterSubscription, InsertNewsletterSubscription
 } from "@shared/schema";
 import { IStorage } from "./storage";
 
@@ -286,6 +287,41 @@ export class DatabaseStorage implements IStorage {
 
   async updatePaymentSessionStatus(id: number, status: string): Promise<PaymentSession | undefined> {
     const result = await db.update(paymentSessions).set({ status }).where(eq(paymentSessions.id, id)).returning();
+    return result[0];
+  }
+
+  // Contact submission methods
+  async createContactSubmission(submission: InsertContactSubmission): Promise<ContactSubmission> {
+    const result = await db.insert(contactSubmissions).values(submission).returning();
+    return result[0];
+  }
+
+  async getContactSubmissions(): Promise<ContactSubmission[]> {
+    return await db.select().from(contactSubmissions).orderBy(desc(contactSubmissions.createdAt));
+  }
+
+  async updateContactSubmissionStatus(id: number, status: string): Promise<ContactSubmission | undefined> {
+    const result = await db.update(contactSubmissions).set({ status }).where(eq(contactSubmissions.id, id)).returning();
+    return result[0];
+  }
+
+  // Newsletter subscription methods
+  async createNewsletterSubscription(subscription: InsertNewsletterSubscription): Promise<NewsletterSubscription> {
+    const result = await db.insert(newsletterSubscriptions).values(subscription).returning();
+    return result[0];
+  }
+
+  async getNewsletterSubscriptions(): Promise<NewsletterSubscription[]> {
+    return await db.select().from(newsletterSubscriptions).orderBy(desc(newsletterSubscriptions.subscribedAt));
+  }
+
+  async getNewsletterSubscriptionByEmail(email: string): Promise<NewsletterSubscription | undefined> {
+    const result = await db.select().from(newsletterSubscriptions).where(eq(newsletterSubscriptions.email, email)).limit(1);
+    return result[0];
+  }
+
+  async updateNewsletterSubscriptionStatus(email: string, status: string): Promise<NewsletterSubscription | undefined> {
+    const result = await db.update(newsletterSubscriptions).set({ status }).where(eq(newsletterSubscriptions.email, email)).returning();
     return result[0];
   }
 }
