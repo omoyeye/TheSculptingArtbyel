@@ -108,8 +108,7 @@ export default function Checkout() {
   });
 
   const totalPrice = getTotalPrice();
-  const tax = totalPrice * 0.08; // 8% tax rate
-  const finalTotal = totalPrice + tax;
+  const finalTotal = totalPrice;
 
   const downloadOrderDetails = (orderData: any) => {
     const orderText = `
@@ -514,11 +513,6 @@ Thank you for your order!
                     <div className="flex justify-between">
                       <span className="text-gray-600">Subtotal</span>
                       <span>{formatCurrency(totalPrice)}</span>
-                    </div>
-
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Tax (8%)</span>
-                      <span>{formatCurrency(tax)}</span>
                     </div>
 
                     <Separator className="my-3" />
