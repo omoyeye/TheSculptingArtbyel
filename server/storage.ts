@@ -694,5 +694,7 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Export storage instance - use memory storage with your actual website data
-export const storage = new MemStorage();
+import { DatabaseStorage } from "./database-storage-clean";
+
+// Export storage instance - use database storage for persistence
+export const storage = new DatabaseStorage();
