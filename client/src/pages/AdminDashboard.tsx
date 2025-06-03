@@ -46,13 +46,18 @@ import {
   DollarSign,
   Save,
   Clock,
-  Users
+  Users,
+  LogOut
 } from "lucide-react";
 import { useStore, type Treatment, type Product } from "@/lib/store";
+import { useAuth } from "@/contexts/AuthContext";
+import { useLocation } from "wouter";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const { toast } = useToast();
+  const { logout } = useAuth();
+  const [, setLocation] = useLocation();
   
   // Get store data
   const { treatments, products, cart } = useStore();
