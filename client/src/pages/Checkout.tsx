@@ -75,7 +75,8 @@ export default function Checkout() {
   }, []);
 
   const form = useForm<CheckoutFormValues>({
-    mode: "onSubmit",
+    resolver: zodResolver(checkoutFormSchema),
+    mode: "onChange",
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -194,24 +195,38 @@ Thank you for your order!
     }
   };
 
-  // Handle button click with proper form validation
+  // Handle button click with strict form validation
   const handleButtonClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     
-    // Trigger form validation for required fields only
-    const isValid = await form.trigger(['firstName', 'lastName', 'email', 'phone']);
+    const formValues = form.getValues();
     
-    if (isValid) {
-      // Use the form's submit handler
-      form.handleSubmit(onSubmit)();
-    } else {
-      // Show validation errors
+    // Manually validate required fields
+    const errors = [];
+    if (!formValues.firstName || formValues.firstName.length < 2) {
+      errors.push("First name is required (minimum 2 characters)");
+    }
+    if (!formValues.lastName || formValues.lastName.length < 2) {
+      errors.push("Last name is required (minimum 2 characters)");
+    }
+    if (!formValues.email || !/\S+@\S+\.\S+/.test(formValues.email)) {
+      errors.push("Valid email address is required");
+    }
+    if (!formValues.phone || formValues.phone.length < 10) {
+      errors.push("Phone number is required (minimum 10 digits)");
+    }
+    
+    if (errors.length > 0) {
       toast({
-        title: "Please check your information",
-        description: "Please fill in all required fields (First Name, Last Name, Email, Phone).",
+        title: "Required Information Missing",
+        description: errors.join(". "),
         variant: "destructive"
       });
+      return;
     }
+    
+    // If validation passes, proceed with submission
+    await onSubmit(formValues);
   };
 
   const handleDirectSubmit = async () => {
