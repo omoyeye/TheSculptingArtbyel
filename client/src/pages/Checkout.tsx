@@ -149,6 +149,9 @@ Thank you for your order!
   };
 
   const onSubmit = async (data: CheckoutFormValues) => {
+    console.log("Form submitted with data:", data);
+    console.log("Form errors:", form.formState.errors);
+    
     setIsSubmitting(true);
     
     try {
@@ -204,6 +207,13 @@ Thank you for your order!
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Add button click handler for debugging
+  const handleButtonClick = (e: React.MouseEvent) => {
+    console.log("Button clicked", e);
+    console.log("Form valid:", form.formState.isValid);
+    console.log("Form errors:", form.formState.errors);
   };
 
   // Format card number with spaces
@@ -368,6 +378,7 @@ Thank you for your order!
                     type="submit" 
                     className="w-full bg-secondary hover:bg-secondary/90 text-lg py-6"
                     disabled={isSubmitting}
+                    onClick={handleButtonClick}
                   >
                     {isSubmitting ? (
                       <>Processing Payment...</>
