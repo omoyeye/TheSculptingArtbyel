@@ -677,7 +677,7 @@ export default function AdminDashboard() {
                   }
                   disabled={day === 'monday'}
                 />
-                {!hours.closed && hours.open && (
+                {!hours.closed && 'open' in hours && 'close' in hours && (
                   <div className="flex items-center space-x-2">
                     <Input 
                       type="time" 

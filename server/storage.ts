@@ -192,7 +192,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteTreatment(id: number): Promise<boolean> {
     const result = await db.delete(treatments).where(eq(treatments.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   async getProducts(): Promise<Product[]> {
@@ -228,7 +228,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteProduct(id: number): Promise<boolean> {
     const result = await db.delete(products).where(eq(products.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   async getBookings(): Promise<Booking[]> {
@@ -263,7 +263,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteBooking(id: number): Promise<boolean> {
     const result = await db.delete(bookings).where(eq(bookings.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   async getOrders(): Promise<Order[]> {
@@ -392,7 +392,7 @@ export class DatabaseStorage implements IStorage {
       
       const [newSettings] = await db
         .insert(websiteSettings)
-        .values(defaultSettings)
+        .values([defaultSettings])
         .returning();
       return newSettings;
     }
