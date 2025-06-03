@@ -56,11 +56,16 @@ import { useLocation } from "wouter";
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const { toast } = useToast();
-  const { logout } = useAuth();
+  const { logout, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
   
   // Get store data
   const { treatments, products, cart } = useStore();
+  
+  // Database data states
+  const [orders, setOrders] = useState([]);
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
   
   // Dialog states
   const [isAddTreatmentOpen, setIsAddTreatmentOpen] = useState(false);
@@ -107,22 +112,52 @@ export default function AdminDashboard() {
     }
   });
 
-  // Load settings from backend on component mount
+  // Check authentication on component mount
   useEffect(() => {
-    const fetchSettings = async () => {
+    if (!isAuthenticated) {
+      setLocation("/admin-login");
+      return;
+    }
+  }, [isAuthenticated, setLocation]);
+
+  // Load settings and data from backend on component mount
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    
+    const fetchData = async () => {
       try {
-        const response = await fetch('/api/settings');
-        if (response.ok) {
-          const settings = await response.json();
+        setLoading(true);
+        
+        // Fetch settings
+        const settingsResponse = await fetch('/api/settings');
+        if (settingsResponse.ok) {
+          const settings = await settingsResponse.json();
           setBusinessSettings(settings);
         }
+        
+        // Fetch orders
+        const ordersResponse = await fetch('/api/orders');
+        if (ordersResponse.ok) {
+          const ordersData = await ordersResponse.json();
+          setOrders(ordersData);
+        }
+        
+        // Fetch bookings
+        const bookingsResponse = await fetch('/api/bookings');
+        if (bookingsResponse.ok) {
+          const bookingsData = await bookingsResponse.json();
+          setBookings(bookingsData);
+        }
+        
       } catch (error) {
-        console.error('Failed to fetch settings:', error);
+        console.error('Failed to fetch data:', error);
+      } finally {
+        setLoading(false);
       }
     };
     
-    fetchSettings();
-  }, []);
+    fetchData();
+  }, [isAuthenticated]);
 
   const handleBusinessSettingsUpdate = async () => {
     try {
@@ -253,12 +288,12 @@ export default function AdminDashboard() {
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Cart Items</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{cart.length}</div>
-            <p className="text-xs text-muted-foreground">Current session</p>
+            <div className="text-2xl font-bold">{loading ? '...' : orders.length}</div>
+            <p className="text-xs text-muted-foreground">Customer orders</p>
           </CardContent>
         </Card>
         
@@ -268,8 +303,10 @@ export default function AdminDashboard() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">£{cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">Cart total</p>
+            <div className="text-2xl font-bold">
+              £{loading ? '...' : orders.reduce((total, order) => total + parseFloat(order.total || '0'), 0).toFixed(2)}
+            </div>
+            <p className="text-xs text-muted-foreground">Total revenue</p>
           </CardContent>
         </Card>
       </div>

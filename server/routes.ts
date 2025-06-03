@@ -648,6 +648,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin-specific routes for managing bookings and orders
+  app.get("/api/orders", async (req, res) => {
+    try {
+      const orders = await storage.getOrders();
+      
+      // Get order items for each order
+      const ordersWithItems = await Promise.all(orders.map(async (order) => {
+        const items = await storage.getOrderItems(order.id);
+        return { ...order, items };
+      }));
+      
+      res.json(ordersWithItems);
+    } catch (error) {
+      console.error('Failed to fetch orders:', error);
+      res.status(500).json({ message: "Failed to fetch orders" });
+    }
+  });
+
+  app.get("/api/bookings", async (req, res) => {
+    try {
+      const bookings = await storage.getBookings();
+      res.json(bookings);
+    } catch (error) {
+      console.error('Failed to fetch bookings:', error);
+      res.status(500).json({ message: "Failed to fetch bookings" });
+    }
+  });
   app.put("/api/bookings/:id/status", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
