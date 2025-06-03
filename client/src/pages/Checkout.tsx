@@ -43,28 +43,14 @@ const checkoutFormSchema = z.object({
   phone: z.string().min(10, {
     message: "Please enter a valid phone number.",
   }),
-  address: z.string().min(5, {
-    message: "Address must be at least 5 characters.",
-  }),
-  city: z.string().min(2, {
-    message: "City must be at least 2 characters.",
-  }),
-  state: z.string().min(2, {
-    message: "Please select a state.",
-  }),
-  zipCode: z.string().min(5, {
-    message: "Please enter a valid ZIP code.",
-  }),
-  cardNumber: z.string().min(13, {
-    message: "Please enter a valid card number.",
-  }).max(19),
-  cardExpiry: z.string().regex(/^(0[1-9]|1[0-2])\/\d{2}$/, {
-    message: "Please enter a valid expiry date (MM/YY).",
-  }),
-  cardCvc: z.string().length(3, {
-    message: "Please enter a valid CVC.",
-  }),
-  paymentMethod: z.enum(["credit", "debit"]),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  zipCode: z.string().optional(),
+  cardNumber: z.string().optional(),
+  cardExpiry: z.string().optional(),
+  cardCvc: z.string().optional(),
+  paymentMethod: z.enum(["credit", "debit"]).optional(),
   notes: z.string().optional(),
 });
 
@@ -208,17 +194,23 @@ Thank you for your order!
     }
   };
 
-  // Add button click handler for debugging
+  // Handle button click with proper form validation
   const handleButtonClick = async (e: React.MouseEvent) => {
     e.preventDefault();
-    console.log("Button clicked", e);
-    console.log("Form valid:", form.formState.isValid);
-    console.log("Form errors:", form.formState.errors);
-
-    // If form validation is blocking, bypass it and submit directly
-    if (!form.formState.isValid) {
-      console.log("Bypassing form validation and submitting directly");
-      await handleDirectSubmit();
+    
+    // Trigger form validation for required fields only
+    const isValid = await form.trigger(['firstName', 'lastName', 'email', 'phone']);
+    
+    if (isValid) {
+      // Use the form's submit handler
+      form.handleSubmit(onSubmit)();
+    } else {
+      // Show validation errors
+      toast({
+        title: "Please check your information",
+        description: "Please fill in all required fields (First Name, Last Name, Email, Phone).",
+        variant: "destructive"
+      });
     }
   };
 
