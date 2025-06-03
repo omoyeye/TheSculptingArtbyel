@@ -151,9 +151,9 @@ Thank you for your order!
   const onSubmit = async (data: CheckoutFormValues) => {
     console.log("Form submitted with data:", data);
     console.log("Form errors:", form.formState.errors);
-    
+
     setIsSubmitting(true);
-    
+
     try {
       // Generate order details for instant download
       const orderNumber = `ORD-${Date.now()}`;
@@ -175,8 +175,8 @@ Thank you for your order!
         total: finalTotal,
         businessInfo: {
           name: "The Sculpting Art",
-          email: "info@thesculptingart.com",
-          phone: "+44 123 456 7890"
+          email: "info@thesculptingartbyel.com",
+          phone: "+44 7570 618832"
         }
       };
 
@@ -186,17 +186,17 @@ Thank you for your order!
       // Open Stripe checkout in new tab
       const stripeUrl = "https://buy.stripe.com/fZufZidtE52l9PseC0a7C00";
       window.open(stripeUrl, '_blank');
-      
+
       // Show success message
       toast({
         title: "Order created successfully!",
         description: "Your order details have been downloaded and Stripe checkout opened in a new tab.",
       });
-      
+
       // Clear cart and redirect to confirmation page
       clearCart();
       setLocation("/");
-      
+
     } catch (error) {
       console.error("Payment processing failed:", error);
       toast({
@@ -215,7 +215,7 @@ Thank you for your order!
     console.log("Button clicked", e);
     console.log("Form valid:", form.formState.isValid);
     console.log("Form errors:", form.formState.errors);
-    
+
     // If form validation is blocking, bypass it and submit directly
     if (!form.formState.isValid) {
       console.log("Bypassing form validation and submitting directly");
@@ -225,11 +225,11 @@ Thank you for your order!
 
   const handleDirectSubmit = async () => {
     setIsSubmitting(true);
-    
+
     try {
       // Get form values directly
       const formData = form.getValues();
-      
+
       // Create order payload for database
       const orderPayload = {
         customerInfo: {
@@ -270,30 +270,30 @@ Thank you for your order!
 
       const responseData = await response.json();
       console.log("API Response:", responseData);
-      
+
       if (!responseData.order || !responseData.downloadData) {
         throw new Error('Invalid response from server');
       }
 
       const { order, downloadData } = responseData;
-      
+
       // Download order details instantly
       downloadOrderDetails(downloadData);
 
       // Open Stripe checkout in new tab
       const stripeUrl = "https://buy.stripe.com/fZufZidtE52l9PseC0a7C00";
       window.open(stripeUrl, '_blank');
-      
+
       // Show success message
       toast({
         title: "Order created successfully!",
         description: "Your order has been saved and Stripe checkout opened in a new tab.",
       });
-      
+
       // Clear cart and redirect to confirmation page
       clearCart();
       setLocation("/");
-      
+
     } catch (error) {
       console.error("Payment processing failed:", error);
       toast({
@@ -312,11 +312,11 @@ Thank you for your order!
     const matches = v.match(/\d{4,16}/g);
     const match = (matches && matches[0]) || "";
     const parts = [];
-    
+
     for (let i = 0, len = match.length; i < len; i += 4) {
       parts.push(match.substring(i, i + 4));
     }
-    
+
     if (parts.length) {
       return parts.join(" ");
     } else {
@@ -327,11 +327,11 @@ Thank you for your order!
   // Format card expiry date
   const formatCardExpiry = (value: string) => {
     const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
-    
+
     if (v.length <= 2) {
       return v;
     }
-    
+
     return `${v.slice(0, 2)}/${v.slice(2, 4)}`;
   };
 
@@ -368,14 +368,14 @@ Thank you for your order!
                   </Link>
                 </Button>
               </div>
-              
+
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                   {/* Personal Information */}
                   <Card>
                     <CardContent className="pt-6">
                       <h2 className="text-xl font-playfair text-secondary mb-6">Personal Information</h2>
-                      
+
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <FormField
                           control={form.control}
@@ -390,7 +390,7 @@ Thank you for your order!
                             </FormItem>
                           )}
                         />
-                        
+
                         <FormField
                           control={form.control}
                           name="lastName"
@@ -404,7 +404,7 @@ Thank you for your order!
                             </FormItem>
                           )}
                         />
-                        
+
                         <FormField
                           control={form.control}
                           name="email"
@@ -418,7 +418,7 @@ Thank you for your order!
                             </FormItem>
                           )}
                         />
-                        
+
                         <FormField
                           control={form.control}
                           name="phone"
@@ -435,16 +435,16 @@ Thank you for your order!
                       </div>
                     </CardContent>
                   </Card>
-                  
 
-                  
-                  
-                  
+
+
+
+
                   {/* Additional Notes */}
                   <Card>
                     <CardContent className="pt-6">
                       <h2 className="text-xl font-playfair text-secondary mb-6">Additional Notes</h2>
-                      
+
                       <FormField
                         control={form.control}
                         name="notes"
@@ -463,7 +463,7 @@ Thank you for your order!
                       />
                     </CardContent>
                   </Card>
-                  
+
                   <Button 
                     type="submit" 
                     className="w-full bg-secondary hover:bg-secondary/90 text-lg py-6"
@@ -481,12 +481,12 @@ Thank you for your order!
                 </form>
               </Form>
             </div>
-            
+
             <div>
               <Card className="sticky top-6">
                 <CardContent className="pt-6">
                   <h2 className="text-xl font-playfair text-secondary mb-6">Order Summary</h2>
-                  
+
                   <div className="max-h-80 overflow-y-auto mb-6 pr-2">
                     {cart.map((item) => (
                       <div key={item.id} className="flex items-start py-3 border-b border-gray-100 last:border-0">
@@ -509,26 +509,26 @@ Thank you for your order!
                       </div>
                     ))}
                   </div>
-                  
+
                   <div className="space-y-3">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Subtotal</span>
                       <span>{formatCurrency(totalPrice)}</span>
                     </div>
-                    
+
                     <div className="flex justify-between">
                       <span className="text-gray-600">Tax (8%)</span>
                       <span>{formatCurrency(tax)}</span>
                     </div>
-                    
+
                     <Separator className="my-3" />
-                    
+
                     <div className="flex justify-between text-lg font-medium">
                       <span>Total</span>
                       <span>{formatCurrency(finalTotal)}</span>
                     </div>
                   </div>
-                  
+
                   <p className="text-xs text-center text-gray-500 mt-6">
                     By completing your purchase, you agree to our{" "}
                     <Link href="/terms" className="text-secondary hover:underline">Terms of Service</Link> and{" "}

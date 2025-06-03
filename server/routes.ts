@@ -401,8 +401,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         total,
         businessInfo: {
           name: "The Sculpting Art",
-          email: "info@thesculptingart.com",
-          phone: "+44 123 456 7890"
+          email: "info@thesculptingartbyel.com", 
+          phone: "+44 7570 618832"
         }
       };
 
