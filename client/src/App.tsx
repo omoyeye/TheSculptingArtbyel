@@ -15,12 +15,15 @@ import Checkout from "@/pages/Checkout";
 import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/Terms";
 import AdminDashboard from "@/pages/AdminDashboard";
+import AdminLogin from "@/pages/AdminLogin";
 import NotFound from "@/pages/not-found";
 import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import ImageTest from "@/components/ImageTest";
 
-function App() {
+function AppRoutes() {
   const { initializeCart } = useStore();
 
   useEffect(() => {
@@ -45,11 +48,28 @@ function App() {
         <Route path="/checkout" component={Checkout} />
         <Route path="/privacy" component={Privacy} />
         <Route path="/terms" component={Terms} />
-        <Route path="/admin" component={AdminDashboard} />
+        <Route path="/admin-login">
+          {() => <AdminLogin onLogin={() => {}} />}
+        </Route>
+        <Route path="/admin">
+          {() => (
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          )}
+        </Route>
         <Route path="/image-test" component={ImageTest} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
   );
 }
 
