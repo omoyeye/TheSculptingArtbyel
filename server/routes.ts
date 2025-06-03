@@ -336,13 +336,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Convert string productId to integer for database compatibility
         let productId = null;
         if (item.productId && typeof item.productId === 'string') {
-          // Extract numeric ID from string IDs like "product-waist-trainer-2-1748893458688"
-          const match = item.productId.match(/(\d+)$/);
+          // Extract the main product ID, not the timestamp suffix
+          const match = item.productId.match(/product-waist-trainer-(\d+)/);
           if (match) {
             productId = parseInt(match[1]);
+          } else {
+            // Fallback to simple numeric extraction for other patterns
+            const numMatch = item.productId.match(/(\d+)/);
+            if (numMatch) {
+              const num = parseInt(numMatch[1]);
+              // Ensure the number is within PostgreSQL integer range
+              productId = num > 2147483647 ? null : num;
+            }
           }
         } else if (typeof item.productId === 'number') {
-          productId = item.productId;
+          productId = item.productId > 2147483647 ? null : item.productId;
         }
 
         const orderItem = await storage.createOrderItem({
