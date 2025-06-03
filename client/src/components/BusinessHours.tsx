@@ -23,7 +23,7 @@ export default function BusinessHours() {
           href="tel:+447570618832" 
           className="mt-2 inline-block text-primary hover:text-primary/80"
         >
-          +447570618832
+          +44 7570 618832
         </a>
       </div>
     </div>

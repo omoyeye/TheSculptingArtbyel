@@ -175,10 +175,10 @@ export default function Booking() {
               </p>
               <div className="space-y-4">
                 <div>
-                  <strong>Phone:</strong> +44 123 456 7890
+                  <strong>Phone:</strong> +44 7570 618832
                 </div>
                 <div>
-                  <strong>Email:</strong> info@thesculptingart.com
+                  <strong>Email:</strong> Businesselom@gmail.com
                 </div>
               </div>
               <div className="mt-8">

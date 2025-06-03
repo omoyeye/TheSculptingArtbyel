@@ -61,7 +61,7 @@ export default function Contact() {
 
   const onSubmit = async (data: ContactFormValues) => {
     setIsSubmitting(true);
-    
+
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
@@ -114,7 +114,7 @@ export default function Contact() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-lg">
               <h2 className="text-2xl font-playfair text-secondary mb-6 font-bold">Send Us a Message</h2>
-              
+
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <FormField
@@ -134,7 +134,7 @@ export default function Contact() {
                       </FormItem>
                     )}
                   />
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormField
                       control={form.control}
@@ -153,7 +153,7 @@ export default function Contact() {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="phone"
@@ -172,7 +172,7 @@ export default function Contact() {
                       )}
                     />
                   </div>
-                  
+
                   <FormField
                     control={form.control}
                     name="subject"
@@ -200,7 +200,7 @@ export default function Contact() {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="message"
@@ -218,7 +218,7 @@ export default function Contact() {
                       </FormItem>
                     )}
                   />
-                  
+
                   <Button 
                     type="submit" 
                     className="w-full bg-secondary hover:bg-secondary/90 text-white font-semibold py-3 text-base shadow-lg hover:shadow-xl transition-all duration-200"
@@ -229,10 +229,10 @@ export default function Contact() {
                 </form>
               </Form>
             </div>
-            
+
             <div>
               <h2 className="text-2xl font-playfair text-secondary mb-6 font-bold">Contact Information</h2>
-              
+
               <div className="bg-secondary/5 border-2 border-secondary/20 p-8 rounded-xl shadow-lg">
                 <div className="space-y-6">
                   <div className="flex items-start">
@@ -247,7 +247,7 @@ export default function Contact() {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start">
                     <div className="mt-1 mr-4 bg-secondary p-3 rounded-full shadow-md">
                       <Phone className="h-6 w-6 text-white" />
@@ -261,7 +261,7 @@ export default function Contact() {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start">
                     <div className="mt-1 mr-4 bg-secondary p-3 rounded-full shadow-md">
                       <Mail className="h-6 w-6 text-white" />
@@ -275,7 +275,7 @@ export default function Contact() {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start">
                     <div className="mt-1 mr-4 bg-secondary p-3 rounded-full shadow-md">
                       <Clock className="h-6 w-6 text-white" />
@@ -290,7 +290,7 @@ export default function Contact() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="mt-8 h-64 rounded-xl shadow-inner overflow-hidden border-2 border-gray-200">
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d9487.642849526936!2d-2.2426!3d53.4808!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x487bb1b3e3d0c3d3%3A0x2acd4fcd2bc9b244!2sManchester%2C%20UK!5e0!3m2!1sen!2sus!4v1633024800000!5m2!1sen!2sus"

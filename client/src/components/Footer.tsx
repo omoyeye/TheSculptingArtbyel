@@ -158,7 +158,7 @@ href="https://www.instagram.com/the_sculptingartbyel/"
               <li className="flex items-center">
                 <Phone className="h-5 w-5 text-black mr-3" />
                 <a
-                  href="tel:+44 7570 618832"
+                  href="tel:+447570618832"
                   className="text-black hover:text-gray-700 transition duration-300"
                 >
                   +44 7570 618832
@@ -170,7 +170,7 @@ href="https://www.instagram.com/the_sculptingartbyel/"
                   href="mailto:Businesselom@gmail.com"
                   className="text-black hover:text-gray-700 transition duration-300"
                 >
-                  Businesselom@gmail.com 
+                  Businesselom@gmail.com
                 </a>
               </li>
               <li className="mt-3">
