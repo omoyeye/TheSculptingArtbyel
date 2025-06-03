@@ -694,7 +694,5 @@ export class MemStorage implements IStorage {
   }
 }
 
-import { DatabaseStorage } from "./database-storage";
-
-// Export storage instance - switch to database storage
-export const storage = process.env.DATABASE_URL ? new DatabaseStorage() : new MemStorage();
+// Export storage instance - use memory storage with your actual website data
+export const storage = new MemStorage();
