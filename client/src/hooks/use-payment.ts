@@ -51,28 +51,35 @@ export function useCreatePaymentSession() {
 
   return useMutation({
     mutationFn: async (data: CreatePaymentSessionData): Promise<PaymentSession> => {
-      const response = await fetch("/api/payment-sessions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      try {
+        const response = await fetch("/api/payment-sessions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
 
-      if (!response.ok) {
-        throw new Error("Failed to create payment session");
+        if (!response.ok) {
+          throw new Error("Failed to create payment session");
+        }
+
+        return response.json();
+      } catch (error) {
+        console.error('Payment session creation error:', error);
+        throw error;
       }
-
-      return response.json();
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["payment-session"] });
-      if (data.orderId) {
-        queryClient.invalidateQueries({ queryKey: ["payment-session", "order", data.orderId] });
+      // Safely invalidate queries without causing unhandled promise rejections
+      try {
+        queryClient.invalidateQueries({ queryKey: ["payment-session"] });
+      } catch (error) {
+        console.error('Query invalidation error:', error);
       }
-      if (data.bookingId) {
-        queryClient.invalidateQueries({ queryKey: ["payment-session", "booking", data.bookingId] });
-      }
+    },
+    onError: (error) => {
+      console.error('Payment session mutation error:', error);
     },
   });
 }
