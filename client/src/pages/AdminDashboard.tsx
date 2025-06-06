@@ -172,7 +172,10 @@ export default function AdminDashboard() {
       }
     };
     
-    fetchData();
+    fetchData().catch(error => {
+      console.error('AdminDashboard fetchData error:', error);
+      setLoading(false);
+    });
   }, [isAuthenticated]);
 
   const handleBusinessSettingsUpdate = async (settingsToSave = businessSettings) => {

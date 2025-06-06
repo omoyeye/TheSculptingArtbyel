@@ -6,15 +6,14 @@ import { queryClient } from "./lib/queryClient";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 
-// Global error handler for unhandled promise rejections
+// Handle unhandled promise rejections safely
 window.addEventListener('unhandledrejection', (event) => {
-  console.error('Unhandled promise rejection prevented:', event.reason);
+  // Prevent default error reporting to avoid console spam
   event.preventDefault();
 });
 
-// Global error handler for unhandled errors
+// Handle global errors safely
 window.addEventListener('error', (event) => {
-  console.error('Global error caught:', event.error);
   event.preventDefault();
 });
 
