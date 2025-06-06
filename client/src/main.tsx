@@ -8,13 +8,14 @@ import { Toaster } from "@/components/ui/toaster";
 
 // Global error handler for unhandled promise rejections
 window.addEventListener('unhandledrejection', (event) => {
-  console.error('Unhandled promise rejection:', event.reason);
+  console.error('Unhandled promise rejection prevented:', event.reason);
   event.preventDefault();
 });
 
 // Global error handler for unhandled errors
 window.addEventListener('error', (event) => {
-  console.error('Global error:', event.error);
+  console.error('Global error caught:', event.error);
+  event.preventDefault();
 });
 
 createRoot(document.getElementById("root")!).render(

@@ -28,13 +28,18 @@ export function useSettings() {
           throw new Error('Failed to fetch settings');
         }
       } catch (err) {
+        console.error('Settings fetch error:', err);
         setError(err instanceof Error ? err.message : 'Unknown error');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchSettings();
+    fetchSettings().catch(err => {
+      console.error('Unhandled settings fetch error:', err);
+      setError('Failed to load settings');
+      setLoading(false);
+    });
   }, []);
 
   return { settings, loading, error, refetch: () => setLoading(true) };
