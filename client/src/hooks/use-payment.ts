@@ -25,42 +25,24 @@ interface CreatePaymentSessionData {
 export function usePaymentSession(id: number) {
   return useQuery({
     queryKey: ["payment-session", id],
-    queryFn: async (): Promise<PaymentSession> => {
-      const response = await fetch(`/api/payment-sessions/${id}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch payment session");
-      }
-      return response.json();
-    },
     enabled: !!id,
+    retry: false,
   });
 }
 
 export function usePaymentSessionByOrderId(orderId: number) {
   return useQuery({
-    queryKey: ["payment-session", "order", orderId],
-    queryFn: async (): Promise<PaymentSession> => {
-      const response = await fetch(`/api/orders/${orderId}/payment-session`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch payment session for order");
-      }
-      return response.json();
-    },
+    queryKey: [`/api/orders/${orderId}/payment-session`],
     enabled: !!orderId,
+    retry: false,
   });
 }
 
 export function usePaymentSessionByBookingId(bookingId: number) {
   return useQuery({
-    queryKey: ["payment-session", "booking", bookingId],
-    queryFn: async (): Promise<PaymentSession> => {
-      const response = await fetch(`/api/bookings/${bookingId}/payment-session`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch payment session for booking");
-      }
-      return response.json();
-    },
+    queryKey: [`/api/bookings/${bookingId}/payment-session`],
     enabled: !!bookingId,
+    retry: false,
   });
 }
 
