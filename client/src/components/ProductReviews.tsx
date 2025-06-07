@@ -37,13 +37,8 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
   });
 
   useEffect(() => {
-    fetchReviews().catch(error => {
-      console.error('ProductReviews fetchReviews error:', error);
-      setLoading(false);
-    });
-    fetchAverageRating().catch(error => {
-      console.error('ProductReviews fetchAverageRating error:', error);
-    });
+    fetchReviews();
+    fetchAverageRating();
   }, [productId]);
 
   const fetchReviews = async () => {

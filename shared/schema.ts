@@ -1,120 +1,121 @@
 
 import { z } from "zod";
-import { pgTable, serial, text, integer, boolean, timestamp, decimal, jsonb } from "drizzle-orm/pg-core";
+// import { pgTable, serial, text, integer, boolean, timestamp, decimal, jsonb } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
+import { mysqlTable, int, varchar, text, boolean, timestamp, decimal, json} from "drizzle-orm/mysql-core"
 
 // Database tables using Drizzle ORM
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-  email: text("email").notNull().unique(),
-  fullName: text("full_name").notNull(),
-  role: text("role").notNull().default("customer"),
+export const users = mysqlTable("users", {
+  id: int().primaryKey().autoincrement(),
+  username: varchar("username",{ length: 255 }).notNull().unique(),
+  password: varchar("password",{ length: 255 }).notNull(),
+  email: varchar("email",{ length: 255 }).notNull().unique(),
+  fullName: varchar("full_name",{ length: 255 }).notNull(),
+  role: varchar("role",{ length: 255 }).notNull().default("customer"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const treatments = pgTable("treatments", {
-  id: serial("id").primaryKey(),
-  slug: text("slug").notNull().unique(),
-  title: text("title").notNull(),
+export const treatments = mysqlTable("treatments", {
+  id: int().primaryKey().autoincrement(),
+  slug: varchar("slug",{ length: 255 }).notNull().unique(),
+  title: varchar("title",{ length: 255 }).notNull(),
   description: text("description").notNull(),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
-  duration: integer("duration").notNull(),
-  image: text("image").notNull(),
+  duration: int("duration").notNull(),
+  image: varchar("image",{ length: 255 }).notNull(),
   featured: boolean("featured").default(false),
 });
 
-export const products = pgTable("products", {
-  id: serial("id").primaryKey(),
-  slug: text("slug").notNull().unique(),
-  title: text("title").notNull(),
+export const products = mysqlTable("products", {
+  id: int().primaryKey().autoincrement(),
+  slug: varchar("slug",{ length: 255 }).notNull().unique(),
+  title: varchar("title",{ length: 255 }).notNull(),
   description: text("description").notNull(),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
-  image: text("image").notNull(),
-  category: text("category").notNull(),
-  badge: text("badge"),
+  image: varchar("image",{ length: 255 }).notNull(),
+  category: varchar("category",{ length: 255 }).notNull(),
+  badge: varchar("badge",{ length: 255 }),
   featured: boolean("featured").default(false),
-  stockQuantity: integer("stock_quantity").default(0),
+  stockQuantity: int("stock_quantity").default(0),
 });
 
-export const bookings = pgTable("bookings", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id),
-  treatmentId: integer("treatment_id").references(() => treatments.id).notNull(),
-  date: text("date").notNull(),
-  time: text("time").notNull(),
-  status: text("status").notNull().default("pending"),
+export const bookings = mysqlTable("bookings", {
+  id: int().primaryKey().autoincrement(),
+  userId: int("user_id").references(() => users.id),
+  treatmentId: int("treatment_id").references(() => treatments.id).notNull(),
+  date: varchar("date",{ length: 100 }).notNull(),
+  time: varchar("time", { length: 100 }).notNull(),
+  status: varchar("status", { length: 100 }).notNull().default("pending"),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const orders = pgTable("orders", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id),
-  status: text("status").notNull().default("pending"),
+export const orders = mysqlTable("orders", {
+  id: int().primaryKey().autoincrement(),
+  userId: int("user_id").references(() => users.id),
+  status: varchar("status",{ length: 55 }).notNull().default("pending"),
   total: decimal("total", { precision: 10, scale: 2 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const orderItems = pgTable("order_items", {
-  id: serial("id").primaryKey(),
-  orderId: integer("order_id").references(() => orders.id).notNull(),
-  productId: integer("product_id").references(() => products.id),
-  quantity: integer("quantity").notNull(),
+export const orderItems = mysqlTable("order_items", {
+  id: int().primaryKey().autoincrement(),
+  orderId: int("order_id").references(() => orders.id).notNull(),
+  productId: int("product_id").references(() => products.id),
+  quantity: int("quantity").notNull(),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
 });
 
-export const testimonials = pgTable("testimonials", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
+export const testimonials = mysqlTable("testimonials", {
+  id: int().primaryKey().autoincrement(),
+  name: varchar("name",{ length: 255 }).notNull(),
   treatment: text("treatment").notNull(),
   rating: decimal("rating", { precision: 3, scale: 1 }).notNull(),
   content: text("content").notNull(),
-  initials: text("initials").notNull(),
+  initials: varchar("initials",{ length: 100 }).notNull(),
   featured: boolean("featured").default(false),
 });
 
-export const galleryItems = pgTable("gallery_items", {
-  id: serial("id").primaryKey(),
-  title: text("title").notNull(),
-  category: text("category").notNull(),
-  image: text("image").notNull(),
+export const galleryItems = mysqlTable("gallery_items", {
+  id: int().primaryKey().autoincrement(),
+  title: varchar("title", { length: 255 }).notNull(),
+  category: varchar("category",{ length: 200 }).notNull(),
+  image: varchar("image",{ length: 255 }).notNull(),
   featured: boolean("featured").default(false),
 });
 
-export const instagramPosts = pgTable("instagram_posts", {
-  id: serial("id").primaryKey(),
+export const instagramPosts = mysqlTable("instagram_posts", {
+  id: int().primaryKey().autoincrement(),
   image: text("image").notNull(),
-  likes: integer("likes").default(0),
+  likes: int("likes").default(0),
   url: text("url"),
 });
 
-export const productReviews = pgTable("product_reviews", {
-  id: serial("id").primaryKey(),
-  productId: integer("product_id").references(() => products.id).notNull(),
-  customerName: text("customer_name").notNull(),
-  rating: integer("rating").notNull(),
+export const productReviews = mysqlTable("product_reviews", {
+  id: int().primaryKey().autoincrement(),
+  productId: int("product_id").references(() => products.id).notNull(),
+  customerName: varchar("customer_name",{ length: 255 }).notNull(),
+  rating: int("rating").notNull(),
   reviewText: text("review_text").notNull(),
   verified: boolean("verified").default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const websiteSettings = pgTable("website_settings", {
-  id: serial("id").primaryKey(),
+export const websiteSettings = mysqlTable("website_settings", {
+  id: int().primaryKey().autoincrement(),
   bookingEnabled: boolean("booking_enabled").default(true),
   maintenanceMode: boolean("maintenance_mode").default(false),
-  businessHours: jsonb("business_hours").notNull(),
-  contactInfo: jsonb("contact_info").notNull(),
-  socialMedia: jsonb("social_media").notNull(),
-  siteContent: jsonb("site_content").notNull(),
+  businessHours: json("business_hours").notNull(),
+  contactInfo: json("contact_info").notNull(),
+  socialMedia: json("social_media").notNull(),
+  siteContent: json("site_content").notNull(),
 });
 
 // New table for Stripe payment sessions
-export const paymentSessions = pgTable("payment_sessions", {
-  id: serial("id").primaryKey(),
-  orderId: integer("order_id").references(() => orders.id),
-  bookingId: integer("booking_id").references(() => bookings.id),
+export const paymentSessions = mysqlTable("payment_sessions", {
+  id: int().primaryKey().autoincrement(),
+  orderId: int("order_id").references(() => orders.id),
+  bookingId: int("booking_id").references(() => bookings.id),
   stripeSessionId: text("stripe_session_id").notNull(),
   stripePaymentUrl: text("stripe_payment_url").notNull(),
   status: text("status").notNull().default("pending"),
@@ -124,10 +125,10 @@ export const paymentSessions = pgTable("payment_sessions", {
 });
 
 // Contact form submissions
-export const contactSubmissions = pgTable("contact_submissions", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  email: text("email").notNull(),
+export const contactSubmissions = mysqlTable("contact_submissions", {
+  id: int().primaryKey().autoincrement(),
+  name: varchar("name",{ length: 255 }).notNull(),
+  email: varchar("email",{ length: 255 }).notNull(),
   phone: text("phone").notNull(),
   subject: text("subject").notNull(),
   message: text("message").notNull(),
@@ -136,9 +137,9 @@ export const contactSubmissions = pgTable("contact_submissions", {
 });
 
 // Newsletter subscriptions
-export const newsletterSubscriptions = pgTable("newsletter_subscriptions", {
-  id: serial("id").primaryKey(),
-  email: text("email").notNull().unique(),
+export const newsletterSubscriptions = mysqlTable("newsletter_subscriptions", {
+  id: int().primaryKey().autoincrement(),
+  email: varchar("email",{ length: 255 }).notNull().unique(),
   status: text("status").notNull().default("active"), // active, unsubscribed
   subscribedAt: timestamp("subscribed_at").defaultNow().notNull(),
 });

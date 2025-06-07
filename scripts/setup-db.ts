@@ -8,7 +8,7 @@ async function setupDatabase() {
     console.log('Setting up database...');
     
     // Read and execute the migration file
-    const migrationPath = join(__dirname, '../migrations/0001_initial.sql');
+    const migrationPath = join(__dirname, '../migrations/0000_thankful_the_enforcers.sql');
     const migrationSQL = readFileSync(migrationPath, 'utf8');
     
     // Execute the migration
