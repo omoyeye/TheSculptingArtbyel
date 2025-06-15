@@ -85,7 +85,7 @@ export const useStore = create<StoreState>()(
           description: 'Natural technique using wooden tools to break down cellulite and aid in lymphatic drainage.',
           price: 40,
           duration: 30,
-          image: 'Before After Beauty Skincare Minimlasit Instagram Post.png',
+          image: 'Wood-Therapy.jpg',
         },
         {
           id: 'wood-therapy-60',
@@ -93,7 +93,7 @@ export const useStore = create<StoreState>()(
           description: 'Extended wood therapy session for deeper treatment and more comprehensive results.',
           price: 56.99,
           duration: 60,
-          image: 'Before After Beauty Skincare Minimlasit Instagram Post.png',
+          image: 'Wood-Therapy.jpg',
         },
         {
           id: 'lymphatic-drainage-30',
@@ -117,7 +117,7 @@ export const useStore = create<StoreState>()(
           description: 'Personalized post-op drainage massage designed specifically for post-operative recovery.',
           price: 45,
           duration: 30,
-          image: 'DE40158A-B168-46C1-B082-94E9F91478C5.jpeg',
+          image: 'recovery boost.jpeg',
         },
         {
           id: 'recovery-boost-60',
@@ -125,7 +125,7 @@ export const useStore = create<StoreState>()(
           description: 'Extended post-op drainage massage for comprehensive recovery support.',
           price: 55.90,
           duration: 60,
-          image: 'DE40158A-B168-46C1-B082-94E9F91478C5.jpeg',
+          image: 'recovery boost.jpeg',
         },
         {
           id: 'laser-lipo-45',
@@ -133,7 +133,7 @@ export const useStore = create<StoreState>()(
           description: 'Non-invasive treatment that uses advanced laser technology to break down stubborn fat cells.',
           price: 77,
           duration: 45,
-          image: 'FDAFD339-7FA3-4285-9421-7B79CAA669BF.jpeg',
+          image: 'laser lipo.jpeg',
         },
         {
           id: 'cavitation-45',
@@ -141,7 +141,7 @@ export const useStore = create<StoreState>()(
           description: 'Advanced ultrasound treatment that targets and reduces stubborn fat deposits.',
           price: 77,
           duration: 45,
-          image: 'IMG_3361.jpeg',
+          image: 'cavitation.jpeg',
         },
         {
           id: 'cavitation-vacuum-60',
@@ -149,7 +149,7 @@ export const useStore = create<StoreState>()(
           description: 'Combined treatment using ultrasound cavitation with vacuum therapy for enhanced fat reduction and skin tightening.',
           price: 90,
           duration: 60,
-          image: 'IMG_3361.jpeg',
+          image: 'cavitation.jpeg',
         },
         {
           id: 'deep-tissue-45',

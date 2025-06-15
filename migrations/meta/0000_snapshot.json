@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "4ae99f4c-0f6e-4aaf-a446-96e2c6418134",
+  "id": "9b7ce1e9-d898-408d-a40f-478339cb16ac",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "bookings": {
@@ -125,7 +125,7 @@
         },
         "email": {
           "name": "email",
-          "type": "varchar(255)",
+          "type": "varchar(100)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -292,7 +292,7 @@
         },
         "email": {
           "name": "email",
-          "type": "varchar(255)",
+          "type": "varchar(100)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -684,7 +684,7 @@
         },
         "slug": {
           "name": "slug",
-          "type": "varchar(255)",
+          "type": "varchar(200)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -719,14 +719,14 @@
         },
         "category": {
           "name": "category",
-          "type": "varchar(255)",
+          "type": "varchar(200)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "badge": {
           "name": "badge",
-          "type": "varchar(255)",
+          "type": "varchar(200)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -780,7 +780,7 @@
         },
         "name": {
           "name": "name",
-          "type": "varchar(255)",
+          "type": "varchar(200)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -847,7 +847,7 @@
         },
         "slug": {
           "name": "slug",
-          "type": "varchar(255)",
+          "type": "varchar(200)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -928,7 +928,7 @@
         },
         "username": {
           "name": "username",
-          "type": "varchar(255)",
+          "type": "varchar(200)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -942,7 +942,7 @@
         },
         "email": {
           "name": "email",
-          "type": "varchar(255)",
+          "type": "varchar(100)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false

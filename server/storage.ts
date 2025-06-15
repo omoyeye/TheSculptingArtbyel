@@ -41,10 +41,11 @@ import {
   type InsertContactSubmission,
   type NewsletterSubscription,
   type InsertNewsletterSubscription,
-} from "@shared/schema";
+} from "./schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
+// Define the storage interface
 // Define the storage interface
 export interface IStorage {
   // Users
@@ -152,11 +153,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(user: InsertUser): Promise<User> {
-    const [newUser] = await db
+    const result = await db
       .insert(users)
       .values(user)
-      .returning();
-    return newUser;
+      .$returningId();
+
+    const [u] = await db.select().from(users).where(eq(users.id, result[0].id));
+    return u || undefined;
   }
 
   async getTreatments(): Promise<Treatment[]> {
@@ -174,10 +177,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createTreatment(treatment: InsertTreatment): Promise<Treatment> {
-    const [newTreatment] = await db
+    const result = await db
       .insert(treatments)
       .values(treatment)
-      .returning();
+      .$returningId();
+
+    const [newTreatment] = await db.select().from(treatments).where(eq(treatments.id, result[0].id));
     return newTreatment;
   }
 
@@ -185,14 +190,15 @@ export class DatabaseStorage implements IStorage {
     const [updatedTreatment] = await db
       .update(treatments)
       .set(treatment)
-      .where(eq(treatments.id, id))
-      .returning();
-    return updatedTreatment || undefined;
+      .where(eq(treatments.id, id));
+
+    const [newTreatment] = await db.select().from(treatments).where(eq(treatments.id, id));
+    return newTreatment || undefined;
   }
 
   async deleteTreatment(id: number): Promise<boolean> {
     const result = await db.delete(treatments).where(eq(treatments.id, id));
-    return (result.rowCount ?? 0) > 0;
+    return true;
   }
 
   async getProducts(): Promise<Product[]> {
@@ -210,25 +216,28 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createProduct(product: InsertProduct): Promise<Product> {
-    const [newProduct] = await db
+    const result = await db
       .insert(products)
       .values(product)
-      .returning();
+      .$returningId();
+
+    const [newProduct] = await db.select().from(products).where(eq(products.id, result[0].id));
     return newProduct;
   }
 
   async updateProduct(id: number, product: Partial<InsertProduct>): Promise<Product | undefined> {
-    const [updatedProduct] = await db
+    const result = await db
       .update(products)
       .set(product)
-      .where(eq(products.id, id))
-      .returning();
+      .where(eq(products.id, id));
+
+    const [updatedProduct] = await db.select().from(products).where(eq(products.id, id));
     return updatedProduct || undefined;
   }
 
   async deleteProduct(id: number): Promise<boolean> {
     const result = await db.delete(products).where(eq(products.id, id));
-    return (result.rowCount ?? 0) > 0;
+    return true;
   }
 
   async getBookings(): Promise<Booking[]> {
@@ -245,25 +254,28 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createBooking(booking: InsertBooking): Promise<Booking> {
-    const [newBooking] = await db
+    const result = await db
       .insert(bookings)
       .values(booking)
-      .returning();
+      .$returningId();
+
+    const [newBooking] = await db.select().from(bookings).where(eq(bookings.id, result[0].id));  
     return newBooking;
   }
 
   async updateBookingStatus(id: number, status: string): Promise<Booking | undefined> {
-    const [updatedBooking] = await db
+    const result = await db
       .update(bookings)
       .set({ status })
-      .where(eq(bookings.id, id))
-      .returning();
+      .where(eq(bookings.id, id));
+    
+    const [updatedBooking] = await db.select().from(bookings).where(eq(bookings.id, id));  
     return updatedBooking || undefined;
   }
 
   async deleteBooking(id: number): Promise<boolean> {
     const result = await db.delete(bookings).where(eq(bookings.id, id));
-    return (result.rowCount ?? 0) > 0;
+    return true;
   }
 
   async getOrders(): Promise<Order[]> {
@@ -280,19 +292,22 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createOrder(order: InsertOrder): Promise<Order> {
-    const [newOrder] = await db
+    const result = await db
       .insert(orders)
       .values(order)
-      .returning();
+      .$returningId();
+
+    const [newOrder] = await db.select().from(orders).where(eq(orders.id, result[0].id));
     return newOrder;
   }
 
   async updateOrderStatus(id: number, status: string): Promise<Order | undefined> {
-    const [updatedOrder] = await db
+    const result = await db
       .update(orders)
       .set({ status })
-      .where(eq(orders.id, id))
-      .returning();
+      .where(eq(orders.id, id));
+    
+    const [updatedOrder] = await db.select().from(orders).where(eq(orders.id, id));
     return updatedOrder || undefined;
   }
 
@@ -301,11 +316,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createOrderItem(orderItem: InsertOrderItem): Promise<OrderItem> {
-    const [newOrderItem] = await db
+    const result = await db
       .insert(orderItems)
       .values(orderItem)
-      .returning();
-    return newOrderItem;
+      .$returningId();
+
+    const [newOrderItem] = await db.select().from(orderItems).where(eq(orderItems.id, result[0].id));
+    return newOrderItem || undefined;
   }
 
   async getTestimonials(): Promise<Testimonial[]> {
@@ -313,10 +330,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createTestimonial(testimonial: InsertTestimonial): Promise<Testimonial> {
-    const [newTestimonial] = await db
+    const result = await db
       .insert(testimonials)
       .values(testimonial)
-      .returning();
+      .$returningId();
+
+    const [newTestimonial] = await db.select().from(testimonials).where(eq(testimonials.id, result[0].id));
     return newTestimonial;
   }
 
@@ -329,11 +348,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createGalleryItem(galleryItem: InsertGalleryItem): Promise<GalleryItem> {
-    const [newGalleryItem] = await db
+    const result = await db
       .insert(galleryItems)
       .values(galleryItem)
-      .returning();
-    return newGalleryItem;
+      .$returningId();
+
+    const [newGalleryItem] = await db.select().from(galleryItems).where(eq(galleryItems.id, result[0].id));
+    return newGalleryItem || undefined;
   }
 
   async getInstagramPosts(): Promise<InstagramPost[]> {
@@ -341,10 +362,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createInstagramPost(instagramPost: InsertInstagramPost): Promise<InstagramPost> {
-    const [newInstagramPost] = await db
+    const result = await db
       .insert(instagramPosts)
       .values(instagramPost)
-      .returning();
+      .$returningId();
+
+    const [newInstagramPost] = await db.select().from(instagramPosts).where(eq(instagramPosts.id, result[0].id));
     return newInstagramPost;
   }
 
@@ -353,10 +376,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createProductReview(review: InsertProductReview): Promise<ProductReview> {
-    const [newReview] = await db
+    const result = await db
       .insert(productReviews)
       .values(review)
-      .returning();
+      .$returningId();
+
+    const [newReview] = await db.select().from(productReviews).where(eq(productReviews.id, result[0].id));
     return newReview;
   }
 
@@ -371,7 +396,7 @@ export class DatabaseStorage implements IStorage {
     const [settings] = await db.select().from(websiteSettings).limit(1);
     if (!settings) {
       // Create default settings if none exist
-      const defaultSettings = {
+      const defaultSettings = <WebsiteSettings> {
         bookingEnabled: true,
         maintenanceMode: false,
         businessHours: {
@@ -390,10 +415,11 @@ export class DatabaseStorage implements IStorage {
         }
       };
       
-      const [newSettings] = await db
+      const result = await db
         .insert(websiteSettings)
-        .values([defaultSettings])
-        .returning();
+        .values(defaultSettings);
+
+      const [newSettings] = await db.select().from(websiteSettings).limit(1);
       return newSettings;
     }
     return settings;
@@ -403,26 +429,30 @@ export class DatabaseStorage implements IStorage {
     const [existingSettings] = await db.select().from(websiteSettings).limit(1);
     
     if (!existingSettings) {
-      const [newSettings] = await db
+      const result = await db
         .insert(websiteSettings)
-        .values(settings as InsertWebsiteSettings)
-        .returning();
+        .values(settings as InsertWebsiteSettings);
+
+      const [newSettings] = await db.select().from(websiteSettings).limit(1);
       return newSettings;
     }
     
-    const [updatedSettings] = await db
+    const result = await db
       .update(websiteSettings)
       .set(settings)
-      .where(eq(websiteSettings.id, existingSettings.id))
-      .returning();
+      .where(eq(websiteSettings.id, existingSettings.id));
+
+    const [updatedSettings] = await db.select().from(websiteSettings).limit(1);
     return updatedSettings;
   }
 
   async createPaymentSession(paymentSession: InsertPaymentSession): Promise<PaymentSession> {
-    const [newPaymentSession] = await db
+    const result = await db
       .insert(paymentSessions)
       .values(paymentSession)
-      .returning();
+      .$returningId();
+      
+    const [newPaymentSession] = await db.select().from(paymentSessions).where(eq(paymentSessions.id, result[0].id));
     return newPaymentSession;
   }
 
@@ -447,19 +477,22 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updatePaymentSessionStatus(id: number, status: string): Promise<PaymentSession | undefined> {
-    const [updatedSession] = await db
+    const result = await db
       .update(paymentSessions)
       .set({ status })
-      .where(eq(paymentSessions.id, id))
-      .returning();
+      .where(eq(paymentSessions.id, id));
+
+    const [updatedSession] = await db.select().from(paymentSessions).where(eq(paymentSessions.id, id));
     return updatedSession || undefined;
   }
 
   async createContactSubmission(submission: InsertContactSubmission): Promise<ContactSubmission> {
-    const [newSubmission] = await db
+    const result = await db
       .insert(contactSubmissions)
       .values(submission)
-      .returning();
+      .$returningId();
+
+    const [newSubmission] = await db.select().from(contactSubmissions).where(eq(contactSubmissions.id, result[0].id));
     return newSubmission;
   }
 
@@ -468,19 +501,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateContactSubmissionStatus(id: number, status: string): Promise<ContactSubmission | undefined> {
-    const [updatedSubmission] = await db
+    const result = await db
       .update(contactSubmissions)
       .set({ status })
-      .where(eq(contactSubmissions.id, id))
-      .returning();
+      .where(eq(contactSubmissions.id, id));
+
+    const [updatedSubmission] = await db.select().from(contactSubmissions).where(eq(contactSubmissions.id, id));
     return updatedSubmission || undefined;
   }
 
   async createNewsletterSubscription(subscription: InsertNewsletterSubscription): Promise<NewsletterSubscription> {
-    const [newSubscription] = await db
+    const result = await db
       .insert(newsletterSubscriptions)
       .values(subscription)
-      .returning();
+      .$returningId();
+
+    const [newSubscription] = await db.select().from(newsletterSubscriptions).where(eq(newsletterSubscriptions.id, result[0].id));
+  
     return newSubscription;
   }
 
@@ -494,11 +531,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateNewsletterSubscriptionStatus(email: string, status: string): Promise<NewsletterSubscription | undefined> {
-    const [updatedSubscription] = await db
+    const result = await db
       .update(newsletterSubscriptions)
       .set({ status })
-      .where(eq(newsletterSubscriptions.email, email))
-      .returning();
+      .where(eq(newsletterSubscriptions.email, email));
+
+    const [updatedSubscription] = await db.select().from(newsletterSubscriptions).where(eq(newsletterSubscriptions.email, email));
+
     return updatedSubscription || undefined;
   }
 

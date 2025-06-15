@@ -269,8 +269,8 @@ export default function Contact() {
                     <div>
                       <h3 className="font-bold text-lg mb-2 text-gray-900">Email Us</h3>
                       <p className="text-gray-700 font-medium">
-                        <a href="mailto:Businesselom@gmail.com" className="hover:text-secondary font-semibold transition-colors duration-200">
-                          Businesselom@gmail.com
+                        <a href="mailto:info@thesculptingartbyel.com" target="_blank" className="hover:text-secondary font-semibold transition-colors duration-200">
+                        info@thesculptingartbyel.com
                         </a>
                       </p>
                     </div>

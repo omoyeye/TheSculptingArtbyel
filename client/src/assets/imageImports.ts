@@ -11,6 +11,10 @@ import screenshot154211 from './images/Screenshot 2025-05-04 154211.png';
 import screenshot160111 from './images/Screenshot 2025-05-04 160111.png';
 import waistTrainer1 from './images/1.jpg';
 import waistTrainer2 from './images/2.jpg';
+import cavitation from './images/cavitation.jpeg';
+import laserLipo from './images/laser lipo.jpeg';
+import recoveryBoost from './images/recovery boost.jpeg';
+import woodTherapy from './images/Wood-Therapy.jpg';
 
 // Define a map for easy lookup by filename
 const imageMap: Record<string, string> = {
@@ -26,6 +30,10 @@ const imageMap: Record<string, string> = {
   'Screenshot 2025-05-04 160111.png': screenshot160111,
   '1.jpg': waistTrainer1,
   '2.jpg': waistTrainer2,
+  'Wood-Therapy.jpg': woodTherapy,
+  'cavitation.jpeg': cavitation,
+  'laser lipo.jpeg': laserLipo,
+  'recovery boost.jpeg': recoveryBoost
 };
 
 // Helper function to get image by filename
@@ -46,5 +54,9 @@ export {
   screenshot154211,
   screenshot160111,
   waistTrainer1,
-  waistTrainer2
+  waistTrainer2,
+  woodTherapy,
+  cultivation,
+  laserLipo,
+  recoveryBoost
 };

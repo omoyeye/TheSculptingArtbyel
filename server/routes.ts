@@ -1,5 +1,5 @@
-import type { Express, Request, Response } from "express";
-import { createServer, type Server } from "http";
+import express, { Request, Response, Router } from 'express';
+
 import { storage } from "./storage";
 import { pool } from "./db";
 import { z } from "zod";
@@ -94,7 +94,8 @@ const insertPaymentSessionSchema = z.object({
   stripePaymentUrl: z.string(),
   status: z.string().default("pending"),
   amount: z.number(),
-  expiresAt: z.string().transform((val) => new Date(val)),
+  // expiresAt: z.string().transform((val) => new Date(val)),
+  expiresAt: z.string()
 });
 
 const insertContactSubmissionSchema = z.object({
@@ -128,22 +129,24 @@ function validateBody<T>(schema: z.ZodType<T>) {
   };
 }
 
-export async function registerRoutes(app: Express): Promise<Server> {
+
+const router = Router();
+
   // API routes for treatments
-  app.get("/api/treatments", async (req, res) => {
+  router.get("/api/treatments", async (req, res) => {
     try {
       const treatments = await storage.getTreatments();
       res.json(treatments);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch treatments" });
+      res.status(500).json({ message: "Failed to fetch treatments "+ error });
     }
   });
   
-  app.get("/api/treatments/:slug", async (req, res) => {
+  router.get("/api/treatments/:slug", async (req: Request, res: Response) => {
     try {
       const treatment = await storage.getTreatmentBySlug(req.params.slug);
       if (!treatment) {
-        return res.status(404).json({ message: "Treatment not found" });
+        res.status(404).json({ message: "Treatment not found" });
       }
       res.json(treatment);
     } catch (error) {
@@ -151,21 +154,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.post("/api/treatments", validateBody(insertTreatmentSchema), async (req, res) => {
+  router.post("/api/treatments", validateBody(insertTreatmentSchema), async (req, res) => {
     try {
       const treatment = await storage.createTreatment(req.body);
       res.status(201).json(treatment);
     } catch (error) {
-      res.status(500).json({ message: "Failed to create treatment" });
+      res.status(500).json({ message: "Failed to create treatment"+ error });
     }
   });
   
-  app.put("/api/treatments/:id", async (req, res) => {
+  router.put("/api/treatments/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const treatment = await storage.updateTreatment(id, req.body);
       if (!treatment) {
-        return res.status(404).json({ message: "Treatment not found" });
+        res.status(404).json({ message: "Treatment not found" });
       }
       res.json(treatment);
     } catch (error) {
@@ -173,12 +176,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.delete("/api/treatments/:id", async (req, res) => {
+  router.delete("/api/treatments/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const success = await storage.deleteTreatment(id);
       if (!success) {
-        return res.status(404).json({ message: "Treatment not found" });
+        res.status(404).json({ message: "Treatment not found" });
       }
       res.status(204).send();
     } catch (error) {
@@ -187,7 +190,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // API routes for products
-  app.get("/api/products", async (req, res) => {
+  router.get("/api/products", async (req, res) => {
     try {
       const products = await storage.getProducts();
       res.json(products);
@@ -196,11 +199,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.get("/api/products/:slug", async (req, res) => {
+  router.get("/api/products/:slug", async (req, res) => {
     try {
       const product = await storage.getProductBySlug(req.params.slug);
       if (!product) {
-        return res.status(404).json({ message: "Product not found" });
+        res.status(404).json({ message: "Product not found" });
       }
       res.json(product);
     } catch (error) {
@@ -208,7 +211,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.post("/api/products", validateBody(insertProductSchema), async (req, res) => {
+  router.post("/api/products", validateBody(insertProductSchema), async (req, res) => {
     try {
       const product = await storage.createProduct(req.body);
       res.status(201).json(product);
@@ -217,12 +220,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.put("/api/products/:id", async (req, res) => {
+  router.put("/api/products/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const product = await storage.updateProduct(id, req.body);
       if (!product) {
-        return res.status(404).json({ message: "Product not found" });
+       res.status(404).json({ message: "Product not found" });
       }
       res.json(product);
     } catch (error) {
@@ -230,12 +233,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.delete("/api/products/:id", async (req, res) => {
+  router.delete("/api/products/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const success = await storage.deleteProduct(id);
       if (!success) {
-        return res.status(404).json({ message: "Product not found" });
+        res.status(404).json({ message: "Product not found" });
       }
       res.status(204).send();
     } catch (error) {
@@ -244,7 +247,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // API routes for bookings
-  app.get("/api/bookings", async (req, res) => {
+  router.get("/api/bookings", async (req, res) => {
     try {
       const bookings = await storage.getBookings();
       res.json(bookings);
@@ -253,12 +256,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.get("/api/bookings/:id", async (req, res) => {
+  router.get("/api/bookings/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const booking = await storage.getBooking(id);
       if (!booking) {
-        return res.status(404).json({ message: "Booking not found" });
+        res.status(404).json({ message: "Booking not found" });
       }
       res.json(booking);
     } catch (error) {
@@ -266,12 +269,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.post("/api/bookings", validateBody(insertBookingSchema), async (req, res) => {
+  router.post("/api/bookings", validateBody(insertBookingSchema), async (req, res) => {
     try {
       // Check if booking is enabled
       const settings = await storage.getWebsiteSettings();
       if (!settings.bookingEnabled) {
-        return res.status(503).json({ 
+        res.status(503).json({ 
           message: "Booking system is currently disabled. Please contact us directly to schedule your appointment." 
         });
       }
@@ -283,18 +286,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.put("/api/bookings/:id/status", async (req, res) => {
+  router.put("/api/bookings/:id/status", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const { status } = req.body;
       
       if (!status || typeof status !== 'string') {
-        return res.status(400).json({ message: "Status is required" });
+        res.status(400).json({ message: "Status is required" });
       }
       
       const booking = await storage.updateBookingStatus(id, status);
       if (!booking) {
-        return res.status(404).json({ message: "Booking not found" });
+        res.status(404).json({ message: "Booking not found" });
       }
       res.json(booking);
     } catch (error) {
@@ -302,12 +305,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.delete("/api/bookings/:id", async (req, res) => {
+  router.delete("/api/bookings/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const success = await storage.deleteBooking(id);
       if (!success) {
-        return res.status(404).json({ message: "Booking not found" });
+        res.status(404).json({ message: "Booking not found" });
       }
       res.status(204).send();
     } catch (error) {
@@ -316,7 +319,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Create order with instant download data
-  app.post("/api/create-order-download", async (req, res) => {
+  router.post("/api/create-order-download", async (req, res) => {
     try {
       const { customerInfo, total, items } = req.body;
       
@@ -433,7 +436,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // API route to get payment URL for products/bookings
-  app.get("/api/payment-url/:type/:id", async (req, res) => {
+  router.get("/api/payment-url/:type/:id", async (req, res) => {
     try {
       // Return the Stripe checkout URL
       const paymentUrl = "https://buy.stripe.com/fZufZidtE52l9PseC0a7C00";
@@ -447,7 +450,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
   // API routes for orders
-  app.get("/api/orders", async (req, res) => {
+  router.get("/api/orders", async (req, res) => {
     try {
       const orders = await storage.getOrders();
       res.json(orders);
@@ -456,12 +459,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.get("/api/orders/:id", async (req, res) => {
+  router.get("/api/orders/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const order = await storage.getOrder(id);
       if (!order) {
-        return res.status(404).json({ message: "Order not found" });
+        res.status(404).json({ message: "Order not found" });
       }
       
       // Get order items
@@ -473,7 +476,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.post("/api/orders", validateBody(insertOrderSchema), async (req, res) => {
+  router.post("/api/orders", validateBody(insertOrderSchema), async (req, res) => {
     try {
       const { items, ...orderData } = req.body;
       
@@ -496,18 +499,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.put("/api/orders/:id/status", async (req, res) => {
+  router.put("/api/orders/:id/status", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const { status } = req.body;
       
       if (!status || typeof status !== 'string') {
-        return res.status(400).json({ message: "Status is required" });
+        res.status(400).json({ message: "Status is required" });
       }
       
       const order = await storage.updateOrderStatus(id, status);
       if (!order) {
-        return res.status(404).json({ message: "Order not found" });
+        res.status(404).json({ message: "Order not found" });
       }
       res.json(order);
     } catch (error) {
@@ -516,7 +519,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // API routes for testimonials
-  app.get("/api/testimonials", async (req, res) => {
+  router.get("/api/testimonials", async (req, res) => {
     try {
       const testimonials = await storage.getTestimonials();
       res.json(testimonials);
@@ -525,7 +528,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.post("/api/testimonials", validateBody(insertTestimonialSchema), async (req, res) => {
+  router.post("/api/testimonials", validateBody(insertTestimonialSchema), async (req, res) => {
     try {
       const testimonial = await storage.createTestimonial(req.body);
       res.status(201).json(testimonial);
@@ -535,13 +538,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // API routes for gallery
-  app.get("/api/gallery", async (req, res) => {
+  router.get("/api/gallery", async (req: Request, res: Response) => {
     try {
       const category = req.query.category as string;
       
       if (category) {
         const items = await storage.getGalleryItemsByCategory(category);
-        return res.json(items);
+        res.json(items);
       }
       
       const items = await storage.getGalleryItems();
@@ -551,7 +554,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.post("/api/gallery", validateBody(insertGalleryItemSchema), async (req, res) => {
+  router.post("/api/gallery", validateBody(insertGalleryItemSchema), async (req, res) => {
     try {
       const galleryItem = await storage.createGalleryItem(req.body);
       res.status(201).json(galleryItem);
@@ -561,7 +564,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // API routes for Instagram posts
-  app.get("/api/instagram", async (req, res) => {
+  router.get("/api/instagram", async (req, res) => {
     try {
       const posts = await storage.getInstagramPosts();
       res.json(posts);
@@ -570,7 +573,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.post("/api/instagram", validateBody(insertInstagramPostSchema), async (req, res) => {
+  router.post("/api/instagram", validateBody(insertInstagramPostSchema), async (req, res) => {
     try {
       const post = await storage.createInstagramPost(req.body);
       res.status(201).json(post);
@@ -580,7 +583,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Product Reviews routes
-  app.get("/api/products/:id/reviews", async (req, res) => {
+  router.get("/api/products/:id/reviews", async (req, res) => {
     try {
       const productId = parseInt(req.params.id);
       const reviews = await storage.getProductReviews(productId);
@@ -590,7 +593,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/products/:id/reviews", validateBody(insertProductReviewSchema), async (req, res) => {
+  router.post("/api/products/:id/reviews", validateBody(insertProductReviewSchema), async (req, res) => {
     try {
       const productId = parseInt(req.params.id);
       const reviewData = { ...req.body, productId };
@@ -601,7 +604,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/products/:id/rating", async (req, res) => {
+  router.get("/api/products/:id/rating", async (req, res) => {
     try {
       const productId = parseInt(req.params.id);
       const averageRating = await storage.getAverageRating(productId);
@@ -612,17 +615,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // API routes for authentication
-  app.post("/api/register", validateBody(insertUserSchema), async (req, res) => {
+  router.post("/api/register", validateBody(insertUserSchema), async (req, res) => {
     try {
       // Check if username or email already exists
       const existingUserByUsername = await storage.getUserByUsername(req.body.username);
       if (existingUserByUsername) {
-        return res.status(400).json({ message: "Username already exists" });
+        res.status(400).json({ message: "Username already exists" });
       }
       
       const existingUserByEmail = await storage.getUserByEmail(req.body.email);
       if (existingUserByEmail) {
-        return res.status(400).json({ message: "Email already exists" });
+        res.status(400).json({ message: "Email already exists" });
       }
       
       // Create user
@@ -637,22 +640,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.post("/api/login", async (req, res) => {
+  router.post("/api/login", async (req, res) => {
     try {
       const { username, password } = req.body;
       
       if (!username || !password) {
-        return res.status(400).json({ message: "Username and password are required" });
+        res.status(400).json({ message: "Username and password are required" });
       }
       
       const user = await storage.getUserByUsername(username);
       if (!user || user.password !== password) {
-        return res.status(401).json({ message: "Invalid credentials" });
+        res.status(401).json({ message: "Invalid credentials" });
       }
       
       // In a real app, we would use JWT or sessions for authentication
       // For simplicity, we'll just return the user without the password
-      const { password: _, ...userWithoutPassword } = user;
+      const { ...userWithoutPassword } = user;
       
       res.json(userWithoutPassword);
     } catch (error) {
@@ -661,7 +664,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // API routes for website settings (Admin functionality)
-  app.get("/api/settings", async (req, res) => {
+  router.get("/api/settings", async (req, res) => {
     try {
       const settings = await storage.getWebsiteSettings();
       res.json(settings);
@@ -670,7 +673,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/settings", async (req, res) => {
+  router.put("/api/settings", async (req, res) => {
     try {
       const settings = await storage.updateWebsiteSettings(req.body);
       res.json(settings);
@@ -680,7 +683,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin-specific routes for managing bookings and orders
-  app.get("/api/orders", async (req, res) => {
+  router.get("/api/orders", async (req, res) => {
     try {
       const orders = await storage.getOrders();
       
@@ -697,7 +700,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/bookings", async (req, res) => {
+  router.get("/api/bookings", async (req, res) => {
     try {
       const bookings = await storage.getBookings();
       res.json(bookings);
@@ -708,7 +711,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Contact form submission endpoint
-  app.post("/api/contact", validateBody(insertContactSubmissionSchema), async (req, res) => {
+  router.post("/api/contact", validateBody(insertContactSubmissionSchema), async (req, res) => {
     try {
       const contactData = req.body;
       const submission = await storage.createContactSubmission(contactData);
@@ -720,7 +723,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Newsletter subscription endpoint
-  app.post("/api/newsletter", validateBody(insertNewsletterSubscriptionSchema), async (req, res) => {
+  router.post("/api/newsletter", validateBody(insertNewsletterSubscriptionSchema), async (req, res) => {
     try {
       const { email } = req.body;
       
@@ -728,11 +731,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const existing = await storage.getNewsletterSubscriptionByEmail(email);
       if (existing) {
         if (existing.status === 'active') {
-          return res.status(400).json({ message: "Email already subscribed" });
+          res.status(400).json({ message: "Email already subscribed" });
         } else {
           // Reactivate subscription
           await storage.updateNewsletterSubscriptionStatus(email, 'active');
-          return res.json({ message: "Subscription reactivated successfully" });
+          res.json({ message: "Subscription reactivated successfully" });
         }
       }
       
@@ -745,7 +748,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin endpoints for contact submissions and newsletter subscriptions
-  app.get("/api/contact-submissions", async (req, res) => {
+  router.get("/api/contact-submissions", async (req, res) => {
     try {
       const submissions = await storage.getContactSubmissions();
       res.json(submissions);
@@ -755,7 +758,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/newsletter-subscriptions", async (req, res) => {
+  router.get("/api/newsletter-subscriptions", async (req, res) => {
     try {
       const subscriptions = await storage.getNewsletterSubscriptions();
       res.json(subscriptions);
@@ -764,13 +767,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch newsletter subscriptions" });
     }
   });
-  app.put("/api/bookings/:id/status", async (req, res) => {
+  router.put("/api/bookings/:id/status", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const { status } = req.body;
       const booking = await storage.updateBookingStatus(id, status);
       if (!booking) {
-        return res.status(404).json({ message: "Booking not found" });
+        res.status(404).json({ message: "Booking not found" });
       }
       res.json(booking);
     } catch (error) {
@@ -778,12 +781,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/bookings/:id", async (req, res) => {
+  router.delete("/api/bookings/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const success = await storage.deleteBooking(id);
       if (!success) {
-        return res.status(404).json({ message: "Booking not found" });
+        res.status(404).json({ message: "Booking not found" });
       }
       res.status(204).send();
     } catch (error) {
@@ -792,7 +795,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Payment session routes
-  app.post("/api/payment-sessions", validateBody(insertPaymentSessionSchema), async (req, res) => {
+  router.post("/api/payment-sessions", validateBody(insertPaymentSessionSchema), async (req, res) => {
     try {
       const paymentSession = await storage.createPaymentSession(req.body);
       res.status(201).json(paymentSession);
@@ -801,12 +804,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/payment-sessions/:id", async (req, res) => {
+  router.get("/api/payment-sessions/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const paymentSession = await storage.getPaymentSession(id);
       if (!paymentSession) {
-        return res.status(404).json({ message: "Payment session not found" });
+        res.status(404).json({ message: "Payment session not found" });
       }
       res.json(paymentSession);
     } catch (error) {
@@ -814,12 +817,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/payment-sessions/stripe/:stripeSessionId", async (req, res) => {
+  router.get("/api/payment-sessions/stripe/:stripeSessionId", async (req, res) => {
     try {
       const stripeSessionId = req.params.stripeSessionId;
       const paymentSession = await storage.getPaymentSessionByStripeId(stripeSessionId);
       if (!paymentSession) {
-        return res.status(404).json({ message: "Payment session not found" });
+        res.status(404).json({ message: "Payment session not found" });
       }
       res.json(paymentSession);
     } catch (error) {
@@ -827,12 +830,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/orders/:orderId/payment-session", async (req, res) => {
+  router.get("/api/orders/:orderId/payment-session", async (req, res) => {
     try {
       const orderId = parseInt(req.params.orderId);
       const paymentSession = await storage.getPaymentSessionByOrderId(orderId);
       if (!paymentSession) {
-        return res.status(404).json({ message: "Payment session not found for this order" });
+        res.status(404).json({ message: "Payment session not found for this order" });
       }
       res.json(paymentSession);
     } catch (error) {
@@ -840,12 +843,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/bookings/:bookingId/payment-session", async (req, res) => {
+  router.get("/api/bookings/:bookingId/payment-session", async (req, res) => {
     try {
       const bookingId = parseInt(req.params.bookingId);
       const paymentSession = await storage.getPaymentSessionByBookingId(bookingId);
       if (!paymentSession) {
-        return res.status(404).json({ message: "Payment session not found for this booking" });
+        res.status(404).json({ message: "Payment session not found for this booking" });
       }
       res.json(paymentSession);
     } catch (error) {
@@ -853,18 +856,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/payment-sessions/:id/status", async (req, res) => {
+  router.put("/api/payment-sessions/:id/status", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const { status } = req.body;
       
       if (!status || typeof status !== 'string') {
-        return res.status(400).json({ message: "Status is required" });
+        res.status(400).json({ message: "Status is required" });
       }
       
       const paymentSession = await storage.updatePaymentSessionStatus(id, status);
       if (!paymentSession) {
-        return res.status(404).json({ message: "Payment session not found" });
+         res.status(404).json({ message: "Payment session not found" });
       }
       res.json(paymentSession);
     } catch (error) {
@@ -872,8 +875,4 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Create HTTP server
-  const httpServer = createServer(app);
-  
-  return httpServer;
-}
+  export default router

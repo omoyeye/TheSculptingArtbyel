@@ -113,7 +113,7 @@ Phone: ${orderData.customerInfo.phone}
 ORDER ITEMS:
 ${orderData.items.map((item: any) => `- ${item.title || 'Item'} x${item.quantity || 1} - £${item.price}`).join('\n')}
 
-TOTAL: £${orderData.total}
+TOTAL: ${formatCurrency(orderData.total)}
 
 BUSINESS CONTACT:
 ${orderData.businessInfo.name}
