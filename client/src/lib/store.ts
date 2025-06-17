@@ -157,7 +157,7 @@ export const useStore = create<StoreState>()(
           description: 'Focused massage that targets deeper layers of muscle and connective tissue for relief from chronic tension.',
           price: 39,
           duration: 45,
-          image: 'Soft Brown Massage Treatment Relaxing Your Body Instagram Story.png',
+          image: 'Deep Tissue Massage.jpeg',
         },
         {
           id: 'relaxing-massage-45',
@@ -165,7 +165,7 @@ export const useStore = create<StoreState>()(
           description: 'Gentle, soothing massage designed to relieve stress and promote overall relaxation.',
           price: 39,
           duration: 45,
-          image: 'Soft Brown Massage Treatment Relaxing Your Body Instagram Story.png',
+          image: 'Relaxing Massage.jpeg',
         },
         {
           id: 'package-one',

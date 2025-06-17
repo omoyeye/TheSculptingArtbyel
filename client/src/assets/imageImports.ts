@@ -15,6 +15,8 @@ import cavitation from './images/cavitation.jpeg';
 import laserLipo from './images/laser lipo.jpeg';
 import recoveryBoost from './images/recovery boost.jpeg';
 import woodTherapy from './images/Wood-Therapy.jpg';
+import relaxingMassage from './images/Relaxing Massage.jpeg';
+import deepTissueMassage from './images/Deep Tissue Massage.jpeg';
 
 // Define a map for easy lookup by filename
 const imageMap: Record<string, string> = {
@@ -33,7 +35,9 @@ const imageMap: Record<string, string> = {
   'Wood-Therapy.jpg': woodTherapy,
   'cavitation.jpeg': cavitation,
   'laser lipo.jpeg': laserLipo,
-  'recovery boost.jpeg': recoveryBoost
+  'recovery boost.jpeg': recoveryBoost,
+  'Relaxing Massage.jpeg': relaxingMassage,
+  'Deep Tissue Massage.jpeg': deepTissueMassage
 };
 
 // Helper function to get image by filename

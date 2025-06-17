@@ -167,10 +167,10 @@ href="https://www.instagram.com/the_sculptingartbyel/"
               <li className="flex items-center">
                 <Mail className="h-5 w-5 text-black mr-3" />
                 <a
-                  href="mailto:Businesselom@gmail.com"
+                  href="mailto:info@thesculptingartbyel.com"
                   className="text-black hover:text-gray-700 transition duration-300"
                 >
-                  Businesselom@gmail.com
+                  info@thesculptingartbyel.com
                 </a>
               </li>
               <li className="mt-3">
